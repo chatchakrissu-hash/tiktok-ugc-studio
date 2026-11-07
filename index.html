@@ -636,12 +636,12 @@
 
         <div>
           <div class="section-label">
-            3. เลือกแนวคลิปจาก 12 แนวหลัก (ตามสูตร Creative Director 2026)
+            3. เลือกแนวคลิปจาก 16 แนวหลัก (12 แนวครีเอเตอร์ + 4 แนวฮาร์ดเซล โกดัง/โรงงาน/หน้าร้าน)
             <span class="opt-tag">เลือก 1 แนว หรือให้ AI เลือกแนวที่หยุดนิ้วดีที่สุดให้อัตโนมัติ</span>
           </div>
           <div class="chips" id="styleChips">
             <div class="chip full-row active" data-val="auto" onclick="selectChip(this)">
-              ✨ ให้ AI Creative Director วิเคราะห์สินค้าแล้วเลือกแนวที่หยุดนิ้วและขายดีที่สุดให้อัตโนมัติ (แนะนำ)
+              ✨ ให้ AI Creative Director + Social Media Skills วิเคราะห์สินค้าแล้วเลือกแนวที่ขายดีที่สุดให้อัตโนมัติ (แนะนำ)
             </div>
             <div class="chip" data-val="1. Real-Use Demo (ใช้งานจริงให้เห็นผลชัด): เปิดด้วยปัญหาหรือสถานการณ์จริง หยิบสินค้ามาใช้ให้เห็น Action Proof และผลลัพธ์คาตา" onclick="selectChip(this)">
               🛠️ 1. Real-Use Demo (ใช้งานจริงให้เห็นผลชัด)
@@ -679,17 +679,33 @@
             <div class="chip" data-val="12. Social Proof / ตอบกลับรีวิวลูกค้า (อบอุ่น จริงใจ ตอกย้ำความมั่นใจ): ขอบคุณลูกค้าหรือหยิบจุดที่คนชมเยอะมาโชว์ของจริงให้ดูชัดๆ" onclick="selectChip(this)">
               💬 12. Social Proof / ตอบกลับรีวิวลูกค้าอย่างอบอุ่น
             </div>
+            <!-- 4 New Hard-Sell / Warehouse / Market / Mall Styles -->
+            <div class="chip" style="border-color: rgba(255,214,0,0.45);" data-val="13. โกดัง/โรงงานมาเอง ฮาร์ดเซลราคาหน้าโรงงาน (Warehouse / Factory Direct Hard-Sell): ฉากหลังเป็นโกดังสินค้าลังเรียงซ้อนกันสูง เจ้าของโกดังหรือคนงานหยิบสินค้าจากลังมาโชว์จะๆ พูดจังหวะเร้าใจ กระชับ บอกโปรราคาหน้าโรงงาน เน้นความคุ้มค่าแบบฮาร์ดเซล" onclick="selectChip(this)">
+              🏭 13. โกดัง/โรงงานปล่อยของเอง (ฮาร์ดเซล ราคาหน้าโรงงาน)
+            </div>
+            <div class="chip" style="border-color: rgba(255,214,0,0.45);" data-val="14. พ่อค้าแม่ค้าหน้าร้าน / ตลาดค้าส่ง (Market / Wholesale Shopfront Hard-Sell): ฉากหน้าร้านค้าส่งหรือแผงใหญ่ในตลาด เถ้าแก่/แม่ค้าถือสินค้าโชว์ให้เห็นความหนา/ขนาดจริง พูดฮาร์ดเซลขายเก่ง ชูโปรแรง ชวนกดตะกร้าเหลืองทันที" onclick="selectChip(this)">
+              🏪 14. พ่อค้าแม่ค้าหน้าร้าน/ตลาดค้าส่ง (ฮาร์ดเซล ขายมันส์)
+            </div>
+            <div class="chip" style="border-color: rgba(255,214,0,0.45);" data-val="15. พนักงานขายในห้าง / โชว์รูมแนะนำโปรเด็ด (Mall / Showroom Salesperson Pitch): ฉากเชลฟ์สินค้าในห้างหรือโชว์รูมสว่างสวย พนักงานขายมืออาชีพหยิบสินค้ามาเทสต์ให้ดูชัดๆ บอกโปรลดหนักน่าเชื่อถือ ปิดการขายคมๆ" onclick="selectChip(this)">
+              🏬 15. พนักงานขายในห้าง/โชว์รูม (ฮาร์ดเซล โปรห้างลดหนัก)
+            </div>
+            <div class="chip" style="border-color: rgba(255,214,0,0.45);" data-val="16. คนงานแพ็กของหน้าลัง / สต็อกแน่นพร้อมส่ง (Packing Station / Bulk Stock Hard-Sell): ฉากโต๊ะแพ็กของในโกดังที่มีสต็อกสินค้ากองแน่น คนงานหยิบสินค้าตัวจริงมาโชว์งานก่อนลงกล่อง บอกโปรราคาส่งจากคลังโดยตรง" onclick="selectChip(this)">
+              📦 16. คนงานแพ็กของหน้าคลัง (โชว์ของจริงก่อนส่ง + โปรราคาคลัง)
+            </div>
           </div>
-          <input type="text" id="customStyle" placeholder="พิมพ์สั่งแนวความต้องการเพิ่มเติมได้ตามใจชอบ (หรือเว้นว่างไว้ได้เลย)..." />
+          <input type="text" id="customStyle" placeholder="พิมพ์สั่งแนวความต้องการเพิ่มเติมได้ตามใจชอบ เช่น 'ขอคนงานผู้ชายยืนหน้าลังสินค้าในโกดัง พูดเสียงดังฟังชัดเน้นโปรลดหนัก' (หรือเว้นว่างไว้ได้เลย)..." />
         </div>
       </div>
 
       <button class="btn-generate" id="btnGenerate" onclick="generateAll()">
         <span>🚀 วิเคราะห์ภาพ & สร้างชุดสคริปต์ + Kling Prompt (รวมบทพูดไทย) ทั้งหมด</span>
       </button>
-      <div style="text-align: center; margin-top: 10px;">
+      <div style="text-align: center; margin-top: 10px; display: flex; justify-content: center; gap: 8px; flex-wrap: wrap;">
         <button class="btn-copy" onclick="loadDemoSample()" style="font-size: 13px; color: var(--accent-2); border-color: rgba(37,244,238,0.35);">
-          👁️ กดดูตัวอย่างผลลัพธ์จริง (พรมห้องครัว 79 บาท ลด 78% ➡️ เซฟเป็น "ไม่ถึงร้อย" & "ลด 75%")
+          👁️ ตัวอย่างแนวที่ 1: Real-Use Demo (ใช้งานจริงในครัว)
+        </button>
+        <button class="btn-copy" onclick="loadWarehouseSample()" style="font-size: 13px; color: var(--gold); border-color: rgba(255,214,0,0.45);">
+          🏭 ตัวอย่างแนวที่ 13: โกดังปล่อยของ ราคาโรงงาน (ฮาร์ดเซล)
         </button>
       </div>
 
@@ -985,15 +1001,18 @@
       selectedChipStyle = el.getAttribute('data-val');
     }
 
-    // 3. Core Skill System Prompt (Creative Director v3.1 + TikTok Affiliate Gem 2026 + 5-Aspect Kling + Anti-Ban 2026)
-    const SYSTEM_PROMPT = `คุณคือ "TikTok AI Affiliate Creative Director & Kling Prompt Designer (2026 Edition)" ที่ผสานสกิลระดับโปรเข้าด้วยกัน:
+    // 3. Core Skill System Prompt (Creative Director v3.1 + TikTok Affiliate Gem 2026 + Social Media Skills + Hard-Sell Warehouse/Storefront + 5-Aspect Kling + Anti-Ban 2026)
+    const SYSTEM_PROMPT = `คุณคือ "TikTok AI Affiliate Creative Director & Kling Prompt Designer (2026 Edition)" ที่ผสาน 5 สกิลจากชุด social-media-skills (hook-generator, reels-scripting, post-formatter, youtube-thumbnail, brand-voice) เข้ากับโครงสร้าง 16 แนวคลิปยอดฮิต:
 
 ============================================================
-กฎเหล็กข้อที่ 1: ความเป็นมนุษย์ (HUMAN COPY FILTER — ห้ามภาษาหุ่นยนต์เด็ดขาด)
+กฎเหล็กข้อที่ 1: ความเป็นมนุษย์ & แนวฮาร์ดเซลขายตรง (HUMAN COPY FILTER + HARD-SELL STYLES 13-16)
 ============================================================
-- เขียนในฐานะ "ครีเอเตอร์คนไทยที่หยิบของจริงมาป้ายยาเพื่อน" อ่านออกเสียงแล้วลื่นไหลเป็นธรรมชาติ
+- เขียนในฐานะ "คนขายจริง / เจ้าของโกดัง / พนักงานหน้าร้าน / ครีเอเตอร์คนไทยที่หยิบของจริงมาป้ายยา" อ่านออกเสียงแล้วลื่นไหลเป็นธรรมชาติ มีพลังดึงดูดสูง
 - ห้ามใช้คำพูดรายงานข้อมูลแบบหุ่นยนต์เด็ดขาด เช่น ห้ามพูดว่า: "จากหน้าร้านระบุว่า", "จากภาพเห็นว่า", "เท่าที่เห็นในภาพ", "ราคาตอนที่แคป", "ข้อมูลที่ร้านแจ้ง", "ตอบโจทย์การใช้งาน", "เพิ่มความสะดวกสบาย", "เหมาะสำหรับผู้ที่", "วันนี้มีสินค้ามาแนะนำ", "ใครกำลังมองหา"
-- ให้เปิดด้วย Hook ที่เห็นภาพหรือความขัดแย้งเฉพาะของสินค้าชิ้นนี้ทันที (Visual Strike / Product-Specific Tension)
+- ให้เปิดด้วย Hook ที่เห็นภาพหรือความขัดแย้งเฉพาะของสินค้าชิ้นนี้ทันทีตามหลัก hook-generator & reels-scripting (Visual Strike / Product-Specific Tension / Factory Direct Shock)
+- **กรณีเลือกแนวที่ 13–16 (สายฮาร์ดเซลเน้นขาย: โกดัง/โรงงานปล่อยของ, พ่อค้าแม่ค้าตลาดค้าส่ง/หน้าร้าน, พนักงานขายในห้าง/โชว์รูม, คนงานแพ็กของหน้าคลัง):**
+  1) บทพูด (voiceover_10s): ใช้โทนเสียงกระตือรือร้น จริงใจ เร่งจังหวะขายแบบมืออาชีพ เปิดด้วยความคุ้มค่าหน้างาน เช่น "บุกโกดังตัดสต็อกตรงไม่ผ่านคนกลาง!", "หน้าร้านจัดโปรปล่อยของเอง!", "พนักงานพาส่องโปรหน้าเชลฟ์ลดจุกๆ!" พร้อมย้ำจุดเด่นสินค้า 2–3 ข้อที่จับต้องได้ แล้วตบเข้าโปรโมชันและราคาแบบเซฟตามกฎข้อที่ 2
+  2) ฉากและมุมกล้อง (Storyboard & Kling Prompt): ต้องเซ็ตฉากให้ตรงกับแนวที่เลือก เช่น โกดังสินค้าที่มีพาเลทและกล่องลังเรียงรายด้านหลัง (Warehouse racks & shipping cartons), หน้าร้านตลาดค้าส่งที่คึกคัก, โชว์รูมห้างสรรพสินค้าไฟสว่างสวย, หรือโต๊ะแพ็กของหน้าคลังสินค้า โดยให้เห็นเจ้าของโกดัง/พนักงานขาย/คนงาน (สวมชุดทำงานจริง เช่น เสื้อโปโลร้าน ผ้ากันเปื้อน หรือเสื้อกั๊กคลังสินค้า) กำลังหยิบจับสาธิตสินค้าชิ้นนั้นให้ดูสดๆ หน้ากล้อง
 
 ============================================================
 กฎเหล็กข้อที่ 2: การพูดราคาและส่วนลดแบบเซฟ 100% (SAFE PRICE & DISCOUNT RULE)
@@ -1006,7 +1025,7 @@
    - ถ้าราคาในภาพ 200–299 บาท (เช่น 250 บาท) ➡️ ให้พูดว่า "สามร้อยมีทอน" หรือ "งบไม่ถึงสามร้อย"
    - ถ้าราคาสูงกว่านั้น ให้ปัดขึ้นไปหาหลักร้อยถัดไปเสมอแล้วตามด้วยคำว่า "...มีทอน" หรือ "งบไม่ถึง..."
 3. การพูดเรื่องโปรโมชันและเปอร์เซ็นต์ส่วนลด:
-   - สามารถใช้คำว่า "ลดหนักมาก", "โปรแรงมาก", "จัดโปรลดอยู่" ได้ตามปกติ
+   - สามารถใช้คำว่า "ลดหนักมาก", "โปรแรงมาก", "ราคาหน้าโรงงาน", "โปรตัดสต็อกหน้าโกดัง", "จัดโปรลดอยู่" ได้ตามปกติ
    - แต่ถ้าจะพูดตัวเลขเปอร์เซ็นต์ส่วนลด (%) ต้อง "ปัดลงให้ต่ำกว่าตัวเลขที่เห็นในภาพ และต้องลงท้ายด้วยเลข 5 หรือ 0 เท่านั้น":
      * ตัวอย่าง: ในภาพลด 78% ➡️ ต้องพูดว่า "ลด 75%" (หรือ "ลดกว่า 75%")
      * ตัวอย่าง: ในภาพลด 72% ➡️ ต้องพูดว่า "ลด 70%"
@@ -1027,7 +1046,7 @@
 1. ใน Storyboard วิดีโอ 10 วินาที: ห้ามมีข้อความขึ้นบนจอ (No On-Screen Text) ให้ระบุเฉพาะ "เวลา" และ "ภาพวิดีโอ & มุมกล้อง (Visual & Camera Action)" ที่เห็นการกระทำชัดเจนแม้ปิดเสียง
 2. ใน Kling Omni Master Prompt:
    - เขียนโครงสร้าง 5-Aspect Cinematography ภาษาอังกฤษที่ล็อกรูปทรงสินค้าจาก <<<image_1>>> และใช้ ++...++ เน้นจุดเด่นสินค้า
-   - **ต้องใส่บล็อก [Voiceover / Thai Dialogue Script] ไว้ใน Kling Prompt ด้วยเสมอ** โดยนำบทพูดภาษาไทย 10 วินาทีใส่ไว้ในเครื่องหมายคำพูด "..." พร้อมระบุโทนเสียงพูดธรรมชาติ
+   - **ต้องใส่บล็อก [Voiceover / Thai Dialogue Script] ไว้ใน Kling Prompt ด้วยเสมอ** โดยนำบทพูดภาษาไทย 10 วินาทีใส่ไว้ในเครื่องหมายคำพูด "..." พร้อมระบุโทนเสียงพูดธรรมชาติ (หรือโทนเสียงเจ้าของโกดัง/พนักงานขายที่กระตือรือร้นหากเป็นแนว 13–16)
    - **ต้องใส่ข้อห้ามท้าย Kling Prompt เสมอว่า:** "No text, no on-screen text, no captions, no subtitles, no logos, no watermarks, no animation overlays, no deformed hands, no extra fingers, no object morphing, no distorted product."
 
 ============================================================
@@ -1038,7 +1057,7 @@
 
 ตอบกลับเป็น JSON Object ตามโครงสร้างนี้เท่านั้น (ห้ามมีข้อความอื่นนอก JSON):
 {
-  "selected_style_name": "ชื่อแนวคลิปที่เลือกใช้จาก 12 แนว พร้อมเหตุผลสั้นๆ 1 ประโยค",
+  "selected_style_name": "ชื่อแนวคลิปที่เลือกใช้จาก 16 แนว พร้อมเหตุผลสั้นๆ 1 ประโยค",
   "product_title": "ชื่อสินค้าและรุ่น/สีที่วิเคราะห์ได้",
   "product_summary": "สรุปภาพรวมสินค้า จุดขายหลัก และเพดานราคาแบบเซฟ",
   "specs": [
@@ -1048,7 +1067,7 @@
     {"label": "วัสดุ", "value": "..."},
     {"label": "คุณสมบัติเด่น", "value": "..."},
     {"label": "ราคาในภาพ ➡️ คำพูดราคาแบบเซฟ", "value": "เช่น ในภาพ 79 บาท (ลด 78%) ➡️ ใช้คำว่า 'งบไม่ถึงร้อย / แบงก์ร้อยมีทอน' และ 'ลด 75%'"},
-    {"label": "แนวคลิปที่ใช้ (จาก 12 แนว)", "value": "..."}
+    {"label": "แนวคลิปที่ใช้ (จาก 16 แนว)", "value": "..."}
   ],
   "voiceover_10s": "บทพูด TikTok 10 วินาที (ประมาณ 25-32 คำไทย พูดเป็นธรรมชาติเหมือนคนจริง เซฟราคาและส่วนลดตามกฎ ปิดท้ายชวนดูที่ตะกร้าเหลืองซ้ายล่าง)...",
   "storyboard": [
@@ -1130,7 +1149,7 @@
       const styleInstruction = customStyle
         ? `แนวความต้องการของผู้ใช้: ${customStyle} (แนวหลักที่เลือก: ${selectedChipStyle})`
         : (selectedChipStyle === 'auto'
-            ? 'แนวความต้องการ: ให้วิเคราะห์สินค้าแล้วเลือก 1 แนวจาก 12 แนวหลักที่หยุดนิ้วและเหมาะกับสินค้านี้มากที่สุดโดยอัตโนมัติ'
+            ? 'แนวความต้องการ: ให้วิเคราะห์สินค้าแล้วเลือก 1 แนวจาก 16 แนวหลักที่หยุดนิ้วและเหมาะกับสินค้านี้มากที่สุดโดยอัตโนมัติ'
             : `แนวความต้องการ: ${selectedChipStyle}`);
 
       const userPromptParts = [];
@@ -1390,6 +1409,57 @@
           "พรมครัวกันลื่นซับน้ำ ได้ครบ 2 ชิ้น",
           "พรมแต่งครัวมินิมอล แบงก์ร้อยมีทอน",
           "กดดูสีและลายพรมครัวเซ็ต 2 ชิ้น"
+        ]
+      };
+      lastResultData = sample;
+      renderOutput(sample);
+      document.getElementById('outputArea').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function loadWarehouseSample() {
+      const sample = {
+        "selected_style_name": "13. โกดัง/โรงงานปล่อยของเอง (ฮาร์ดเซล ราคาหน้าโรงงาน) — เจ้าของโกดังพาบุกชั้นวางสต็อก โชว์เนื้อพรมและแผ่นกันลื่นสดๆ พร้อมโปรตัดสต็อกหน้าโกดัง",
+        "product_title": "พรมห้องครัวเซ็ต 2 ชิ้น ลายหมากรุกขาวดำ (โปรตัดสต็อกหน้าโกดัง)",
+        "product_summary": "เซ็ตพรมปูพื้นห้องครัว 2 ชิ้น (ผืนยาว 120×40 ซม. + ผืนสั้น 60×40 ซม.) แนวฮาร์ดเซลบุกโกดังปล่อยของเอง เซฟคำเคลมราคาเป็น 'งบไม่ถึงร้อย / แบงก์ร้อยมีทอน' และเซฟส่วนลดจาก 78% เป็น 'ลด 75%'",
+        "specs": [
+          {"label": "สินค้า", "value": "พรมห้องครัวเซ็ต 2 ชิ้น (ได้ทั้งผืนยาวและผืนสั้น ยกแพ็กจากโกดัง)"},
+          {"label": "สีและลายที่เลือก", "value": "ลายหมากรุกขาวดำ (Checkerboard)"},
+          {"label": "ขนาด / ในเซ็ตประกอบด้วย", "value": "ผืนยาว 120 × 40 ซม. และผืนสั้น 60 × 40 ซม."},
+          {"label": "วัสดุ", "value": "ผ้าโพลีเอสเตอร์ทอแน่น ซับน้ำไว ด้านหลังบุปุ่มยางกันลื่น"},
+          {"label": "คุณสมบัติเด่น", "value": "ยึดเกาะพื้นแน่น ซับน้ำไว ซักเครื่องได้ งานตัดสต็อกตรงจากโกดัง"},
+          {"label": "ราคาในภาพ ➡️ คำพูดราคาแบบเซฟ", "value": "ในภาพ 79 บาท (ลด 78%) ➡️ เซฟเป็น 'งบไม่ถึงร้อย / แบงก์ร้อยมีทอน' และ 'ลดหนัก 75%' (ห้ามพูดคำว่าหลักสิบ)"},
+          {"label": "แนวคลิปที่ใช้ (จาก 16 แนว)", "value": "แนวที่ 13: โกดัง/โรงงานปล่อยของเอง (ฮาร์ดเซล ราคาหน้าโรงงาน)"}
+        ],
+        "voiceover_10s": "บุกโกดังมาปล่อยของเอง! พรมห้องครัวลายหมากรุกยกเซ็ตสองผืน ได้ทั้งผืนยาวผืนสั้น งานทอแน่นซับน้ำไว ฐานกันลื่นหนึบๆ วันนี้จัดโปรหน้าโรงงานลดหนัก 75% แบงก์ร้อยมีทอนได้ครบสองชิ้น จิ้มตะกร้าเหลืองซ้ายล่างได้เลยครับ!",
+        "storyboard": [
+          {"time": "0–2 วินาที", "visual": "ภาพเปิด Frame Zero ในโกดังสินค้า: เจ้าของโกดังยืนหน้าชั้นวางพาเลทสต็อกพรม คลี่พรมลายหมากรุกขาวดำผืนยาว 120×40 ซม. คู่กับผืนสั้น 60×40 ซม. โชว์หน้ากล้องอย่างกระฉับกระเฉง"},
+          {"time": "2–4 วินาที", "visual": "กล้องซูมเข้าใกล้ขณะมือเจ้าของโกดังดึงและบิดเนื้อผ้าโพลีเอสเตอร์โชว์ความหนาแน่นและลวดลายตารางหมากรุกคมชัด"},
+          {"time": "4–6 วินาที", "visual": "พลิกด้านหลังพรมโชว์แผ่นปุ่มกันลื่น แล้วโยนพรมวางลงบนพื้นปูนขัดมันในโกดัง ใช้เท้าดันทดสอบความหนึบว่าพรมไม่ลื่นไถล"},
+          {"time": "6–8 วินาที", "visual": "มือหยิบพรมทั้ง 2 ผืน (ผืนยาว + ผืนสั้น) มารวมคู่กันตรงหน้าลังพัสดุที่เตรียมแพ็กส่ง โชว์ว่าได้ครบเซ็ต 2 ชิ้น"},
+          {"time": "8–10 วินาที", "visual": "เจ้าของโกดังถือเซ็ตพรมคู่โชว์ชัดๆ หน้าชั้นวางสินค้าในโกดังไฟสว่างคมชัด จบคลิปอย่างมืออาชีพ"}
+        ],
+        "kling_master_prompt": "[Subject]: <<<image_1>>>, ++black and white checkerboard kitchen mat 2-piece set++, consisting of one long rectangular runner mat (120x40 cm proportion) and one matching shorter rectangular mat (60x40 cm proportion), held and demonstrated by an energetic Thai warehouse owner wearing a neat dark polo work shirt.\n\n[Subject Motion]: Fast-paced authentic hard-sell demonstration; the warehouse owner briskly unrolls the two checkerboard mats in front of stacked inventory shelves, flips the mat edge to show the non-slip backing texture, and places it firmly on the clean warehouse floor to prove grip stability without any pattern warping.\n\n[Scene]: Authentic modern wholesale distribution warehouse in Thailand, stacked brown shipping cartons and neat product racks in the background, bright industrial daylight LED lighting.\n\n[Spatial]: Vertical 9:16 frame; foreground highlights the crisp black-and-white checkerboard mats in the seller's hands, midground shows the active warehouse packing station, background features deep industrial shelves with soft depth-of-field.\n\n[Camera]: Dynamic handheld commercial tracking shot starting with a punchy medium close-up, pushing in on the fabric texture and backing grip, 35mm lens, high clarity realistic TikTok Shop warehouse live-sell aesthetic.\n\n[Voiceover / Thai Dialogue Script]: Energetic and trustworthy Thai male warehouse owner voice speaking with exciting factory-direct sales rhythm (10s): \"บุกโกดังมาปล่อยของเอง! พรมห้องครัวลายหมากรุกยกเซ็ตสองผืน ได้ทั้งผืนยาวผืนสั้น งานทอแน่นซับน้ำไว ฐานกันลื่นหนึบๆ วันนี้จัดโปรหน้าโรงงานลดหนัก 75% แบงก์ร้อยมีทอนได้ครบสองชิ้น จิ้มตะกร้าเหลืองซ้ายล่างได้เลยครับ!\"\n\n[Negative / Constraints]: No text, no on-screen text, no captions, no subtitles, no Thai characters on screen, no logos, no watermarks, no animation overlays, no distorted checkerboard lines, no warped grid pattern, no deformed hands, no extra fingers, no object morphing.",
+        "cover_headlines": [
+          "โกดังมาเอง! พรมครัว 2 ผืน แบงก์ร้อยมีทอน",
+          "โปรหน้าโรงงานลด 75% ได้ครบผืนยาว+ผืนสั้น",
+          "ตัดสต็อกหน้าคลัง! พรมหมากรุกเซ็ตคู่สุดคุ้ม",
+          "งบไม่ถึงร้อยได้ 2 ชิ้น! พรมครัวกันลื่นซับน้ำ",
+          "บุกโกดังพรมห้องครัวมินิมอล โปรแรงลด 75%"
+        ],
+        "caption_body": "บุกโกดังมาจัดโปรปล่อยของเองเลยครับ! เซ็ตพรมปูพื้นห้องครัวลายหมากรุกขาวดำ ได้ครบเซ็ต 2 ชิ้น ทั้งผืนยาว 120×40 ซม. และผืนสั้น 60×40 ซม.\n\nงานทอโพลีเอสเตอร์เนื้อแน่น ซับน้ำไว ด้านหลังมีฐานกันลื่นยึดเกาะพื้นหนึบ ซักทำความสะอาดง่าย\n\nรอบนี้จัดโปรราคาหน้าโรงงาน ลดหนัก 75% แบงก์ร้อยมีทอนก็ได้ครบทั้ง 2 ผืนแล้ว กดเช็กสีและขนาดที่ตะกร้าเหลืองซ้ายล่างได้เลยครับ",
+        "hashtag_sets": [
+          {"style_name": "แบบที่ 1: สายโกดังปล่อยของ & ราคาโรงงาน", "tags": ["#โกดังปล่อยของ", "#ราคาหน้าโรงงาน", "#พรมห้องครัว", "#พรมเซ็ต2ชิ้น", "#พรมกันลื่น"]},
+          {"style_name": "แบบที่ 2: สายโปรแรงฮาร์ดเซล & ความคุ้มค่า", "tags": ["#แบงก์ร้อยมีทอน", "#งบไม่ถึงร้อย", "#โปรแรงลดหนัก", "#ของคุ้มราคาประหยัด", "#ตัดสต็อก"]},
+          {"style_name": "แบบที่ 3: สายของใช้ในครัว & แม่บ้าน", "tags": ["#ของใช้ในครัว", "#พรมปูพื้นห้องครัว", "#พรมซับน้ำ", "#พรมลายหมากรุก", "#แม่บ้านถูกใจสิ่งนี้"]},
+          {"style_name": "แบบที่ 4: สายแต่งบ้านมินิมอล", "tags": ["#แต่งห้องครัว", "#ครัวมินิมอล", "#แต่งบ้านงบประหยัด", "#ของแต่งบ้าน", "#ไอเดียแต่งครัว"]},
+          {"style_name": "แบบที่ 5: สายไวรัลดันฟีด TikTok Shop", "tags": ["#TikTokShopครีเอเตอร์", "#พิกัดตะกร้าเหลือง", "#ป้ายยาTikTokShop", "#รีวิวTikTokShop", "#ของดีบอกต่อ"]}
+        ],
+        "basket_titles": [
+          "โปรโกดัง! พรมครัว 2 ผืน งบไม่ถึงร้อย",
+          "ลด 75% เซ็ตพรมยาว+สั้น ราคาโรงงาน",
+          "พรมครัวหมากรุก 2 ชิ้น แบงก์ร้อยมีทอน",
+          "ตัดสต็อกคลัง! พรมครัวกันลื่นซับน้ำ",
+          "กดดูสี/ขนาด พรมครัวเซ็ตคู่ 2 ชิ้น"
         ]
       };
       lastResultData = sample;
