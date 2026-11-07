@@ -1,15 +1,19 @@
 <!DOCTYPE html>
 <html lang="th" data-theme="dark">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>TikTok Shop UGC & Kling Prompt Studio (2026 Anti-Ban Edition)</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
+    rel="stylesheet">
   <style>
     /* Dark Theme (Default) */
-    :root, [data-theme="dark"] {
+    :root,
+    [data-theme="dark"] {
       --bg: #0b0d13;
       --bg-grad-1: rgba(37, 244, 238, 0.08);
       --bg-grad-2: rgba(254, 44, 85, 0.10);
@@ -55,10 +59,11 @@
       margin: 0;
       padding: 0;
     }
+
     body {
       background: radial-gradient(circle at top right, var(--bg-grad-1), transparent 40%),
-                  radial-gradient(circle at top left, var(--bg-grad-2), transparent 40%),
-                  var(--bg);
+        radial-gradient(circle at top left, var(--bg-grad-2), transparent 40%),
+        var(--bg);
       color: var(--text);
       font-family: 'Kanit', sans-serif;
       line-height: 1.6;
@@ -66,11 +71,13 @@
       padding-bottom: 80px;
       transition: background 0.2s, color 0.2s;
     }
+
     .container {
       max-width: 1060px;
       margin: 0 auto;
       padding: 24px 18px;
     }
+
     /* Header */
     .header {
       display: flex;
@@ -85,11 +92,13 @@
       margin-bottom: 22px;
       box-shadow: var(--shadow);
     }
+
     .brand {
       display: flex;
       align-items: center;
       gap: 14px;
     }
+
     .brand-logo {
       width: 48px;
       height: 48px;
@@ -103,6 +112,7 @@
       box-shadow: 0 0 20px rgba(254, 44, 85, 0.35);
       flex-shrink: 0;
     }
+
     .brand h1 {
       font-size: 21px;
       font-weight: 800;
@@ -112,6 +122,7 @@
       gap: 8px;
       flex-wrap: wrap;
     }
+
     .badge-skill {
       font-size: 12px;
       font-weight: 600;
@@ -121,16 +132,19 @@
       color: var(--green);
       border: 1px solid rgba(16, 185, 129, 0.35);
     }
+
     .brand p {
       font-size: 13.5px;
       color: var(--muted);
     }
+
     .header-actions {
       display: flex;
       align-items: center;
       gap: 8px;
       flex-wrap: wrap;
     }
+
     .btn-key {
       background: var(--card-2);
       color: var(--text);
@@ -146,19 +160,23 @@
       gap: 7px;
       transition: 0.2s;
     }
+
     .btn-key:hover {
       border-color: var(--accent-2);
     }
+
     .key-dot {
       width: 9px;
       height: 9px;
       border-radius: 50%;
       background: #ef4444;
     }
+
     .key-dot.ready {
       background: var(--green);
       box-shadow: 0 0 10px var(--green);
     }
+
     .model-select {
       background: var(--card-2);
       color: var(--text);
@@ -181,15 +199,18 @@
       margin-bottom: 20px;
       box-shadow: var(--shadow);
     }
+
     .key-panel.open {
       display: block;
     }
+
     .key-row {
       display: flex;
       gap: 10px;
       margin-top: 10px;
       flex-wrap: wrap;
     }
+
     .key-row input {
       flex: 1;
       min-width: 240px;
@@ -211,6 +232,7 @@
       margin-bottom: 22px;
       box-shadow: var(--shadow);
     }
+
     .section-label {
       font-size: 16px;
       font-weight: 700;
@@ -220,6 +242,7 @@
       gap: 8px;
       flex-wrap: wrap;
     }
+
     .opt-tag {
       font-size: 12px;
       font-weight: 500;
@@ -241,28 +264,35 @@
       transition: 0.2s;
       margin-bottom: 16px;
     }
-    .dropzone:hover, .dropzone.dragover {
+
+    .dropzone:hover,
+    .dropzone.dragover {
       border-color: var(--accent-2);
     }
+
     .dropzone-icon {
       font-size: 34px;
       margin-bottom: 6px;
     }
+
     .dropzone h3 {
       font-size: 16px;
       font-weight: 600;
       margin-bottom: 4px;
     }
+
     .dropzone p {
       font-size: 13px;
       color: var(--muted);
     }
+
     .preview-grid {
       display: flex;
       gap: 12px;
       flex-wrap: wrap;
       margin-bottom: 18px;
     }
+
     .preview-item {
       position: relative;
       width: 105px;
@@ -272,11 +302,13 @@
       border: 1px solid var(--border);
       background: #000;
     }
+
     .preview-item img {
       width: 100%;
       height: 100%;
       object-fit: cover;
     }
+
     .preview-remove {
       position: absolute;
       top: 5px;
@@ -300,7 +332,9 @@
       grid-template-columns: 1fr;
       gap: 18px;
     }
-    textarea, input[type="text"] {
+
+    textarea,
+    input[type="text"] {
       width: 100%;
       background: var(--card-2);
       border: 1px solid var(--border);
@@ -312,16 +346,20 @@
       resize: vertical;
       transition: 0.2s;
     }
-    textarea:focus, input[type="text"]:focus {
+
+    textarea:focus,
+    input[type="text"]:focus {
       outline: none;
       border-color: var(--accent-2);
     }
+
     .chips {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
       gap: 8px;
       margin-bottom: 12px;
     }
+
     .chip {
       background: var(--card-2);
       border: 1px solid var(--border);
@@ -337,11 +375,14 @@
       gap: 6px;
       line-height: 1.35;
     }
-    .chip.active, .chip:hover {
+
+    .chip.active,
+    .chip:hover {
       background: rgba(254, 44, 85, 0.14);
       border-color: var(--accent);
       font-weight: 600;
     }
+
     .chip.full-row {
       grid-column: 1 / -1;
       justify-content: center;
@@ -368,10 +409,12 @@
       box-shadow: 0 10px 26px rgba(254, 44, 85, 0.35);
       transition: 0.2s;
     }
+
     .btn-generate:hover:not(:disabled) {
       transform: translateY(-1px);
       box-shadow: 0 14px 30px rgba(254, 44, 85, 0.5);
     }
+
     .btn-generate:disabled {
       opacity: 0.55;
       cursor: not-allowed;
@@ -390,9 +433,11 @@
       align-items: center;
       gap: 12px;
     }
+
     .status-box.show {
       display: flex;
     }
+
     .spinner {
       width: 20px;
       height: 20px;
@@ -402,17 +447,22 @@
       animation: spin 0.8s linear infinite;
       flex-shrink: 0;
     }
+
     @keyframes spin {
-      to { transform: rotate(360deg); }
+      to {
+        transform: rotate(360deg);
+      }
     }
 
     /* Output Area */
     #outputArea {
       display: none;
     }
+
     #outputArea.show {
       display: block;
     }
+
     .out-header {
       display: flex;
       justify-content: space-between;
@@ -421,6 +471,7 @@
       margin-bottom: 14px;
       flex-wrap: wrap;
     }
+
     .out-title {
       font-size: 18px;
       font-weight: 700;
@@ -429,6 +480,7 @@
       align-items: center;
       gap: 8px;
     }
+
     .btn-copy {
       background: var(--card-2);
       color: var(--text);
@@ -445,9 +497,11 @@
       transition: 0.15s;
       flex-shrink: 0;
     }
+
     .btn-copy:hover {
       border-color: var(--accent-2);
     }
+
     .btn-copy.copied {
       background: rgba(16, 185, 129, 0.2);
       border-color: var(--green);
@@ -460,18 +514,22 @@
       border-collapse: collapse;
       font-size: 14.5px;
     }
-    .data-table th, .data-table td {
+
+    .data-table th,
+    .data-table td {
       padding: 11px 14px;
       border-bottom: 1px solid var(--border);
       text-align: left;
       vertical-align: top;
     }
+
     .data-table th {
       color: var(--muted);
       font-weight: 600;
       width: 28%;
-      background: rgba(128,128,128,0.04);
+      background: rgba(128, 128, 128, 0.04);
     }
+
     .code-box {
       background: var(--code-bg);
       color: var(--code-text);
@@ -483,6 +541,7 @@
       word-break: break-word;
       line-height: 1.65;
     }
+
     .code-box.mono {
       font-family: 'JetBrains Mono', 'Kanit', monospace;
       font-size: 13.3px;
@@ -494,6 +553,7 @@
       flex-direction: column;
       gap: 10px;
     }
+
     .copy-item {
       display: flex;
       justify-content: space-between;
@@ -504,11 +564,13 @@
       border-radius: 12px;
       padding: 11px 15px;
     }
+
     .copy-item-text {
       font-size: 15px;
       font-weight: 500;
       word-break: break-word;
     }
+
     .hashtag-card {
       background: var(--card-2);
       border: 1px solid var(--border);
@@ -516,6 +578,7 @@
       padding: 14px 16px;
       margin-top: 12px;
     }
+
     .hashtag-top {
       display: flex;
       justify-content: space-between;
@@ -524,22 +587,26 @@
       margin-bottom: 6px;
       flex-wrap: wrap;
     }
+
     .hashtag-label {
       font-size: 13.5px;
       font-weight: 700;
       color: var(--accent-2);
     }
+
     .hashtag-tags {
       font-family: 'JetBrains Mono', 'Kanit', sans-serif;
       font-size: 14px;
       color: var(--tag-color);
       word-break: break-word;
     }
+
     .btn-group {
       display: flex;
       gap: 8px;
       flex-wrap: wrap;
     }
+
     .policy-list {
       font-size: 13.2px;
       color: var(--muted);
@@ -551,6 +618,7 @@
     }
   </style>
 </head>
+
 <body>
   <div class="container">
     <!-- Header -->
@@ -562,7 +630,8 @@
             TikTok UGC & Kling Prompt Studio
             <span class="badge-skill">🛡️ TikTok Safe 2026 + 12 Creative Styles</span>
           </h1>
-          <p>อัปโหลดรูปสินค้า ➡️ สร้างบทพูด 10 วิ + Storyboard (ไร้ตัวหนังสือรกจอ) + Kling Prompt (รวมบทพูดไทย) + ปกคลิป + แฮชแท็ก 5×5</p>
+          <p>อัปโหลดรูปสินค้า ➡️ สร้างบทพูด 10 วิ + Storyboard (ไร้ตัวหนังสือรกจอ) + Kling Prompt (รวมบทพูดไทย) + ปกคลิป
+            + แฮชแท็ก 5×5</p>
         </div>
       </div>
       <div class="header-actions">
@@ -574,7 +643,8 @@
           <option value="gemini-3-flash-preview">✨ Gemini 3.0 Flash Preview</option>
           <option value="gemini-2.5-flash">🛡️ Gemini 2.5 Flash (เสถียรสูง)</option>
           <option value="gemini-4-argon">🔥 Gemini 4 Argon (ต้องผูก Billing — ถ้าคีย์ฟรีจะสลับไป 3.6 Flash)</option>
-          <option value="gemini-3.1-pro-preview">🧠 Gemini 3.1 Pro (ต้องผูก Billing — ถ้าคีย์ฟรีจะสลับไป 3.6 Flash)</option>
+          <option value="gemini-3.1-pro-preview">🧠 Gemini 3.1 Pro (ต้องผูก Billing — ถ้าคีย์ฟรีจะสลับไป 3.6 Flash)
+          </option>
         </select>
         <button class="btn-key" onclick="toggleTheme()" id="themeBtn" title="สลับธีมมืด/สว่าง">
           🌙 โหมดมืด
@@ -591,14 +661,22 @@
 
     <!-- Anti-Ban Policy Drawer -->
     <div class="key-panel" id="policyPanel">
-      <div class="section-label">🛡️ กฎเหล็กป้องกันโดนแบน TikTok Shop Creator (อัปเดต 2025–2026) ที่ฝังล็อกในระบบนี้แล้ว</div>
+      <div class="section-label">🛡️ กฎเหล็กป้องกันโดนแบน TikTok Shop Creator (อัปเดต 2025–2026) ที่ฝังล็อกในระบบนี้แล้ว
+      </div>
       <ul class="policy-list">
-        <li><b>เซฟราคาไม่ให้โดนแบน:</b> ห้ามพูด "ราคาหลักสิบ" หรือบอกราคาเป๊ะๆ ระบบจะปัดเป็นเพดานปลอดภัยเสมอ เช่น 79.- ➡️ "งบไม่ถึงร้อย / แบงก์ร้อยมีทอน", 2XX.- ➡️ "สามร้อยมีทอน"</li>
-        <li><b>เซฟเปอร์เซ็นต์ส่วนลด:</b> พูดคำว่า "ลดหนักมาก / โปรแรงมาก" ได้ แต่ถ้าบอก % ลด ระบบจะปัดลงให้ต่ำกว่าในภาพและลงท้ายด้วย 0 หรือ 5 เท่านั้น (เช่น ในภาพลด 78% ➡️ พูด "ลด 75%", ลด 72% ➡️ พูด "ลด 70%")</li>
-        <li><b>ห้ามคำเคลมโอ้อวดเกินจริง:</b> ห้ามใช้ "ดีที่สุด, อันดับ 1, การันตี 100%, เห็นผลทันที, หายขาด, ของแท้ 100%, เปลี่ยนชีวิต"</li>
-        <li><b>ห้ามเคลมทางการแพทย์/Before-After ลวง:</b> ห้ามอ้างรักษาโรค รักษาสิว/ฝ้า ลดน้ำหนักเร่งด่วน หรือขาวถาวร</li>
-        <li><b>ห้ามดึงคนออกนอกแอป/พูดแอปคู่แข่ง:</b> ห้ามพูด "ตะกร้าส้ม, ถุงส้ม, แอปส้ม, Shopee, Lazada, แอดไลน์" (บังคับใช้ "ตะกร้าเหลืองซ้ายล่าง" เท่านั้น)</li>
-        <li><b>ไร้ข้อความรกในคลิป & Storyboard:</b> ไม่ใส่ข้อความลอยในคลิปและใน Storyboard และฝังบทพูดภาษาไทยลงใน Kling Prompt โดยตรง</li>
+        <li><b>เซฟราคาไม่ให้โดนแบน:</b> ห้ามพูด "ราคาหลักสิบ" หรือบอกราคาเป๊ะๆ ระบบจะปัดเป็นเพดานปลอดภัยเสมอ เช่น 79.-
+          ➡️ "งบไม่ถึงร้อย / แบงก์ร้อยมีทอน", 2XX.- ➡️ "สามร้อยมีทอน"</li>
+        <li><b>เซฟเปอร์เซ็นต์ส่วนลด:</b> พูดคำว่า "ลดหนักมาก / โปรแรงมาก" ได้ แต่ถ้าบอก % ลด
+          ระบบจะปัดลงให้ต่ำกว่าในภาพและลงท้ายด้วย 0 หรือ 5 เท่านั้น (เช่น ในภาพลด 78% ➡️ พูด "ลด 75%", ลด 72% ➡️ พูด "ลด
+          70%")</li>
+        <li><b>ห้ามคำเคลมโอ้อวดเกินจริง:</b> ห้ามใช้ "ดีที่สุด, อันดับ 1, การันตี 100%, เห็นผลทันที, หายขาด, ของแท้
+          100%, เปลี่ยนชีวิต"</li>
+        <li><b>ห้ามเคลมทางการแพทย์/Before-After ลวง:</b> ห้ามอ้างรักษาโรค รักษาสิว/ฝ้า ลดน้ำหนักเร่งด่วน หรือขาวถาวร
+        </li>
+        <li><b>ห้ามดึงคนออกนอกแอป/พูดแอปคู่แข่ง:</b> ห้ามพูด "ตะกร้าส้ม, ถุงส้ม, แอปส้ม, Shopee, Lazada, แอดไลน์"
+          (บังคับใช้ "ตะกร้าเหลืองซ้ายล่าง" เท่านั้น)</li>
+        <li><b>ไร้ข้อความรกในคลิป & Storyboard:</b> ไม่ใส่ข้อความลอยในคลิปและใน Storyboard และฝังบทพูดภาษาไทยลงใน Kling
+          Prompt โดยตรง</li>
       </ul>
     </div>
 
@@ -606,12 +684,15 @@
     <div class="key-panel" id="keyPanel">
       <div class="section-label">🔑 ตั้งค่า Google Gemini API Key (บันทึกไว้ในเบราว์เซอร์เครื่องนี้ครั้งเดียว)</div>
       <p style="font-size: 13px; color: var(--muted);">
-        ระบบจะเก็บคีย์ไว้ในเครื่องของคุณเท่านั้น หรือกดคัดลอกลิงก์ผูกคีย์อัตโนมัติ (<code>#key=...</code>) เพื่อส่งให้มือถือหรือทีมงานคลิกครั้งเดียวใช้งานได้ทันที
+        ระบบจะเก็บคีย์ไว้ในเครื่องของคุณเท่านั้น หรือกดคัดลอกลิงก์ผูกคีย์อัตโนมัติ (<code>#key=...</code>)
+        เพื่อส่งให้มือถือหรือทีมงานคลิกครั้งเดียวใช้งานได้ทันที
       </p>
       <div class="key-row">
         <input type="password" id="apiKeyInput" placeholder="วาง Gemini API Key ที่นี่ (เช่น AIza... หรือ AQ...)" />
-        <button class="btn-copy" onclick="saveApiKey()" style="background: var(--green); border-color: var(--green); color: #fff;">💾 บันทึกคีย์</button>
-        <button class="btn-copy" onclick="copyMagicLink()">🔗 คัดลอกลิงก์ผูกคีย์อัตโนมัติสำหรับส่งให้มือถือ/เครื่องอื่น</button>
+        <button class="btn-copy" onclick="saveApiKey()"
+          style="background: var(--green); border-color: var(--green); color: #fff;">💾 บันทึกคีย์</button>
+        <button class="btn-copy" onclick="copyMagicLink()">🔗
+          คัดลอกลิงก์ผูกคีย์อัตโนมัติสำหรับส่งให้มือถือ/เครื่องอื่น</button>
       </div>
     </div>
 
@@ -625,7 +706,8 @@
         <div class="dropzone-icon">📸</div>
         <h3>คลิกเพื่อเลือกรูปภาพ หรือ ลากไฟล์รูปมาวางที่นี่</h3>
         <p>รองรับภาพถ่ายสินค้าจริง, ภาพหน้าสินค้า TikTok Shop, ภาพตารางขนาด หรือภาพคอมเมนต์รีวิวลูกค้า</p>
-        <input type="file" id="fileInput" accept="image/*" multiple style="display:none" onchange="handleFiles(this.files)" />
+        <input type="file" id="fileInput" accept="image/*" multiple style="display:none"
+          onchange="handleFiles(this.files)" />
       </div>
       <div class="preview-grid" id="previewGrid"></div>
 
@@ -635,7 +717,8 @@
             2. รายละเอียดสินค้าเพิ่มเติม
             <span class="opt-tag">ไม่บังคับ — ถ้าในรูปมีข้อมูลครบแล้ว เว้นว่างได้เลย</span>
           </div>
-          <textarea id="productInfo" rows="2" placeholder="เช่น พรมห้องครัวเซ็ต 2 ชิ้น ลายหมากรุกขาวดำ ราคา 79 บาท ลด 78% กันลื่น ซับน้ำ (ถ้าในรูปมีอยู่แล้วไม่ต้องพิมพ์ก็ได้ครับ)"></textarea>
+          <textarea id="productInfo" rows="2"
+            placeholder="เช่น พรมห้องครัวเซ็ต 2 ชิ้น ลายหมากรุกขาวดำ ราคา 79 บาท ลด 78% กันลื่น ซับน้ำ (ถ้าในรูปมีอยู่แล้วไม่ต้องพิมพ์ก็ได้ครับ)"></textarea>
         </div>
 
         <div>
@@ -645,70 +728,107 @@
           </div>
           <div class="chips" id="styleChips">
             <div class="chip full-row active" data-val="auto" onclick="selectChip(this)">
-              ✨ ให้ AI Creative Director + Social Media Skills วิเคราะห์สินค้าแล้วเลือกแนวที่ขายดีที่สุดให้อัตโนมัติ (แนะนำ)
+              ✨ ให้ AI Creative Director + Social Media Skills วิเคราะห์สินค้าแล้วเลือกแนวที่ขายดีที่สุดให้อัตโนมัติ
+              (แนะนำ)
             </div>
-            <div class="chip" data-val="1. Real-Use Demo (ใช้งานจริงให้เห็นผลชัด): เปิดด้วยปัญหาหรือสถานการณ์จริง หยิบสินค้ามาใช้ให้เห็น Action Proof และผลลัพธ์คาตา" onclick="selectChip(this)">
+            <div class="chip"
+              data-val="1. Real-Use Demo (ใช้งานจริงให้เห็นผลชัด): เปิดด้วยปัญหาหรือสถานการณ์จริง หยิบสินค้ามาใช้ให้เห็น Action Proof และผลลัพธ์คาตา"
+              onclick="selectChip(this)">
               🛠️ 1. Real-Use Demo (ใช้งานจริงให้เห็นผลชัด)
             </div>
-            <div class="chip" data-val="2. Problem -> Solution (ขยี้ปัญหา -> เฉลยตัวช่วย): เปิดด้วยความหงุดหงิดหรือปัญหาที่คนเจอบ่อย แล้วใช้สินค้าชิ้นนี้จบปัญหาทันที" onclick="selectChip(this)">
+            <div class="chip"
+              data-val="2. Problem -> Solution (ขยี้ปัญหา -> เฉลยตัวช่วย): เปิดด้วยความหงุดหงิดหรือปัญหาที่คนเจอบ่อย แล้วใช้สินค้าชิ้นนี้จบปัญหาทันที"
+              onclick="selectChip(this)">
               🔥 2. Problem → Solution (ขยี้ปัญหา → จบด้วยตัวช่วย)
             </div>
-            <div class="chip" data-val="3. Hands-Only Proof (เห็นแต่มือใช้งาน เน้นสินค้าเต็มตา): โฟกัสมือจับ กด ลูบ เท หรือสาธิตสินค้าชัดๆ ไม่เน้นหน้าคน เจน AI เนียนที่สุด" onclick="selectChip(this)">
+            <div class="chip"
+              data-val="3. Hands-Only Proof (เห็นแต่มือใช้งาน เน้นสินค้าเต็มตา): โฟกัสมือจับ กด ลูบ เท หรือสาธิตสินค้าชัดๆ ไม่เน้นหน้าคน เจน AI เนียนที่สุด"
+              onclick="selectChip(this)">
               🤲 3. Hands-Only Proof (เห็นแต่มือสาธิตสินค้าชัดๆ)
             </div>
-            <div class="chip" data-val="4. POV Experience (มุมมองสายตาผู้ใช้จริง): เหมือนคนดูเป็นคนหยิบและสัมผัสสินค้าด้วยตัวเอง ดึง Watch Time สูง" onclick="selectChip(this)">
+            <div class="chip"
+              data-val="4. POV Experience (มุมมองสายตาผู้ใช้จริง): เหมือนคนดูเป็นคนหยิบและสัมผัสสินค้าด้วยตัวเอง ดึง Watch Time สูง"
+              onclick="selectChip(this)">
               👀 4. POV Experience (มุมมองสายตาคนใช้จริง)
             </div>
-            <div class="chip" data-val="5. Curiosity Gap (ชวนสงสัย เดี๋ยวนะ...มันคืออะไร): เปิดด้วยภาพหรือจังหวะที่ทำให้คนสงสัยจนต้องดูต่อให้จบเพื่อรอเฉลย" onclick="selectChip(this)">
+            <div class="chip"
+              data-val="5. Curiosity Gap (ชวนสงสัย เดี๋ยวนะ...มันคืออะไร): เปิดด้วยภาพหรือจังหวะที่ทำให้คนสงสัยจนต้องดูต่อให้จบเพื่อรอเฉลย"
+              onclick="selectChip(this)">
               ❓ 5. Curiosity Gap (ชวนสงสัย ต้องดูจนจบ)
             </div>
-            <div class="chip" data-val="6. Mistake & Discovery (ทำแบบเดิมลำบากมาตั้งนาน -> เพิ่งเจอตัวช่วยที่ดีกว่า): เทียบวิธีเดิมที่ยุ่งยากกับความสบายหลังใช้สินค้านี้" onclick="selectChip(this)">
+            <div class="chip"
+              data-val="6. Mistake & Discovery (ทำแบบเดิมลำบากมาตั้งนาน -> เพิ่งเจอตัวช่วยที่ดีกว่า): เทียบวิธีเดิมที่ยุ่งยากกับความสบายหลังใช้สินค้านี้"
+              onclick="selectChip(this)">
               💡 6. Mistake & Discovery (เพิ่งรู้ว่ามีวิธีที่ง่ายกว่านี้)
             </div>
-            <div class="chip" data-val="7. Hidden Feature / Detail Proof (โชว์ดีเทลลึก/ฟีเจอร์ที่คนมองข้าม): ซูมเจาะเนื้อวัสดุ ขอบตะเข็บ หรือกลไกเด็ดที่ทำให้คุ้มเกินราคา" onclick="selectChip(this)">
+            <div class="chip"
+              data-val="7. Hidden Feature / Detail Proof (โชว์ดีเทลลึก/ฟีเจอร์ที่คนมองข้าม): ซูมเจาะเนื้อวัสดุ ขอบตะเข็บ หรือกลไกเด็ดที่ทำให้คุ้มเกินราคา"
+              onclick="selectChip(this)">
               🔍 7. Hidden Feature (เจาะดีเทลลับ/วัสดุคุ้มเกินราคา)
             </div>
-            <div class="chip" data-val="8. Before -> After Ease (ก่อนใช้ลำบาก -> หลังใช้ชีวิตง่ายขึ้น): เปรียบเทียบความเรียบร้อยหรือความสะดวกก่อนและหลังจัดวางใช้งานจริง" onclick="selectChip(this)">
+            <div class="chip"
+              data-val="8. Before -> After Ease (ก่อนใช้ลำบาก -> หลังใช้ชีวิตง่ายขึ้น): เปรียบเทียบความเรียบร้อยหรือความสะดวกก่อนและหลังจัดวางใช้งานจริง"
+              onclick="selectChip(this)">
               🔄 8. Before → After Ease (ก่อนใช้ vs หลังใช้คล่องขึ้น)
             </div>
-            <div class="chip" data-val="9. Expectation vs Reality (พิสูจน์ของจริงตรงปกไหม): หยิบข้อกังวลของคนซื้อมาทดสอบให้เห็นจะจะว่าของจริงงานดีแค่ไหน" onclick="selectChip(this)">
+            <div class="chip"
+              data-val="9. Expectation vs Reality (พิสูจน์ของจริงตรงปกไหม): หยิบข้อกังวลของคนซื้อมาทดสอบให้เห็นจะจะว่าของจริงงานดีแค่ไหน"
+              onclick="selectChip(this)">
               ⚖️ 9. Expectation vs Reality (พิสูจน์ของจริงตรงปก)
             </div>
-            <div class="chip" data-val="10. Product Hero / Aesthetic (มินิมอล แต่งบ้าน/คาเฟ่): เน้นสินค้าเป็นพระเอก แสงธรรมชาติอบอุ่น มู้ดแพง ขับรูปทรงและสีสันสินค้า" onclick="selectChip(this)">
+            <div class="chip"
+              data-val="10. Product Hero / Aesthetic (มินิมอล แต่งบ้าน/คาเฟ่): เน้นสินค้าเป็นพระเอก แสงธรรมชาติอบอุ่น มู้ดแพง ขับรูปทรงและสีสันสินค้า"
+              onclick="selectChip(this)">
               🏡 10. Product Hero / Aesthetic (มินิมอล แต่งบ้านคาเฟ่)
             </div>
-            <div class="chip" data-val="11. Banter / เพื่อนป้ายยาเพื่อน (เล่าสนุก เป็นธรรมชาติ ไม่เหมือนโฆษณา): น้ำเสียงกันเองเหมือนเพื่อนสนิทมาบอกต่อของดีที่เพิ่งได้มา" onclick="selectChip(this)">
+            <div class="chip"
+              data-val="11. Banter / เพื่อนป้ายยาเพื่อน (เล่าสนุก เป็นธรรมชาติ ไม่เหมือนโฆษณา): น้ำเสียงกันเองเหมือนเพื่อนสนิทมาบอกต่อของดีที่เพิ่งได้มา"
+              onclick="selectChip(this)">
               🗣️ 11. เพื่อนป้ายยาเพื่อน (เล่าสนุก เป็นกันเอง ไม่ขายตรง)
             </div>
-            <div class="chip" data-val="12. Social Proof / ตอบกลับรีวิวลูกค้า (อบอุ่น จริงใจ ตอกย้ำความมั่นใจ): ขอบคุณลูกค้าหรือหยิบจุดที่คนชมเยอะมาโชว์ของจริงให้ดูชัดๆ" onclick="selectChip(this)">
+            <div class="chip"
+              data-val="12. Social Proof / ตอบกลับรีวิวลูกค้า (อบอุ่น จริงใจ ตอกย้ำความมั่นใจ): ขอบคุณลูกค้าหรือหยิบจุดที่คนชมเยอะมาโชว์ของจริงให้ดูชัดๆ"
+              onclick="selectChip(this)">
               💬 12. Social Proof / ตอบกลับรีวิวลูกค้าอย่างอบอุ่น
             </div>
             <!-- 4 New Hard-Sell / Warehouse / Market / Mall Styles -->
-            <div class="chip" style="border-color: rgba(255,214,0,0.45);" data-val="13. โกดัง/โรงงานมาเอง ฮาร์ดเซลราคาหน้าโรงงาน (Warehouse / Factory Direct Hard-Sell): ฉากหลังเป็นโกดังสินค้าลังเรียงซ้อนกันสูง เจ้าของโกดังหรือคนงานหยิบสินค้าจากลังมาโชว์จะๆ พูดจังหวะเร้าใจ กระชับ บอกโปรราคาหน้าโรงงาน เน้นความคุ้มค่าแบบฮาร์ดเซล" onclick="selectChip(this)">
+            <div class="chip" style="border-color: rgba(255,214,0,0.45);"
+              data-val="13. โกดัง/โรงงานมาเอง ฮาร์ดเซลราคาหน้าโรงงาน (Warehouse / Factory Direct Hard-Sell): ฉากหลังเป็นโกดังสินค้าลังเรียงซ้อนกันสูง เจ้าของโกดังหรือคนงานหยิบสินค้าจากลังมาโชว์จะๆ พูดจังหวะเร้าใจ กระชับ บอกโปรราคาหน้าโรงงาน เน้นความคุ้มค่าแบบฮาร์ดเซล"
+              onclick="selectChip(this)">
               🏭 13. โกดัง/โรงงานปล่อยของเอง (ฮาร์ดเซล ราคาหน้าโรงงาน)
             </div>
-            <div class="chip" style="border-color: rgba(255,214,0,0.45);" data-val="14. พ่อค้าแม่ค้าหน้าร้าน / ตลาดค้าส่ง (Market / Wholesale Shopfront Hard-Sell): ฉากหน้าร้านค้าส่งหรือแผงใหญ่ในตลาด เถ้าแก่/แม่ค้าถือสินค้าโชว์ให้เห็นความหนา/ขนาดจริง พูดฮาร์ดเซลขายเก่ง ชูโปรแรง ชวนกดตะกร้าเหลืองทันที" onclick="selectChip(this)">
+            <div class="chip" style="border-color: rgba(255,214,0,0.45);"
+              data-val="14. พ่อค้าแม่ค้าหน้าร้าน / ตลาดค้าส่ง (Market / Wholesale Shopfront Hard-Sell): ฉากหน้าร้านค้าส่งหรือแผงใหญ่ในตลาด เถ้าแก่/แม่ค้าถือสินค้าโชว์ให้เห็นความหนา/ขนาดจริง พูดฮาร์ดเซลขายเก่ง ชูโปรแรง ชวนกดตะกร้าเหลืองทันที"
+              onclick="selectChip(this)">
               🏪 14. พ่อค้าแม่ค้าหน้าร้าน/ตลาดค้าส่ง (ฮาร์ดเซล ขายมันส์)
             </div>
-            <div class="chip" style="border-color: rgba(255,214,0,0.45);" data-val="15. พนักงานขายในห้าง / โชว์รูมแนะนำโปรเด็ด (Mall / Showroom Salesperson Pitch): ฉากเชลฟ์สินค้าในห้างหรือโชว์รูมสว่างสวย พนักงานขายมืออาชีพหยิบสินค้ามาเทสต์ให้ดูชัดๆ บอกโปรลดหนักน่าเชื่อถือ ปิดการขายคมๆ" onclick="selectChip(this)">
+            <div class="chip" style="border-color: rgba(255,214,0,0.45);"
+              data-val="15. พนักงานขายในห้าง / โชว์รูมแนะนำโปรเด็ด (Mall / Showroom Salesperson Pitch): ฉากเชลฟ์สินค้าในห้างหรือโชว์รูมสว่างสวย พนักงานขายมืออาชีพหยิบสินค้ามาเทสต์ให้ดูชัดๆ บอกโปรลดหนักน่าเชื่อถือ ปิดการขายคมๆ"
+              onclick="selectChip(this)">
               🏬 15. พนักงานขายในห้าง/โชว์รูม (ฮาร์ดเซล โปรห้างลดหนัก)
             </div>
-            <div class="chip" style="border-color: rgba(255,214,0,0.45);" data-val="16. คนงานแพ็กของหน้าลัง / สต็อกแน่นพร้อมส่ง (Packing Station / Bulk Stock Hard-Sell): ฉากโต๊ะแพ็กของในโกดังที่มีสต็อกสินค้ากองแน่น คนงานหยิบสินค้าตัวจริงมาโชว์งานก่อนลงกล่อง บอกโปรราคาส่งจากคลังโดยตรง" onclick="selectChip(this)">
+            <div class="chip" style="border-color: rgba(255,214,0,0.45);"
+              data-val="16. คนงานแพ็กของหน้าลัง / สต็อกแน่นพร้อมส่ง (Packing Station / Bulk Stock Hard-Sell): ฉากโต๊ะแพ็กของในโกดังที่มีสต็อกสินค้ากองแน่น คนงานหยิบสินค้าตัวจริงมาโชว์งานก่อนลงกล่อง บอกโปรราคาส่งจากคลังโดยตรง"
+              onclick="selectChip(this)">
               📦 16. คนงานแพ็กของหน้าคลัง (โชว์ของจริงก่อนส่ง + โปรราคาคลัง)
             </div>
           </div>
-          <input type="text" id="customStyle" placeholder="พิมพ์สั่งแนวความต้องการเพิ่มเติมได้ตามใจชอบ เช่น 'ขอคนงานผู้ชายยืนหน้าลังสินค้าในโกดัง พูดเสียงดังฟังชัดเน้นโปรลดหนัก' (หรือเว้นว่างไว้ได้เลย)..." />
+          <input type="text" id="customStyle"
+            placeholder="พิมพ์สั่งแนวความต้องการเพิ่มเติมได้ตามใจชอบ เช่น 'ขอคนงานผู้ชายยืนหน้าลังสินค้าในโกดัง พูดเสียงดังฟังชัดเน้นโปรลดหนัก' (หรือเว้นว่างไว้ได้เลย)..." />
         </div>
       </div>
 
       <button class="btn-generate" id="btnGenerate" onclick="generateAll()">
         <span>🚀 วิเคราะห์ภาพ & สร้างชุดสคริปต์ + Kling Prompt (รวมบทพูดไทย) ทั้งหมด</span>
       </button>
-      <div style="text-align: center; margin-top: 10px; display: flex; justify-content: center; gap: 8px; flex-wrap: wrap;">
-        <button class="btn-copy" onclick="loadDemoSample()" style="font-size: 13px; color: var(--accent-2); border-color: rgba(37,244,238,0.35);">
+      <div
+        style="text-align: center; margin-top: 10px; display: flex; justify-content: center; gap: 8px; flex-wrap: wrap;">
+        <button class="btn-copy" onclick="loadDemoSample()"
+          style="font-size: 13px; color: var(--accent-2); border-color: rgba(37,244,238,0.35);">
           👁️ ตัวอย่างแนวที่ 1: Real-Use Demo (ใช้งานจริงในครัว)
         </button>
-        <button class="btn-copy" onclick="loadWarehouseSample()" style="font-size: 13px; color: var(--gold); border-color: rgba(255,214,0,0.45);">
+        <button class="btn-copy" onclick="loadWarehouseSample()"
+          style="font-size: 13px; color: var(--gold); border-color: rgba(255,214,0,0.45);">
           🏭 ตัวอย่างแนวที่ 13: โกดังปล่อยของ ราคาโรงงาน (ฮาร์ดเซล)
         </button>
       </div>
@@ -722,22 +842,36 @@
     <!-- Output Area -->
     <div id="outputArea">
       <!-- Top Copy All Bar -->
-      <div class="card" style="padding: 16px 22px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; background: rgba(16, 185, 129, 0.1); border-color: rgba(16, 185, 129, 0.4);">
+      <div class="card"
+        style="padding: 16px 22px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; background: rgba(16, 185, 129, 0.1); border-color: rgba(16, 185, 129, 0.4);">
         <div>
-          <div style="font-weight: 700; color: var(--green);">✅ สร้างชุดข้อมูลครบทั้ง 6 ส่วน (ผ่านระบบตรวจคำต้องห้าม TikTok Shop 2026 เรียบร้อยแล้ว!)</div>
-          <div id="modelUsedBadge" style="font-size: 13px; color: var(--muted); margin-top: 4px;">🤖 ประมวลผลด้วยโมเดล: gemini-3.6-flash</div>
+          <div style="font-weight: 700; color: var(--green);">✅ สร้างชุดข้อมูลครบทั้ง 6 ส่วน (ผ่านระบบตรวจคำต้องห้าม
+            TikTok Shop 2026 เรียบร้อยแล้ว!)</div>
+          <div id="modelUsedBadge" style="font-size: 13px; color: var(--muted); margin-top: 4px;">🤖 ประมวลผลด้วยโมเดล:
+            gemini-3.6-flash</div>
         </div>
-        <button class="btn-copy" onclick="copyEntirePackage(this)" style="background: var(--green); border-color: var(--green); color: #fff;">
+        <button class="btn-copy" onclick="copyEntirePackage(this)"
+          style="background: var(--green); border-color: var(--green); color: #fff;">
           📋 คัดลอกทั้งหมดในคลิกเดียว
         </button>
       </div>
 
-      <!-- 0. Product Analysis Table -->
+      <!-- 0. Product Analysis Table + Exact OCR Product Name -->
       <div class="card">
         <div class="out-header">
           <div class="out-title" id="analysisTitle">📊 วิเคราะห์สินค้าจากภาพ</div>
           <button class="btn-copy" onclick="copyTextById('analysisRaw', this)">📋 คัดลอกตารางวิเคราะห์</button>
         </div>
+
+        <!-- Exact Product Name OCR Box -->
+        <div style="background: var(--card-2); border: 1px solid rgba(37, 244, 238, 0.35); border-radius: 12px; padding: 14px 16px; margin-bottom: 14px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 8px;">
+            <div style="font-size: 14px; font-weight: 700; color: var(--accent-2);">🏷️ ชื่อสินค้าเต็มที่ถอดจากรูปภาพทั้งหมด (Exact OCR Text)</div>
+            <button class="btn-copy" onclick="copyTextById('ocrProductNameBox', this)">📋 คัดลอกชื่อสินค้าเต็ม</button>
+          </div>
+          <div id="ocrProductNameBox" style="font-size: 15px; font-weight: 500; color: var(--text); word-break: break-word; line-height: 1.55;"></div>
+        </div>
+
         <p id="analysisSummary" style="color: var(--muted); font-size: 14px; margin-bottom: 12px;"></p>
         <table class="data-table" id="analysisTable"></table>
         <pre id="analysisRaw" style="display:none;"></pre>
@@ -765,7 +899,8 @@
       <!-- 3. Kling Omni Master Prompt (Includes Voiceover Script & No Text Rule) -->
       <div class="card">
         <div class="out-header">
-          <div class="out-title">3. 🤖 Kling Omni Master Prompt (รวมสคริปต์เสียงพากย์ไทย + ล็อกทรงสินค้า + ห้ามมีข้อความขึ้นในคลิป)</div>
+          <div class="out-title">3. 🤖 Kling Omni Master Prompt (รวมสคริปต์เสียงพากย์ไทย + ล็อกทรงสินค้า +
+            ห้ามมีข้อความขึ้นในคลิป)</div>
           <button class="btn-copy" onclick="copyTextById('klingPromptBox', this)">📋 คัดลอก Kling Prompt</button>
         </div>
         <div class="code-box mono" id="klingPromptBox"></div>
@@ -788,7 +923,8 @@
           <button class="btn-copy" onclick="copyTextById('captionOnlyBox', this)">📋 คัดลอกเฉพาะ Caption</button>
         </div>
         <div class="code-box" id="captionOnlyBox"></div>
-        <div style="margin-top: 16px; font-weight: 700; font-size: 15px;">🏷️ เลือกก๊อปปี้ชุด Hashtag 5 แบบ (แบบละ 5 แฮชแท็กตรงกลุ่มเป้าหมาย):</div>
+        <div style="margin-top: 16px; font-weight: 700; font-size: 15px;">🏷️ เลือกก๊อปปี้ชุด Hashtag 5 แบบ (แบบละ 5
+          แฮชแท็กตรงกลุ่มเป้าหมาย):</div>
         <div id="hashtagSetsContainer"></div>
       </div>
 
@@ -859,7 +995,7 @@
         document.body.appendChild(ta);
         ta.focus();
         ta.select();
-        try { document.execCommand('copy'); } catch (e) {}
+        try { document.execCommand('copy'); } catch (e) { }
         document.body.removeChild(ta);
         resolve();
       });
@@ -870,9 +1006,9 @@
       let s = String(str || '');
       // 1. Competitor / Off-platform terms
       s = s.replace(/ตะกร้าส้ม/g, 'ตะกร้าเหลือง')
-           .replace(/ตะกร้าสีส้ม/g, 'ตะกร้าสีเหลือง')
-           .replace(/ถุงส้ม/g, 'ตะกร้าเหลือง')
-           .replace(/แอพส้ม|แอปส้ม|Shopee|Lazada/gi, 'TikTok Shop');
+        .replace(/ตะกร้าสีส้ม/g, 'ตะกร้าสีเหลือง')
+        .replace(/ถุงส้ม/g, 'ตะกร้าเหลือง')
+        .replace(/แอพส้ม|แอปส้ม|Shopee|Lazada/gi, 'TikTok Shop');
 
       // 2. Never say "ราคาหลักสิบ" or "หลักสิบ" -> convert to safe price cushion "งบไม่ถึงร้อย"
       s = s.replace(/ราคาแค่หลักสิบ|ราคาหลักสิบ|แค่หลักสิบ|งบหลักสิบ|หลักสิบบาท|หลักสิบ/g, 'งบไม่ถึงร้อย');
@@ -1063,10 +1199,12 @@
 
 ตอบกลับเป็น JSON Object ตามโครงสร้างนี้เท่านั้น (ห้ามมีข้อความอื่นนอก JSON):
 {
+  "exact_product_name_from_image": "ถอดข้อความชื่อสินค้าทั้งหมดที่ปรากฏในรูปภาพแบบคำต่อคำ (Exact OCR Verbatim) ทุกตัวอักษร ไม่ตัดคำ ไม่สรุปย่อ (หากในรูปมีข้อความชื่อสินค้า + ตัวเลือกสี/ขนาดที่แสดงอยู่ ให้ถอดมาให้ครบถ้วน)",
   "selected_style_name": "ชื่อแนวคลิปที่เลือกใช้จาก 16 แนว พร้อมเหตุผลสั้นๆ 1 ประโยค",
   "product_title": "ชื่อสินค้าและรุ่น/สีที่วิเคราะห์ได้",
   "product_summary": "สรุปภาพรวมสินค้า จุดขายหลัก และเพดานราคาแบบเซฟ",
   "specs": [
+    {"label": "ชื่อสินค้าเต็มที่ถอดจากภาพ (OCR)", "value": "ข้อความชื่อสินค้าทั้งหมดที่แกะได้จากในรูปภาพแบบคำต่อคำ..."},
     {"label": "สินค้า", "value": "..."},
     {"label": "สีและลายที่เลือก", "value": "..."},
     {"label": "ขนาด / ในเซ็ตประกอบด้วย", "value": "..."},
@@ -1155,8 +1293,8 @@
       const styleInstruction = customStyle
         ? `แนวความต้องการของผู้ใช้: ${customStyle} (แนวหลักที่เลือก: ${selectedChipStyle})`
         : (selectedChipStyle === 'auto'
-            ? 'แนวความต้องการ: ให้วิเคราะห์สินค้าแล้วเลือก 1 แนวจาก 16 แนวหลักที่หยุดนิ้วและเหมาะกับสินค้านี้มากที่สุดโดยอัตโนมัติ'
-            : `แนวความต้องการ: ${selectedChipStyle}`);
+          ? 'แนวความต้องการ: ให้วิเคราะห์สินค้าแล้วเลือก 1 แนวจาก 16 แนวหลักที่หยุดนิ้วและเหมาะกับสินค้านี้มากที่สุดโดยอัตโนมัติ'
+          : `แนวความต้องการ: ${selectedChipStyle}`);
 
       const userPromptParts = [];
       uploadedImages.forEach(img => {
@@ -1169,7 +1307,7 @@
       });
 
       userPromptParts.push({
-        text: `กรุณาวิเคราะห์ข้อมูลจากภาพสินค้าที่แนบมานี้ ${infoText ? `(ข้อมูลเพิ่มเติมจากผู้ใช้: ${infoText})` : ''}\n${styleInstruction}\nจำกฎเหล็ก: 1) ห้ามพูดคำว่า "ราคาหลักสิบ" เด็ดขาด ให้ปัดเป็นเพดานราคาปลอดภัย เช่น 79 บาท -> "งบไม่ถึงร้อย / แบงก์ร้อยมีทอน", 2XX บาท -> "สามร้อยมีทอน" 2) ถ้าพูด % ส่วนลด ต้องปัดลงให้ต่ำกว่าในภาพและลงท้ายด้วย 0 หรือ 5 เท่านั้น (เช่น 78% -> 75%, 72% -> 70%) 3) ห้ามมีข้อความขึ้นในคลิปและใน Storyboard 4) ต้องนำบทพูดภาษาไทยใส่ลงใน Kling Master Prompt ด้วย 5) ชุดแฮชแท็กต้องมี 5 แบบ แบบละ 5 แฮชแท็กเป๊ะๆ`
+        text: `กรุณาวิเคราะห์ข้อมูลจากภาพสินค้าที่แนบมานี้ ${infoText ? `(ข้อมูลเพิ่มเติมจากผู้ใช้: ${infoText})` : ''}\n${styleInstruction}\nจำกฎเหล็ก: 0) ต้องถอดข้อความชื่อสินค้าทั้งหมดที่ปรากฏในรูปภาพแบบคำต่อคำครบทุกตัวอักษรใส่ใน exact_product_name_from_image 1) ห้ามพูดคำว่า "ราคาหลักสิบ" เด็ดขาด ให้ปัดเป็นเพดานราคาปลอดภัย เช่น 79 บาท -> "งบไม่ถึงร้อย / แบงก์ร้อยมีทอน", 2XX บาท -> "สามร้อยมีทอน" 2) ถ้าพูด % ส่วนลด ต้องปัดลงให้ต่ำกว่าในภาพและลงท้ายด้วย 0 หรือ 5 เท่านั้น (เช่น 78% -> 75%, 72% -> 70%) 3) ห้ามมีข้อความขึ้นในคลิปและใน Storyboard 4) ต้องนำบทพูดภาษาไทยใส่ลงใน Kling Master Prompt ด้วย 5) ชุดแฮชแท็กต้องมี 5 แบบ แบบละ 5 แฮชแท็กเป๊ะๆ`
       });
 
       const modelsToTry = getModelQueue();
@@ -1256,8 +1394,11 @@
         }
       }
 
-      // 0. Analysis
+      // 0. Analysis + Exact OCR Product Name
       document.getElementById('analysisTitle').textContent = `📊 วิเคราะห์สินค้า: ${d.product_title || ''}`;
+      const ocrFullName = (d.exact_product_name_from_image || d.product_title || '').trim();
+      document.getElementById('ocrProductNameBox').textContent = ocrFullName;
+
       const styleBanner = d.selected_style_name ? `🎯 แนวคลิปที่ใช้: ${d.selected_style_name} — ` : '';
       document.getElementById('analysisSummary').textContent = styleBanner + (d.product_summary || '');
       const specs = d.specs || [];
@@ -1268,6 +1409,7 @@
         </tbody>
       `;
       document.getElementById('analysisRaw').textContent =
+        `ชื่อสินค้าเต็มที่ถอดจากรูปภาพ (OCR): ${ocrFullName}\n` +
         `วิเคราะห์สินค้า: ${d.product_title || ''}\n${styleBanner}${d.product_summary || ''}\n` +
         specs.map(s => `- ${s.label}: ${s.value}`).join('\n');
 
@@ -1360,7 +1502,7 @@
       if (!lastResultData) return;
       const d = lastResultData;
       const hSetsText = (d.hashtag_sets || []).slice(0, 5).map((hs, i) =>
-        `${hs.style_name || `แบบที่ ${i+1}`}: ${normalizeFiveTags(hs.tags).join(' ')}`
+        `${hs.style_name || `แบบที่ ${i + 1}`}: ${normalizeFiveTags(hs.tags).join(' ')}`
       ).join('\n');
 
       const fullText = [
@@ -1387,25 +1529,27 @@
 
     function loadDemoSample() {
       const sample = {
+        "exact_product_name_from_image": "พรมห้องครัวเซ็ต 2 ชิ้น พรมปูพื้นห้องครัวสไตล์มินิมอล แบบไร้ขอบ ลายหมากรุกขาวดำ กันลื่น ซับน้ำ ซักทำความสะอาดได้ (ขนาด 40x60cm + 40x120cm)",
         "selected_style_name": "1. Real-Use Demo (ใช้งานจริงให้เห็นผลชัด) — โชว์การวางใช้งานหน้าเคาน์เตอร์ครัวและการซับน้ำ/กันลื่นให้เห็นด้วยตา",
         "product_title": "พรมห้องครัวเซ็ต 2 ชิ้น ลายหมากรุกขาวดำ สไตล์มินิมอล",
         "product_summary": "เซ็ตพรมปูพื้นห้องครัว 2 ชิ้น (ผืนยาว 120×40 ซม. + ผืนสั้น 60×40 ซม.) ลายหมากรุกขาวดำ ซับน้ำไว ฐานกันลื่น เซฟคำเคลมราคาเป็น 'งบไม่ถึงร้อย / แบงก์ร้อยมีทอน' และเซฟส่วนลดจาก 78% เป็น 'ลด 75%'",
         "specs": [
-          {"label": "สินค้า", "value": "พรมห้องครัวเซ็ต 2 ชิ้น (ได้ทั้งผืนยาวและผืนสั้น)"},
-          {"label": "สีและลายที่เลือก", "value": "ลายหมากรุกขาวดำ (Checkerboard)"},
-          {"label": "ขนาด / ในเซ็ตประกอบด้วย", "value": "ผืนยาว 120 × 40 ซม. และผืนสั้น 60 × 40 ซม."},
-          {"label": "วัสดุ", "value": "ผ้าโพลีเอสเตอร์ทอแน่น สัมผัสนุ่มสบายเท้า"},
-          {"label": "คุณสมบัติเด่น", "value": "ฐานกันลื่นยึดเกาะพื้นกระเบื้อง ซับน้ำไว ซักทำความสะอาดง่าย"},
-          {"label": "ราคาในภาพ ➡️ คำพูดราคาแบบเซฟ", "value": "ในภาพ 79 บาท (ลด 78%) ➡️ เซฟเป็น 'งบไม่ถึงร้อย / แบงก์ร้อยมีทอน' และ 'ลดหนัก 75%' (ห้ามพูดคำว่าหลักสิบ)"},
-          {"label": "แนวคลิปที่ใช้ (จาก 12 แนว)", "value": "แนวที่ 1: Real-Use Demo (ใช้งานจริงให้เห็นผลชัด)"}
+          { "label": "ชื่อสินค้าเต็มที่ถอดจากภาพ (OCR)", "value": "พรมห้องครัวเซ็ต 2 ชิ้น พรมปูพื้นห้องครัวสไตล์มินิมอล แบบไร้ขอบ ลายหมากรุกขาวดำ กันลื่น ซับน้ำ ซักทำความสะอาดได้ (ขนาด 40x60cm + 40x120cm)" },
+          { "label": "สินค้า", "value": "พรมห้องครัวเซ็ต 2 ชิ้น (ได้ทั้งผืนยาวและผืนสั้น)" },
+          { "label": "สีและลายที่เลือก", "value": "ลายหมากรุกขาวดำ (Checkerboard)" },
+          { "label": "ขนาด / ในเซ็ตประกอบด้วย", "value": "ผืนยาว 120 × 40 ซม. และผืนสั้น 60 × 40 ซม." },
+          { "label": "วัสดุ", "value": "ผ้าโพลีเอสเตอร์ทอแน่น สัมผัสนุ่มสบายเท้า" },
+          { "label": "คุณสมบัติเด่น", "value": "ฐานกันลื่นยึดเกาะพื้นกระเบื้อง ซับน้ำไว ซักทำความสะอาดง่าย" },
+          { "label": "ราคาในภาพ ➡️ คำพูดราคาแบบเซฟ", "value": "ในภาพ 79 บาท (ลด 78%) ➡️ เซฟเป็น 'งบไม่ถึงร้อย / แบงก์ร้อยมีทอน' และ 'ลดหนัก 75%' (ห้ามพูดคำว่าหลักสิบ)" },
+          { "label": "แนวคลิปที่ใช้ (จาก 12 แนว)", "value": "แนวที่ 1: Real-Use Demo (ใช้งานจริงให้เห็นผลชัด)" }
         ],
         "voiceover_10s": "ยืนล้างจานน้ำกระเด็นพื้นลื่น ลองเปลี่ยนมาปูพรมหมากรุกเซ็ตสองชิ้นคู่นี้ดูค่ะ ได้ทั้งผืนยาวผืนสั้น ซับน้ำไว ฐานหนึบไม่ลื่นไถล ตอนนี้จัดโปรลดหนัก 75% งบไม่ถึงร้อยได้ครบเซ็ต กดดูที่ตะกร้าเหลืองซ้ายล่างได้เลยนะ!",
         "storyboard": [
-          {"time": "0–2 วินาที", "visual": "ภาพเปิด Frame Zero: เท้าเปล่าก้าวเหยียบลงบนพรมลายหมากรุกขาวดำผืนยาวหน้าอ่างล้างจานอย่างมั่นคง พรมยึดเกาะพื้นกระเบื้องแน่นไม่ขยับ"},
-          {"time": "2–4 วินาที", "visual": "กล้องแพนมุมต่ำตามแนวยาวให้เห็นพรมทั้ง 2 ชิ้นวางเข้าชุดกัน (ผืนยาว 120×40 ซม. หน้าเคาน์เตอร์ครัว และผืนสั้น 60×40 ซม. หน้าซิงก์ล้างจาน)"},
-          {"time": "4–6 วินาที", "visual": "มุมใกล้ Close-up มือลูบเนื้อผ้าโพลีเอสเตอร์ให้เห็นความนุ่มและลายตารางหมากรุกคมชัด"},
-          {"time": "6–8 วินาที", "visual": "มือเปิดมุมพรมด้านหลังขึ้นเล็กน้อย โชว์แผ่นฐานกันลื่นที่ยึดติดกับพื้นกระเบื้องห้องครัว"},
-          {"time": "8–10 วินาที", "visual": "กล้องถอยออกช้าๆ เห็นภาพรวมห้องครัวมินิมอลสะอาดตาที่มีพรมหมากรุกทั้งสองผืนวางเข้าชุดกันอย่างสวยงาม"}
+          { "time": "0–2 วินาที", "visual": "ภาพเปิด Frame Zero: เท้าเปล่าก้าวเหยียบลงบนพรมลายหมากรุกขาวดำผืนยาวหน้าอ่างล้างจานอย่างมั่นคง พรมยึดเกาะพื้นกระเบื้องแน่นไม่ขยับ" },
+          { "time": "2–4 วินาที", "visual": "กล้องแพนมุมต่ำตามแนวยาวให้เห็นพรมทั้ง 2 ชิ้นวางเข้าชุดกัน (ผืนยาว 120×40 ซม. หน้าเคาน์เตอร์ครัว และผืนสั้น 60×40 ซม. หน้าซิงก์ล้างจาน)" },
+          { "time": "4–6 วินาที", "visual": "มุมใกล้ Close-up มือลูบเนื้อผ้าโพลีเอสเตอร์ให้เห็นความนุ่มและลายตารางหมากรุกคมชัด" },
+          { "time": "6–8 วินาที", "visual": "มือเปิดมุมพรมด้านหลังขึ้นเล็กน้อย โชว์แผ่นฐานกันลื่นที่ยึดติดกับพื้นกระเบื้องห้องครัว" },
+          { "time": "8–10 วินาที", "visual": "กล้องถอยออกช้าๆ เห็นภาพรวมห้องครัวมินิมอลสะอาดตาที่มีพรมหมากรุกทั้งสองผืนวางเข้าชุดกันอย่างสวยงาม" }
         ],
         "kling_master_prompt": "[Subject]: <<<image_1>>>, ++black and white checkerboard kitchen mat 2-piece set++, consisting of one long rectangular runner mat (approx 3:1 length-to-width proportion) and one matching shorter rectangular mat (approx 3:2 proportion), crisp woven polyester fabric texture with sharp black-and-white checker grid.\n\n[Subject Motion]: Zero warping or morphing of the checkerboard pattern; natural human action as bare feet gently step onto the mat in front of the kitchen sink, followed by a single adult hand lightly pressing the fabric surface to demonstrate softness and non-slip stability against the floor.\n\n[Scene]: Clean minimalist home kitchen, warm oak cabinets, bright white floor tiles, soft natural daylight streaming from a side window.\n\n[Spatial]: Vertical 9:16 composition; foreground shows tactile mat surface and foot/hand interaction, midground shows the 2-piece mat placement along the kitchen counter and sink, softly blurred clean kitchen background.\n\n[Camera]: Continuous smooth high-angle push-in transitioning into a gentle low-angle lateral tracking glide along the mats, 35mm lens, shallow depth of field, authentic native TikTok UGC realism.\n\n[Voiceover / Thai Dialogue Script]: Natural Thai female creator voice speaking warmly and conversationally (10s): \"ยืนล้างจานน้ำกระเด็นพื้นลื่น ลองเปลี่ยนมาปูพรมหมากรุกเซ็ตสองชิ้นคู่นี้ดูค่ะ ได้ทั้งผืนยาวผืนสั้น ซับน้ำไว ฐานหนึบไม่ลื่นไถล ตอนนี้จัดโปรลดหนัก 75% งบไม่ถึงร้อยได้ครบเซ็ต กดดูที่ตะกร้าเหลืองซ้ายล่างได้เลยนะ!\"\n\n[Negative / Constraints]: No text, no on-screen text, no captions, no subtitles, no Thai characters on screen, no logos, no watermarks, no animation overlays, no distorted checkerboard lines, no warped grid pattern, no deformed hands, no extra fingers, no duplicate extra mats.",
         "cover_headlines": [
@@ -1417,11 +1561,11 @@
         ],
         "caption_body": "หมดปัญหาพื้นครัวเปียกลื่นเวลาทำกับข้าวหรือล้างจาน ด้วยพรมห้องครัวลายหมากรุกขาวดำเซ็ต 2 ชิ้นคู่นี้เลยค่ะ\n\nในเซ็ตได้ครบทั้งผืนยาว 120×40 ซม. และผืนสั้น 60×40 ซม. วางคู่กันหน้าเคาน์เตอร์กับหน้าอ่างล้างจานคือเข้าชุดกันพอดี เนื้อผ้าโพลีเอสเตอร์นุ่มสบายเท้า ซับน้ำไว ด้านหลังมีฐานกันลื่นยึดพื้นแน่น ถอดซักทำความสะอาดได้\n\nตอนนี้จัดโปรลดแรง 75% แบงก์ร้อยมีทอนก็ได้ครบทั้ง 2 ผืนแล้ว กดดูสีและขนาดที่ตะกร้าเหลืองซ้ายล่างได้เลยนะคะ",
         "hashtag_sets": [
-          {"style_name": "แบบที่ 1: สายตรงสินค้า & พิกัดใช้งาน", "tags": ["#พรมห้องครัว", "#พรมปูพื้นห้องครัว", "#พรมลายหมากรุก", "#พรมซับน้ำ", "#พรมกันลื่น"]},
-          {"style_name": "แบบที่ 2: สายป้ายยา & รีวิวของใช้จริง", "tags": ["#ป้ายยาของใช้ในบ้าน", "#รีวิวของใช้ในบ้าน", "#ของใช้ในครัว", "#แม่บ้านรีวิว", "#ใช้ดีบอกต่อ"]},
-          {"style_name": "แบบที่ 3: สายแต่งบ้านมินิมอล / คาเฟ่", "tags": ["#แต่งบ้านมินิมอล", "#แต่งห้องครัว", "#ครัวมินิมอล", "#แต่งบ้านงบประหยัด", "#ไอเดียแต่งครัว"]},
-          {"style_name": "แบบที่ 4: สายคุ้มค่า / โปรแรงราคาโดน", "tags": ["#แบงก์ร้อยมีทอน", "#งบไม่ถึงร้อย", "#โปรแรงTikTokShop", "#ของคุ้มราคาประหยัด", "#พรมเซ็ต2ชิ้น"]},
-          {"style_name": "แบบที่ 5: สายไวรัลดันฟีด TikTok Shop", "tags": ["#TikTokShopครีเอเตอร์", "#พิกัดตะกร้าเหลือง", "#ป้ายยาTikTokShop", "#รีวิวTikTokShop", "#TikTokแต่งบ้าน"]}
+          { "style_name": "แบบที่ 1: สายตรงสินค้า & พิกัดใช้งาน", "tags": ["#พรมห้องครัว", "#พรมปูพื้นห้องครัว", "#พรมลายหมากรุก", "#พรมซับน้ำ", "#พรมกันลื่น"] },
+          { "style_name": "แบบที่ 2: สายป้ายยา & รีวิวของใช้จริง", "tags": ["#ป้ายยาของใช้ในบ้าน", "#รีวิวของใช้ในบ้าน", "#ของใช้ในครัว", "#แม่บ้านรีวิว", "#ใช้ดีบอกต่อ"] },
+          { "style_name": "แบบที่ 3: สายแต่งบ้านมินิมอล / คาเฟ่", "tags": ["#แต่งบ้านมินิมอล", "#แต่งห้องครัว", "#ครัวมินิมอล", "#แต่งบ้านงบประหยัด", "#ไอเดียแต่งครัว"] },
+          { "style_name": "แบบที่ 4: สายคุ้มค่า / โปรแรงราคาโดน", "tags": ["#แบงก์ร้อยมีทอน", "#งบไม่ถึงร้อย", "#โปรแรงTikTokShop", "#ของคุ้มราคาประหยัด", "#พรมเซ็ต2ชิ้น"] },
+          { "style_name": "แบบที่ 5: สายไวรัลดันฟีด TikTok Shop", "tags": ["#TikTokShopครีเอเตอร์", "#พิกัดตะกร้าเหลือง", "#ป้ายยาTikTokShop", "#รีวิวTikTokShop", "#TikTokแต่งบ้าน"] }
         ],
         "basket_titles": [
           "พรมครัวหมากรุก 2 ผืน งบไม่ถึงร้อย",
@@ -1438,25 +1582,27 @@
 
     function loadWarehouseSample() {
       const sample = {
+        "exact_product_name_from_image": "พรมห้องครัวเซ็ต 2 ชิ้น พรมปูพื้นห้องครัวสไตล์มินิมอล แบบไร้ขอบ ลายหมากรุกขาวดำ กันลื่น ซับน้ำ ซักทำความสะอาดได้ (ขนาด 40x60cm + 40x120cm)",
         "selected_style_name": "13. โกดัง/โรงงานปล่อยของเอง (ฮาร์ดเซล ราคาหน้าโรงงาน) — เจ้าของโกดังพาบุกชั้นวางสต็อก โชว์เนื้อพรมและแผ่นกันลื่นสดๆ พร้อมโปรตัดสต็อกหน้าโกดัง",
         "product_title": "พรมห้องครัวเซ็ต 2 ชิ้น ลายหมากรุกขาวดำ (โปรตัดสต็อกหน้าโกดัง)",
         "product_summary": "เซ็ตพรมปูพื้นห้องครัว 2 ชิ้น (ผืนยาว 120×40 ซม. + ผืนสั้น 60×40 ซม.) แนวฮาร์ดเซลบุกโกดังปล่อยของเอง เซฟคำเคลมราคาเป็น 'งบไม่ถึงร้อย / แบงก์ร้อยมีทอน' และเซฟส่วนลดจาก 78% เป็น 'ลด 75%'",
         "specs": [
-          {"label": "สินค้า", "value": "พรมห้องครัวเซ็ต 2 ชิ้น (ได้ทั้งผืนยาวและผืนสั้น ยกแพ็กจากโกดัง)"},
-          {"label": "สีและลายที่เลือก", "value": "ลายหมากรุกขาวดำ (Checkerboard)"},
-          {"label": "ขนาด / ในเซ็ตประกอบด้วย", "value": "ผืนยาว 120 × 40 ซม. และผืนสั้น 60 × 40 ซม."},
-          {"label": "วัสดุ", "value": "ผ้าโพลีเอสเตอร์ทอแน่น ซับน้ำไว ด้านหลังบุปุ่มยางกันลื่น"},
-          {"label": "คุณสมบัติเด่น", "value": "ยึดเกาะพื้นแน่น ซับน้ำไว ซักเครื่องได้ งานตัดสต็อกตรงจากโกดัง"},
-          {"label": "ราคาในภาพ ➡️ คำพูดราคาแบบเซฟ", "value": "ในภาพ 79 บาท (ลด 78%) ➡️ เซฟเป็น 'งบไม่ถึงร้อย / แบงก์ร้อยมีทอน' และ 'ลดหนัก 75%' (ห้ามพูดคำว่าหลักสิบ)"},
-          {"label": "แนวคลิปที่ใช้ (จาก 16 แนว)", "value": "แนวที่ 13: โกดัง/โรงงานปล่อยของเอง (ฮาร์ดเซล ราคาหน้าโรงงาน)"}
+          { "label": "ชื่อสินค้าเต็มที่ถอดจากภาพ (OCR)", "value": "พรมห้องครัวเซ็ต 2 ชิ้น พรมปูพื้นห้องครัวสไตล์มินิมอล แบบไร้ขอบ ลายหมากรุกขาวดำ กันลื่น ซับน้ำ ซักทำความสะอาดได้ (ขนาด 40x60cm + 40x120cm)" },
+          { "label": "สินค้า", "value": "พรมห้องครัวเซ็ต 2 ชิ้น (ได้ทั้งผืนยาวและผืนสั้น ยกแพ็กจากโกดัง)" },
+          { "label": "สีและลายที่เลือก", "value": "ลายหมากรุกขาวดำ (Checkerboard)" },
+          { "label": "ขนาด / ในเซ็ตประกอบด้วย", "value": "ผืนยาว 120 × 40 ซม. และผืนสั้น 60 × 40 ซม." },
+          { "label": "วัสดุ", "value": "ผ้าโพลีเอสเตอร์ทอแน่น ซับน้ำไว ด้านหลังบุปุ่มยางกันลื่น" },
+          { "label": "คุณสมบัติเด่น", "value": "ยึดเกาะพื้นแน่น ซับน้ำไว ซักเครื่องได้ งานตัดสต็อกตรงจากโกดัง" },
+          { "label": "ราคาในภาพ ➡️ คำพูดราคาแบบเซฟ", "value": "ในภาพ 79 บาท (ลด 78%) ➡️ เซฟเป็น 'งบไม่ถึงร้อย / แบงก์ร้อยมีทอน' และ 'ลดหนัก 75%' (ห้ามพูดคำว่าหลักสิบ)" },
+          { "label": "แนวคลิปที่ใช้ (จาก 16 แนว)", "value": "แนวที่ 13: โกดัง/โรงงานปล่อยของเอง (ฮาร์ดเซล ราคาหน้าโรงงาน)" }
         ],
         "voiceover_10s": "บุกโกดังมาปล่อยของเอง! พรมห้องครัวลายหมากรุกยกเซ็ตสองผืน ได้ทั้งผืนยาวผืนสั้น งานทอแน่นซับน้ำไว ฐานกันลื่นหนึบๆ วันนี้จัดโปรหน้าโรงงานลดหนัก 75% แบงก์ร้อยมีทอนได้ครบสองชิ้น จิ้มตะกร้าเหลืองซ้ายล่างได้เลยครับ!",
         "storyboard": [
-          {"time": "0–2 วินาที", "visual": "ภาพเปิด Frame Zero ในโกดังสินค้า: เจ้าของโกดังยืนหน้าชั้นวางพาเลทสต็อกพรม คลี่พรมลายหมากรุกขาวดำผืนยาว 120×40 ซม. คู่กับผืนสั้น 60×40 ซม. โชว์หน้ากล้องอย่างกระฉับกระเฉง"},
-          {"time": "2–4 วินาที", "visual": "กล้องซูมเข้าใกล้ขณะมือเจ้าของโกดังดึงและบิดเนื้อผ้าโพลีเอสเตอร์โชว์ความหนาแน่นและลวดลายตารางหมากรุกคมชัด"},
-          {"time": "4–6 วินาที", "visual": "พลิกด้านหลังพรมโชว์แผ่นปุ่มกันลื่น แล้วโยนพรมวางลงบนพื้นปูนขัดมันในโกดัง ใช้เท้าดันทดสอบความหนึบว่าพรมไม่ลื่นไถล"},
-          {"time": "6–8 วินาที", "visual": "มือหยิบพรมทั้ง 2 ผืน (ผืนยาว + ผืนสั้น) มารวมคู่กันตรงหน้าลังพัสดุที่เตรียมแพ็กส่ง โชว์ว่าได้ครบเซ็ต 2 ชิ้น"},
-          {"time": "8–10 วินาที", "visual": "เจ้าของโกดังถือเซ็ตพรมคู่โชว์ชัดๆ หน้าชั้นวางสินค้าในโกดังไฟสว่างคมชัด จบคลิปอย่างมืออาชีพ"}
+          { "time": "0–2 วินาที", "visual": "ภาพเปิด Frame Zero ในโกดังสินค้า: เจ้าของโกดังยืนหน้าชั้นวางพาเลทสต็อกพรม คลี่พรมลายหมากรุกขาวดำผืนยาว 120×40 ซม. คู่กับผืนสั้น 60×40 ซม. โชว์หน้ากล้องอย่างกระฉับกระเฉง" },
+          { "time": "2–4 วินาที", "visual": "กล้องซูมเข้าใกล้ขณะมือเจ้าของโกดังดึงและบิดเนื้อผ้าโพลีเอสเตอร์โชว์ความหนาแน่นและลวดลายตารางหมากรุกคมชัด" },
+          { "time": "4–6 วินาที", "visual": "พลิกด้านหลังพรมโชว์แผ่นปุ่มกันลื่น แล้วโยนพรมวางลงบนพื้นปูนขัดมันในโกดัง ใช้เท้าดันทดสอบความหนึบว่าพรมไม่ลื่นไถล" },
+          { "time": "6–8 วินาที", "visual": "มือหยิบพรมทั้ง 2 ผืน (ผืนยาว + ผืนสั้น) มารวมคู่กันตรงหน้าลังพัสดุที่เตรียมแพ็กส่ง โชว์ว่าได้ครบเซ็ต 2 ชิ้น" },
+          { "time": "8–10 วินาที", "visual": "เจ้าของโกดังถือเซ็ตพรมคู่โชว์ชัดๆ หน้าชั้นวางสินค้าในโกดังไฟสว่างคมชัด จบคลิปอย่างมืออาชีพ" }
         ],
         "kling_master_prompt": "[Subject]: <<<image_1>>>, ++black and white checkerboard kitchen mat 2-piece set++, consisting of one long rectangular runner mat (120x40 cm proportion) and one matching shorter rectangular mat (60x40 cm proportion), held and demonstrated by an energetic Thai warehouse owner wearing a neat dark polo work shirt.\n\n[Subject Motion]: Fast-paced authentic hard-sell demonstration; the warehouse owner briskly unrolls the two checkerboard mats in front of stacked inventory shelves, flips the mat edge to show the non-slip backing texture, and places it firmly on the clean warehouse floor to prove grip stability without any pattern warping.\n\n[Scene]: Authentic modern wholesale distribution warehouse in Thailand, stacked brown shipping cartons and neat product racks in the background, bright industrial daylight LED lighting.\n\n[Spatial]: Vertical 9:16 frame; foreground highlights the crisp black-and-white checkerboard mats in the seller's hands, midground shows the active warehouse packing station, background features deep industrial shelves with soft depth-of-field.\n\n[Camera]: Dynamic handheld commercial tracking shot starting with a punchy medium close-up, pushing in on the fabric texture and backing grip, 35mm lens, high clarity realistic TikTok Shop warehouse live-sell aesthetic.\n\n[Voiceover / Thai Dialogue Script]: Energetic and trustworthy Thai male warehouse owner voice speaking with exciting factory-direct sales rhythm (10s): \"บุกโกดังมาปล่อยของเอง! พรมห้องครัวลายหมากรุกยกเซ็ตสองผืน ได้ทั้งผืนยาวผืนสั้น งานทอแน่นซับน้ำไว ฐานกันลื่นหนึบๆ วันนี้จัดโปรหน้าโรงงานลดหนัก 75% แบงก์ร้อยมีทอนได้ครบสองชิ้น จิ้มตะกร้าเหลืองซ้ายล่างได้เลยครับ!\"\n\n[Negative / Constraints]: No text, no on-screen text, no captions, no subtitles, no Thai characters on screen, no logos, no watermarks, no animation overlays, no distorted checkerboard lines, no warped grid pattern, no deformed hands, no extra fingers, no object morphing.",
         "cover_headlines": [
@@ -1468,11 +1614,11 @@
         ],
         "caption_body": "บุกโกดังมาจัดโปรปล่อยของเองเลยครับ! เซ็ตพรมปูพื้นห้องครัวลายหมากรุกขาวดำ ได้ครบเซ็ต 2 ชิ้น ทั้งผืนยาว 120×40 ซม. และผืนสั้น 60×40 ซม.\n\nงานทอโพลีเอสเตอร์เนื้อแน่น ซับน้ำไว ด้านหลังมีฐานกันลื่นยึดเกาะพื้นหนึบ ซักทำความสะอาดง่าย\n\nรอบนี้จัดโปรราคาหน้าโรงงาน ลดหนัก 75% แบงก์ร้อยมีทอนก็ได้ครบทั้ง 2 ผืนแล้ว กดเช็กสีและขนาดที่ตะกร้าเหลืองซ้ายล่างได้เลยครับ",
         "hashtag_sets": [
-          {"style_name": "แบบที่ 1: สายโกดังปล่อยของ & ราคาโรงงาน", "tags": ["#โกดังปล่อยของ", "#ราคาหน้าโรงงาน", "#พรมห้องครัว", "#พรมเซ็ต2ชิ้น", "#พรมกันลื่น"]},
-          {"style_name": "แบบที่ 2: สายโปรแรงฮาร์ดเซล & ความคุ้มค่า", "tags": ["#แบงก์ร้อยมีทอน", "#งบไม่ถึงร้อย", "#โปรแรงลดหนัก", "#ของคุ้มราคาประหยัด", "#ตัดสต็อก"]},
-          {"style_name": "แบบที่ 3: สายของใช้ในครัว & แม่บ้าน", "tags": ["#ของใช้ในครัว", "#พรมปูพื้นห้องครัว", "#พรมซับน้ำ", "#พรมลายหมากรุก", "#แม่บ้านถูกใจสิ่งนี้"]},
-          {"style_name": "แบบที่ 4: สายแต่งบ้านมินิมอล", "tags": ["#แต่งห้องครัว", "#ครัวมินิมอล", "#แต่งบ้านงบประหยัด", "#ของแต่งบ้าน", "#ไอเดียแต่งครัว"]},
-          {"style_name": "แบบที่ 5: สายไวรัลดันฟีด TikTok Shop", "tags": ["#TikTokShopครีเอเตอร์", "#พิกัดตะกร้าเหลือง", "#ป้ายยาTikTokShop", "#รีวิวTikTokShop", "#ของดีบอกต่อ"]}
+          { "style_name": "แบบที่ 1: สายโกดังปล่อยของ & ราคาโรงงาน", "tags": ["#โกดังปล่อยของ", "#ราคาหน้าโรงงาน", "#พรมห้องครัว", "#พรมเซ็ต2ชิ้น", "#พรมกันลื่น"] },
+          { "style_name": "แบบที่ 2: สายโปรแรงฮาร์ดเซล & ความคุ้มค่า", "tags": ["#แบงก์ร้อยมีทอน", "#งบไม่ถึงร้อย", "#โปรแรงลดหนัก", "#ของคุ้มราคาประหยัด", "#ตัดสต็อก"] },
+          { "style_name": "แบบที่ 3: สายของใช้ในครัว & แม่บ้าน", "tags": ["#ของใช้ในครัว", "#พรมปูพื้นห้องครัว", "#พรมซับน้ำ", "#พรมลายหมากรุก", "#แม่บ้านถูกใจสิ่งนี้"] },
+          { "style_name": "แบบที่ 4: สายแต่งบ้านมินิมอล", "tags": ["#แต่งห้องครัว", "#ครัวมินิมอล", "#แต่งบ้านงบประหยัด", "#ของแต่งบ้าน", "#ไอเดียแต่งครัว"] },
+          { "style_name": "แบบที่ 5: สายไวรัลดันฟีด TikTok Shop", "tags": ["#TikTokShopครีเอเตอร์", "#พิกัดตะกร้าเหลือง", "#ป้ายยาTikTokShop", "#รีวิวTikTokShop", "#ของดีบอกต่อ"] }
         ],
         "basket_titles": [
           "โปรโกดัง! พรมครัว 2 ผืน งบไม่ถึงร้อย",
@@ -1488,4 +1634,5 @@
     }
   </script>
 </body>
+
 </html>
