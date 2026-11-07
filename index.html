@@ -567,10 +567,14 @@
       </div>
       <div class="header-actions">
         <select id="modelSelect" class="model-select" title="เลือกโมเดล AI">
-          <option value="auto">🤖 โมเดล: Auto (Pro/Flash ฉลาดสุด)</option>
-          <option value="gemini-2.5-pro">🧠 Gemini 2.5 Pro (ภาษามนุษย์เนียนลึกสุด)</option>
-          <option value="gemini-3.5-flash">⚡ Gemini 3.5 Flash (เร็ว + แม่นยำ)</option>
-          <option value="gemini-2.5-flash">⚡ Gemini 2.5 Flash (เสถียรสูง)</option>
+          <option value="auto">🤖 โมเดล: Auto (ใช้ Gemini 3.6 Flash ใหม่สุด + สลับสำรองอัตโนมัติ)</option>
+          <option value="gemini-3.6-flash">🚀 Gemini 3.6 Flash (ใหม่ล่าสุดที่รองรับคีย์ฟรี — แนะนำ)</option>
+          <option value="gemini-3.5-flash">⚡ Gemini 3.5 Flash (เร็ว + ภาษามนุษย์ธรรมชาติ)</option>
+          <option value="gemini-3.5-flash-lite">💨 Gemini 3.5 Flash Lite (ความเร็วสูงพิเศษ)</option>
+          <option value="gemini-3-flash-preview">✨ Gemini 3.0 Flash Preview</option>
+          <option value="gemini-2.5-flash">🛡️ Gemini 2.5 Flash (เสถียรสูง)</option>
+          <option value="gemini-4-argon">🔥 Gemini 4 Argon (ต้องผูก Billing — ถ้าคีย์ฟรีจะสลับไป 3.6 Flash)</option>
+          <option value="gemini-3.1-pro-preview">🧠 Gemini 3.1 Pro (ต้องผูก Billing — ถ้าคีย์ฟรีจะสลับไป 3.6 Flash)</option>
         </select>
         <button class="btn-key" onclick="toggleTheme()" id="themeBtn" title="สลับธีมมืด/สว่าง">
           🌙 โหมดมืด
@@ -719,7 +723,10 @@
     <div id="outputArea">
       <!-- Top Copy All Bar -->
       <div class="card" style="padding: 16px 22px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; background: rgba(16, 185, 129, 0.1); border-color: rgba(16, 185, 129, 0.4);">
-        <div style="font-weight: 700; color: var(--green);">✅ สร้างชุดข้อมูลครบทั้ง 6 ส่วน (ผ่านระบบตรวจคำต้องห้าม TikTok Shop 2026 เรียบร้อยแล้ว!)</div>
+        <div>
+          <div style="font-weight: 700; color: var(--green);">✅ สร้างชุดข้อมูลครบทั้ง 6 ส่วน (ผ่านระบบตรวจคำต้องห้าม TikTok Shop 2026 เรียบร้อยแล้ว!)</div>
+          <div id="modelUsedBadge" style="font-size: 13px; color: var(--muted); margin-top: 4px;">🤖 ประมวลผลด้วยโมเดล: gemini-3.6-flash</div>
+        </div>
         <button class="btn-copy" onclick="copyEntirePackage(this)" style="background: var(--green); border-color: var(--green); color: #fff;">
           📋 คัดลอกทั้งหมดในคลิกเดียว
         </button>
@@ -801,12 +808,11 @@
     const STORAGE_KEY = 'AGY_TIKTOK_STUDIO_GEMINI_KEY';
     const THEME_KEY = 'AGY_TIKTOK_STUDIO_THEME';
     const DEFAULT_MODELS = [
-      'gemini-2.5-flash',
-      'gemini-2.5-pro',
-      'gemini-3.5-flash-lite',
-      'gemini-3.5-flash',
       'gemini-3.6-flash',
-      'gemini-3-flash-preview'
+      'gemini-3.5-flash',
+      'gemini-3.5-flash-lite',
+      'gemini-3-flash-preview',
+      'gemini-2.5-flash'
     ];
     let uploadedImages = []; // { mimeType, base64, dataUrl }
     let selectedChipStyle = 'auto';
@@ -1168,9 +1174,14 @@
 
       const modelsToTry = getModelQueue();
       let lastErr = null;
+      const failedModels = [];
       for (const modelName of modelsToTry) {
         try {
-          statusText.textContent = `กำลังประมวลผลด้วยโมเดล ${modelName}...`;
+          if (failedModels.length > 0) {
+            statusText.textContent = `โมเดล ${failedModels[failedModels.length - 1]} ไม่พร้อมใช้งานในคีย์นี้ ➡️ สลับมาประมวลผลด้วย ${modelName} อัตโนมัติ...`;
+          } else {
+            statusText.textContent = `กำลังประมวลผลด้วยโมเดล ${modelName}...`;
+          }
           const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${encodeURIComponent(apiKey)}`;
           const resp = await fetch(url, {
             method: 'POST',
@@ -1196,13 +1207,14 @@
           const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
           const parsed = JSON.parse(rawText.replace(/^```json\s*/i, '').replace(/```\s*$/i, '').trim());
           lastResultData = parsed;
-          renderOutput(parsed);
+          renderOutput(parsed, modelName, failedModels);
           statusBox.classList.remove('show');
           btn.disabled = false;
           document.getElementById('outputArea').scrollIntoView({ behavior: 'smooth' });
           return;
         } catch (err) {
           console.warn(`Model ${modelName} failed:`, err);
+          failedModels.push(modelName);
           lastErr = err;
         }
       }
@@ -1233,8 +1245,16 @@
       return kp;
     }
 
-    function renderOutput(d) {
+    function renderOutput(d, usedModel = 'gemini-3.6-flash (ตัวอย่าง)', failedModels = []) {
       document.getElementById('outputArea').classList.add('show');
+      const badgeEl = document.getElementById('modelUsedBadge');
+      if (badgeEl) {
+        if (failedModels && failedModels.length > 0) {
+          badgeEl.textContent = `🤖 ประมวลผลสำเร็จด้วยโมเดล: ${usedModel} (สลับอัตโนมัติจาก ${failedModels.join(', ')} เนื่องจากคีย์ฟรีจำกัดโควตารุ่นนั้น)`;
+        } else {
+          badgeEl.textContent = `🤖 ประมวลผลสำเร็จด้วยโมเดล: ${usedModel}`;
+        }
+      }
 
       // 0. Analysis
       document.getElementById('analysisTitle').textContent = `📊 วิเคราะห์สินค้า: ${d.product_title || ''}`;
