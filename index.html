@@ -1,0 +1,1181 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TikTok Shop UGC & Kling Prompt Studio (Powered by Video-Studio Skills)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0b0d13;
+      --card: #131722;
+      --card-2: #1a2030;
+      --border: #283147;
+      --text: #f3f6fc;
+      --muted: #9aa6bf;
+      --accent: #fe2c55;
+      --accent-2: #25f4ee;
+      --gold: #ffd600;
+      --green: #10b981;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      background: radial-gradient(circle at top right, rgba(37, 244, 238, 0.08), transparent 40%),
+                  radial-gradient(circle at top left, rgba(254, 44, 85, 0.1), transparent 40%),
+                  var(--bg);
+      color: var(--text);
+      font-family: 'Kanit', sans-serif;
+      line-height: 1.6;
+      min-height: 100vh;
+      padding-bottom: 80px;
+    }
+    .container {
+      max-width: 1020px;
+      margin: 0 auto;
+      padding: 24px 18px;
+    }
+    /* Header */
+    .header {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 14px;
+      padding: 20px 24px;
+      background: linear-gradient(135deg, rgba(26, 32, 48, 0.92), rgba(19, 23, 34, 0.95));
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      margin-bottom: 24px;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .brand-logo {
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, var(--accent), #ff5e3a);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      box-shadow: 0 0 20px rgba(254, 44, 85, 0.45);
+    }
+    .brand h1 {
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: -0.3px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .badge-skill {
+      font-size: 12px;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 999px;
+      background: rgba(37, 244, 238, 0.14);
+      color: var(--accent-2);
+      border: 1px solid rgba(37, 244, 238, 0.35);
+    }
+    .brand p {
+      font-size: 13.5px;
+      color: var(--muted);
+    }
+    .btn-key {
+      background: var(--card-2);
+      color: var(--text);
+      border: 1px solid var(--border);
+      padding: 9px 16px;
+      border-radius: 12px;
+      font-family: inherit;
+      font-size: 13.5px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: 0.2s;
+    }
+    .btn-key:hover {
+      border-color: var(--accent-2);
+    }
+    .key-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: #ef4444;
+    }
+    .key-dot.ready {
+      background: var(--green);
+      box-shadow: 0 0 10px var(--green);
+    }
+
+    /* Modal / Key Drawer */
+    .key-panel {
+      display: none;
+      background: var(--card);
+      border: 1px solid var(--accent-2);
+      border-radius: 16px;
+      padding: 18px 20px;
+      margin-bottom: 22px;
+    }
+    .key-panel.open {
+      display: block;
+    }
+    .key-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+      flex-wrap: wrap;
+    }
+    .key-row input {
+      flex: 1;
+      min-width: 240px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 10px 14px;
+      border-radius: 10px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+    }
+
+    /* Input Card */
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 24px;
+      margin-bottom: 22px;
+      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.35);
+    }
+    .section-label {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .opt-tag {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--muted);
+      background: rgba(255,255,255,0.06);
+      padding: 2px 9px;
+      border-radius: 99px;
+    }
+
+    /* Dropzone */
+    .dropzone {
+      border: 2px dashed #3b4766;
+      border-radius: 16px;
+      padding: 28px 20px;
+      text-align: center;
+      background: rgba(26, 32, 48, 0.5);
+      cursor: pointer;
+      transition: 0.2s;
+      margin-bottom: 16px;
+    }
+    .dropzone:hover, .dropzone.dragover {
+      border-color: var(--accent-2);
+      background: rgba(37, 244, 238, 0.06);
+    }
+    .dropzone-icon {
+      font-size: 36px;
+      margin-bottom: 6px;
+    }
+    .dropzone h3 {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    .dropzone p {
+      font-size: 13px;
+      color: var(--muted);
+    }
+    .preview-grid {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 18px;
+    }
+    .preview-item {
+      position: relative;
+      width: 105px;
+      height: 135px;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      background: #000;
+    }
+    .preview-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .preview-remove {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: rgba(220, 38, 38, 0.92);
+      color: #fff;
+      border: none;
+      font-size: 13px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Form Controls */
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+    textarea, input[type="text"] {
+      width: 100%;
+      background: var(--card-2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 12px;
+      padding: 12px 14px;
+      font-family: inherit;
+      font-size: 14.5px;
+      resize: vertical;
+      transition: 0.2s;
+    }
+    textarea:focus, input[type="text"]:focus {
+      outline: none;
+      border-color: var(--accent-2);
+    }
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    .chip {
+      background: var(--card-2);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      padding: 6px 13px;
+      border-radius: 999px;
+      font-size: 13px;
+      cursor: pointer;
+      transition: 0.15s;
+      user-select: none;
+    }
+    .chip.active, .chip:hover {
+      background: rgba(254, 44, 85, 0.16);
+      color: #fff;
+      border-color: var(--accent);
+    }
+
+    /* Primary Submit Button */
+    .btn-generate {
+      margin-top: 20px;
+      width: 100%;
+      padding: 15px 24px;
+      border-radius: 14px;
+      border: none;
+      background: linear-gradient(90deg, var(--accent) 0%, #ff5533 100%);
+      color: #fff;
+      font-family: inherit;
+      font-size: 17px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      box-shadow: 0 10px 26px rgba(254, 44, 85, 0.35);
+      transition: 0.2s;
+    }
+    .btn-generate:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 14px 30px rgba(254, 44, 85, 0.5);
+    }
+    .btn-generate:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+
+    /* Status / Loader */
+    .status-box {
+      display: none;
+      margin-top: 16px;
+      padding: 14px 18px;
+      border-radius: 12px;
+      background: rgba(37, 244, 238, 0.08);
+      border: 1px solid rgba(37, 244, 238, 0.3);
+      color: var(--accent-2);
+      font-size: 14px;
+      align-items: center;
+      gap: 12px;
+    }
+    .status-box.show {
+      display: flex;
+    }
+    .spinner {
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(37, 244, 238, 0.25);
+      border-top-color: var(--accent-2);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      flex-shrink: 0;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Output Area */
+    #outputArea {
+      display: none;
+    }
+    #outputArea.show {
+      display: block;
+    }
+    .out-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+    }
+    .out-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--gold);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn-copy {
+      background: var(--card-2);
+      color: var(--text);
+      border: 1px solid var(--border);
+      padding: 7px 14px;
+      border-radius: 10px;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: 0.15s;
+      flex-shrink: 0;
+    }
+    .btn-copy:hover {
+      border-color: var(--accent-2);
+      background: rgba(37, 244, 238, 0.12);
+    }
+    .btn-copy.copied {
+      background: rgba(16, 185, 129, 0.2);
+      border-color: var(--green);
+      color: #6ee7b7;
+    }
+
+    /* Tables */
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14.5px;
+    }
+    .data-table th, .data-table td {
+      padding: 11px 14px;
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+      vertical-align: top;
+    }
+    .data-table th {
+      color: var(--muted);
+      font-weight: 600;
+      width: 34%;
+      background: rgba(255,255,255,0.02);
+    }
+    .code-box {
+      background: #090b10;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px 18px;
+      font-size: 14.5px;
+      white-space: pre-wrap;
+      word-break: break-word;
+      line-height: 1.65;
+    }
+    .code-box.mono {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13.2px;
+      color: #e2e8f0;
+    }
+
+    /* List items with individual copy buttons */
+    .copy-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .copy-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      background: var(--card-2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 11px 15px;
+    }
+    .copy-item-text {
+      font-size: 15px;
+      font-weight: 500;
+      word-break: break-word;
+    }
+    .hashtag-card {
+      background: var(--card-2);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 14px 16px;
+      margin-top: 12px;
+    }
+    .hashtag-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 6px;
+      flex-wrap: wrap;
+    }
+    .hashtag-label {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: var(--accent-2);
+    }
+    .hashtag-tags {
+      font-family: 'JetBrains Mono', 'Kanit', sans-serif;
+      font-size: 14px;
+      color: #fcd34d;
+      word-break: break-word;
+    }
+    .btn-group {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <div class="header">
+      <div class="brand">
+        <div class="brand-logo">🎬</div>
+        <div>
+          <h1>
+            TikTok UGC & Kling Prompt Studio
+            <span class="badge-skill">Powered by Video-Studio + 5-Aspect Kling Skill</span>
+          </h1>
+          <p>อัปโหลดรูปสินค้า & รีวิว ➡️ สร้างบทพูด 10 วิ + Storyboard + Kling Master Prompt + ปกคลิป + แคปชั่น & แฮชแท็ก 5×5</p>
+        </div>
+      </div>
+      <button class="btn-key" onclick="toggleKeyPanel()">
+        <span class="key-dot" id="keyDot"></span>
+        <span id="keyStatusText">ตั้งค่า API Key</span>
+      </button>
+    </div>
+
+    <!-- API Key Drawer -->
+    <div class="key-panel" id="keyPanel">
+      <div class="section-label">🔑 ตั้งค่า Google Gemini API Key (บันทึกไว้ในเบราว์เซอร์เครื่องนี้ครั้งเดียว)</div>
+      <p style="font-size: 13px; color: var(--muted);">
+        ระบบจะเก็บคีย์ไว้ในเครื่องของคุณเท่านั้น (ไม่ส่งไปเก็บที่เซิร์ฟเวอร์อื่น) หรือส่งลิงก์พร้อม <code>#key=YOUR_KEY</code> ให้ทีมงานคลิกเพื่อผูกคีย์อัตโนมัติได้ทันที
+      </p>
+      <div class="key-row">
+        <input type="password" id="apiKeyInput" placeholder="วาง Gemini API Key ที่นี่ (เช่น AIza... หรือ AQ...)" />
+        <button class="btn-copy" onclick="saveApiKey()" style="background: var(--green); border-color: var(--green); color: #fff;">💾 บันทึกคีย์</button>
+        <button class="btn-copy" onclick="copyMagicLink()">🔗 คัดลอกลิงก์ผูกคีย์อัตโนมัติสำหรับส่งให้มือถือ/เครื่องอื่น</button>
+      </div>
+    </div>
+
+    <!-- Input Card -->
+    <div class="card">
+      <div class="section-label">
+        1. อัปโหลดรูปภาพสินค้า / รูปแคปหน้าจอ TikTok Shop
+        <span class="opt-tag">ใส่ได้ 1–5 รูป (หรือกด Ctrl+V วางรูปแคปจอได้เลย)</span>
+      </div>
+      <div class="dropzone" id="dropzone" onclick="document.getElementById('fileInput').click()">
+        <div class="dropzone-icon">📸</div>
+        <h3>คลิกเพื่อเลือกรูปภาพ หรือ ลากไฟล์รูปมาวางที่นี่</h3>
+        <p>รองรับภาพถ่ายสินค้าจริง, ภาพหน้าสินค้า TikTok Shop, ภาพตารางขนาด หรือภาพคอมเมนต์รีวิวลูกค้า</p>
+        <input type="file" id="fileInput" accept="image/*" multiple style="display:none" onchange="handleFiles(this.files)" />
+      </div>
+      <div class="preview-grid" id="previewGrid"></div>
+
+      <div class="form-grid">
+        <div>
+          <div class="section-label">
+            2. รายละเอียดสินค้าเพิ่มเติม
+            <span class="opt-tag">ไม่บังคับ — ถ้าในรูปมีข้อมูลครบแล้ว เว้นว่างได้เลย</span>
+          </div>
+          <textarea id="productInfo" rows="2" placeholder="เช่น พรมห้องครัวเซ็ต 2 ชิ้น ลายหมากรุกขาวดำ ราคา 59 บาท กันลื่น ซับน้ำ (ถ้าในรูปมีอยู่แล้วไม่ต้องพิมพ์ก็ได้ครับ)"></textarea>
+        </div>
+
+        <div>
+          <div class="section-label">
+            3. แนวความต้องการ / สไตล์คลิป
+            <span class="opt-tag">ไม่บังคับ — เลือกปุ่มลัดหรือเว้นว่างให้ AI เลือกให้เอง</span>
+          </div>
+          <div class="chips" id="styleChips">
+            <div class="chip active" data-val="auto" onclick="selectChip(this)">✨ ให้สกิลเลือกแนวที่ป้ายยาขายดีที่สุดอัตโนมัติ (แนะนำ)</div>
+            <div class="chip" data-val="คุ้มค่า ราคาโดนใจ เน้นป้ายยาปิดการขายไว" onclick="selectChip(this)">🏷️ เน้นความคุ้มค่า / ราคาโดนใจ</div>
+            <div class="chip" data-val="มินิมอล อบอุ่น แต่งบ้านสไตล์คาเฟ่เกาหลี" onclick="selectChip(this)">🏡 มินิมอล / แต่งบ้านคาเฟ่</div>
+            <div class="chip" data-val="ตอบกลับรีวิวลูกค้าอย่างอบอุ่น จริงใจ เหมือนเจ้าของร้านพูดเอง" onclick="selectChip(this)">💬 ตอบกลับรีวิวลูกค้า (อบอุ่นจริงใจ)</div>
+            <div class="chip" data-val="ขยี้ปัญหาของคนใช้จริง แล้วเฉลยด้วยจุดเด่นสินค้า" onclick="selectChip(this)">🔥 ขยี้ปัญหา ➡️ จบด้วยตัวช่วย</div>
+          </div>
+          <input type="text" id="customStyle" placeholder="พิมพ์แนวความต้องการเพิ่มเติมได้ตามใจชอบ (หรือเว้นว่างไว้ได้เลย)..." />
+        </div>
+      </div>
+
+      <button class="btn-generate" id="btnGenerate" onclick="generateAll()">
+        <span>🚀 วิเคราะห์ภาพ & สร้างชุดสคริปต์ + Kling Prompt ทั้งหมด</span>
+      </button>
+      <div style="text-align: center; margin-top: 10px;">
+        <button class="btn-copy" onclick="loadDemoSample()" style="font-size: 13px; color: var(--accent-2); border-color: rgba(37,244,238,0.35);">
+          👁️ กดดูตัวอย่างผลลัพธ์จริงจากสกิล (พรมห้องครัวลายหมากรุก 2 ชิ้น)
+        </button>
+      </div>
+
+      <div class="status-box" id="statusBox">
+        <div class="spinner"></div>
+        <span id="statusText">กำลังอ่านรายละเอียดจากรูปภาพและรันสกิล Video-Studio...</span>
+      </div>
+    </div>
+
+    <!-- Output Area -->
+    <div id="outputArea">
+      <!-- Top Copy All Bar -->
+      <div class="card" style="padding: 16px 22px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; background: rgba(16, 185, 129, 0.1); border-color: rgba(16, 185, 129, 0.4);">
+        <div style="font-weight: 700; color: #6ee7b7;">✅ สร้างชุดข้อมูลครบทั้ง 6 ส่วนตามมาตรฐานสกิลเรียบร้อยแล้ว!</div>
+        <button class="btn-copy" onclick="copyEntirePackage(this)" style="background: var(--green); border-color: var(--green); color: #fff;">
+          📋 คัดลอกทั้งหมดในคลิกเดียว
+        </button>
+      </div>
+
+      <!-- 0. Product Analysis Table -->
+      <div class="card">
+        <div class="out-header">
+          <div class="out-title" id="analysisTitle">📊 วิเคราะห์สินค้าจากภาพ</div>
+          <button class="btn-copy" onclick="copyTextById('analysisRaw', this)">📋 คัดลอกตารางวิเคราะห์</button>
+        </div>
+        <p id="analysisSummary" style="color: var(--muted); font-size: 14px; margin-bottom: 12px;"></p>
+        <table class="data-table" id="analysisTable"></table>
+        <pre id="analysisRaw" style="display:none;"></pre>
+      </div>
+
+      <!-- 1. Voiceover Script 10s -->
+      <div class="card">
+        <div class="out-header">
+          <div class="out-title">1. 🎙️ บทพูด TikTok 10 วินาที (สูตร Hook-Generator + Reels-Scripting)</div>
+          <button class="btn-copy" onclick="copyTextById('scriptBox', this)">📋 คัดลอกบทพูด</button>
+        </div>
+        <div class="code-box" id="scriptBox"></div>
+      </div>
+
+      <!-- 2. Storyboard 10s -->
+      <div class="card">
+        <div class="out-header">
+          <div class="out-title">2. 🎬 Storyboard วิดีโอ 10 วินาที</div>
+          <button class="btn-copy" onclick="copyTextById('storyboardRaw', this)">📋 คัดลอก Storyboard</button>
+        </div>
+        <table class="data-table" id="storyboardTable"></table>
+        <pre id="storyboardRaw" style="display:none;"></pre>
+      </div>
+
+      <!-- 3. Kling Omni Master Prompt -->
+      <div class="card">
+        <div class="out-header">
+          <div class="out-title">3. 🤖 Kling Omni Master Prompt (สูตร 5-Aspect Cinematography ล็อกทรงสินค้าไม่เบี้ยว)</div>
+          <button class="btn-copy" onclick="copyTextById('klingPromptBox', this)">📋 คัดลอก Kling Prompt</button>
+        </div>
+        <div class="code-box mono" id="klingPromptBox"></div>
+      </div>
+
+      <!-- 4. Cover Text 5 Variations -->
+      <div class="card">
+        <div class="out-header">
+          <div class="out-title">4. 🖼️ ข้อความปกคลิป 5 แบบ (สูตร Thumbnail หยุดนิ้วใน 0.3 วินาที)</div>
+          <button class="btn-copy" onclick="copyTextById('coversRaw', this)">📋 คัดลอกทั้ง 5 แบบ</button>
+        </div>
+        <div class="copy-list" id="coversList"></div>
+        <pre id="coversRaw" style="display:none;"></pre>
+      </div>
+
+      <!-- 5. Caption + 5 Hashtag Sets (5 tags each) -->
+      <div class="card">
+        <div class="out-header">
+          <div class="out-title">5. 📝 Caption พร้อมโพสต์ + ชุด Hashtag 5 แบบ (คัดเน้นๆ แบบละ 5 อัน)</div>
+          <button class="btn-copy" onclick="copyTextById('captionOnlyBox', this)">📋 คัดลอกเฉพาะ Caption</button>
+        </div>
+        <div class="code-box" id="captionOnlyBox"></div>
+        <div style="margin-top: 16px; font-weight: 700; font-size: 15px;">🏷️ เลือกก๊อปปี้ชุด Hashtag 5 แบบ (แบบละ 5 แฮชแท็กตรงกลุ่มเป้าหมาย):</div>
+        <div id="hashtagSetsContainer"></div>
+      </div>
+
+      <!-- 6. Basket Titles 5 Variations -->
+      <div class="card">
+        <div class="out-header">
+          <div class="out-title">6. 🛒 ข้อความตะกร้าสินค้า 5 แบบ (กระตุ้นคลิกสั่งซื้อ)</div>
+          <button class="btn-copy" onclick="copyTextById('basketsRaw', this)">📋 คัดลอกทั้ง 5 แบบ</button>
+        </div>
+        <div class="copy-list" id="basketsList"></div>
+        <pre id="basketsRaw" style="display:none;"></pre>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const STORAGE_KEY = 'AGY_TIKTOK_STUDIO_GEMINI_KEY';
+    const MODELS = [
+      'gemini-3.5-flash',
+      'gemini-3.6-flash',
+      'gemini-2.5-flash',
+      'gemini-3.5-flash-lite',
+      'gemini-3.1-flash-lite',
+      'gemini-3-flash-preview',
+      'gemini-2.0-flash'
+    ];
+    let uploadedImages = []; // { mimeType, base64, dataUrl }
+    let selectedChipStyle = 'auto';
+    let lastResultData = null;
+
+    function copyToClipboard(text) {
+      if (navigator.clipboard && window.isSecureContext) {
+        return navigator.clipboard.writeText(text).catch(() => fallbackCopy(text));
+      }
+      return fallbackCopy(text);
+    }
+
+    function fallbackCopy(text) {
+      return new Promise((resolve) => {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.left = '-9999px';
+        ta.style.top = '0';
+        document.body.appendChild(ta);
+        ta.focus();
+        ta.select();
+        try { document.execCommand('copy'); } catch (e) {}
+        document.body.removeChild(ta);
+        resolve();
+      });
+    }
+
+    function sanitizeTikTokText(str) {
+      return String(str || '')
+        .replace(/ตะกร้าส้ม/g, 'ตะกร้าเหลือง')
+        .replace(/ตะกร้าสีส้ม/g, 'ตะกร้าสีเหลือง')
+        .replace(/ถุงส้ม/g, 'ตะกร้าเหลือง')
+        .replace(/แอพส้ม/g, 'TikTok Shop')
+        .replace(/แอปส้ม/g, 'TikTok Shop');
+    }
+
+    // 1. Check URL Hash for #key=... so user can share one-click setup link
+    (function initKey() {
+      const hash = window.location.hash || '';
+      if (hash.startsWith('#key=')) {
+        const k = decodeURIComponent(hash.replace('#key=', '').trim());
+        if (k) {
+          localStorage.setItem(STORAGE_KEY, k);
+          history.replaceState(null, '', window.location.pathname + window.location.search);
+        }
+      }
+      updateKeyStatusUI();
+    })();
+
+    function getApiKey() {
+      return (localStorage.getItem(STORAGE_KEY) || '').trim();
+    }
+
+    function updateKeyStatusUI() {
+      const k = getApiKey();
+      const dot = document.getElementById('keyDot');
+      const txt = document.getElementById('keyStatusText');
+      const input = document.getElementById('apiKeyInput');
+      if (k) {
+        dot.classList.add('ready');
+        txt.textContent = 'API Key พร้อมใช้งาน';
+        input.value = k;
+      } else {
+        dot.classList.remove('ready');
+        txt.textContent = 'ตั้งค่า API Key (คลิก)';
+        document.getElementById('keyPanel').classList.add('open');
+      }
+    }
+
+    function toggleKeyPanel() {
+      document.getElementById('keyPanel').classList.toggle('open');
+    }
+
+    function saveApiKey() {
+      const val = document.getElementById('apiKeyInput').value.trim();
+      if (!val) {
+        alert('กรุณาวาง Gemini API Key ก่อนกดบันทึกครับ');
+        return;
+      }
+      localStorage.setItem(STORAGE_KEY, val);
+      updateKeyStatusUI();
+      document.getElementById('keyPanel').classList.remove('open');
+    }
+
+    function copyMagicLink() {
+      const val = document.getElementById('apiKeyInput').value.trim() || getApiKey();
+      if (!val) {
+        alert('กรุณาใส่ Gemini API Key ก่อนคัดลอกลิงก์ครับ');
+        return;
+      }
+      localStorage.setItem(STORAGE_KEY, val);
+      updateKeyStatusUI();
+      const url = window.location.origin + window.location.pathname + '#key=' + encodeURIComponent(val);
+      copyToClipboard(url);
+      alert('คัดลอกลิงก์พร้อมผูก API Key อัตโนมัติแล้ว!\nส่งลิงก์นี้ไปเปิดในมือถือหรือคอมเครื่องอื่นได้เลย ระบบจะจำคีย์ให้ทันทีครับ');
+    }
+
+    // 2. Image Upload / Drag & Drop / Paste
+    const dropzone = document.getElementById('dropzone');
+    dropzone.addEventListener('dragover', (e) => { e.preventDefault(); dropzone.classList.add('dragover'); });
+    dropzone.addEventListener('dragleave', () => dropzone.classList.remove('dragover'));
+    dropzone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropzone.classList.remove('dragover');
+      if (e.dataTransfer.files) handleFiles(e.dataTransfer.files);
+    });
+
+    window.addEventListener('paste', (e) => {
+      const items = (e.clipboardData || e.originalEvent.clipboardData).items;
+      const files = [];
+      for (const item of items) {
+        if (item.type.indexOf('image') === 0) {
+          files.push(item.getAsFile());
+        }
+      }
+      if (files.length > 0) handleFiles(files);
+    });
+
+    function handleFiles(fileList) {
+      Array.from(fileList).forEach(file => {
+        if (!file.type.startsWith('image/')) return;
+        if (uploadedImages.length >= 5) return;
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          const dataUrl = ev.target.result;
+          const base64 = dataUrl.split(',')[1];
+          uploadedImages.push({ mimeType: file.type, base64, dataUrl });
+          renderPreviews();
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    function removeImage(idx) {
+      uploadedImages.splice(idx, 1);
+      renderPreviews();
+    }
+
+    function renderPreviews() {
+      const grid = document.getElementById('previewGrid');
+      grid.innerHTML = uploadedImages.map((img, i) => `
+        <div class="preview-item">
+          <img src="${img.dataUrl}" alt="upload-${i}" />
+          <button class="preview-remove" onclick="removeImage(${i})">✕</button>
+        </div>
+      `).join('');
+    }
+
+    function selectChip(el) {
+      document.querySelectorAll('#styleChips .chip').forEach(c => c.classList.remove('active'));
+      el.classList.add('active');
+      selectedChipStyle = el.getAttribute('data-val');
+    }
+
+    // 3. Core Skill System Prompt (Baked-in Video-Studio + 5-Aspect Kling + Social-Media-Skills)
+    const SYSTEM_PROMPT = `คุณคือ "TikTok Shop UGC & Kling Prompt Studio" ที่ผสาน 5 สกิลระดับโปรเข้าด้วยกัน:
+1. สกิลวิเคราะห์สินค้าจากภาพ (Visual Product Extractor): อ่านชื่อสินค้า, สี/ลาย, ขนาด, วัสดุ, คุณสมบัติเด่น, ราคา, คะแนนรีวิว และยอดขายจากภาพแคปหน้าจอหรือภาพถ่ายสินค้าอย่างแม่นยำ
+2. สกิลคิดฮุคและบทพากย์ 10 วินาที (hook-generator + reels-scripting):
+   - ความยาวประมาณ 25–32 คำ (พูดด้วยจังหวะธรรมชาติจบใน 10 วินาทีเป๊ะ)
+   - ประโยคแรกต้องเป็น Hook หยุดนิ้ว (เช่น ชูความคุ้มค่า, ราคาหลักสิบได้ครบเซ็ต, ยอดขายถล่มทลาย, หรือการแก้ปัญหาตรงจุด)
+   - ห้ามใช้ภาษาหุ่นยนต์เด็ดขาด เช่น ห้ามพูดว่า "ร้านระบุว่า..." หรือ "ราคาในภาพอาจเปลี่ยนแปลง" ให้พูดเหมือนครีเอเตอร์ป้ายยาที่ใช้จริงแล้วประทับใจ ปิดท้ายด้วย Call-to-Action ชวนกด "ตะกร้าเหลืองซ้ายล่าง" (ห้ามใช้คำว่าตะกร้าส้มเด็ดขาด)
+3. สกิลออกแบบ Storyboard 10 วินาที:
+   - แบ่งเป็น 5 ช่วงเวลา (0–2 วินาที, 2–4 วินาที, 4–6 วินาที, 6–8 วินาที, 8–10 วินาที)
+   - ออกแบบมุมกล้องและการเคลื่อนไหวให้ต่อเนื่องสมูท ไม่ตัดฉับมั่วจน AI เจนภาพเพี้ยน
+4. สกิลเขียน Kling Omni / Image-to-Video Master Prompt (CMU/Harvard 5-Aspect Cinematography + Kling Official Syntax):
+   - เขียนเป็นภาษาอังกฤษที่ออกแบบมาเพื่อโมเดล Kling AI (Kling Omni / Image-to-Video) โดยเฉพาะ
+   - ห้ามใส่คำสั่งขยะที่โมเดลอ่านไม่ได้อย่าง "1080x1920 30fps" หรือตัวเลขเซนติเมตรดิบๆ โดยไม่แปลงเป็นสัดส่วนภาพ
+   - ต้องใช้โครงสร้าง 6 บล็อกนี้เสมอ:
+     [Subject]: อ้างอิง <<<image_1>>> และใช้ ++...++ เน้นจุดเด่นสำคัญของสินค้า ระบุรูปทรง สัดส่วนเปรียบเทียบ ลวดลาย และพื้นผิววัสดุให้ชัดเจน
+     [Subject Motion]: อธิบายการคงรูปทรงของสินค้า (zero warping/morphing) และการโต้ตอบที่เป็นธรรมชาติ (เช่น มือลูบเนื้อผ้าเบาๆ หรือเท้าสวมสลิปเปอร์เหยียบ)
+     [Scene]: ฉากหลัง แสงธรรมชาติ โทนห้องมินิมอล/อบอุ่นที่ขับให้สินค้าดูแพง
+     [Spatial]: การจัดวางตำแหน่งสินค้าในเฟรมแนวตั้ง 9:16 (Foreground / Midground / Background)
+     [Camera]: การเคลื่อนกล้องต่อเนื่อง (เช่น High-angle slow dolly-in -> Low-angle lateral tracking glide -> Gentle pull-back reveal, 35mm lens, shallow depth of field, photorealistic commercial UGC aesthetic)
+     [Negative / Constraints]: ข้อห้ามเพื่อล็อกไม่ให้ลายเบี้ยว ไม่ให้ของงอกเกิน หรือนิ้วมือเพี้ยน
+5. สกิลคิดข้อความปกคลิป 5 แบบ + Caption พร้อมโพสต์ + ชุดแฮชแท็ก 5 แบบ (แบบละ 5 อันเป๊ะ!) + ข้อความตะกร้าสินค้า 5 แบบ:
+   - ข้อความปกคลิป 5 แบบ (youtube-thumbnail + hook-generator): สั้น กระชับ กระแทกตา หยุดนิ้วใน 0.3 วินาที
+   - Caption พร้อมโพสต์ (post-formatter PAS/BAB): จัดย่อหน้าอ่านง่ายบนมือถือ ป้ายยาเป็นธรรมชาติ ชี้พิกัดตะกร้าเหลืองซ้ายล่าง ไม่ใส่แฮชแท็กปนในตัวแคปชั่นหลัก (เพราะแยกชุดแฮชแท็กให้เลือกก๊อปปี้ 5 แบบแล้ว)
+   - ชุดแฮชแท็ก 5 แบบ (hashtag_sets): ต้องมี **5 แบบ** และ **แต่ละแบบต้องมีแฮชแท็ก 5 อันเป๊ะๆ (ห้ามขาดห้ามเกิน)** แบ่งตามมุมมองการค้นหา (1. สายตรงสินค้า & พิกัดใช้งาน, 2. สายป้ายยา & รีวิวของใช้จริง, 3. สายแต่งบ้านมินิมอล/ไลฟ์สไตล์, 4. สายคุ้มค่า/ของดีราคาโดน, 5. สายไวรัลดันฟีด TikTok Shop)
+   - ข้อความตะกร้าสินค้า 5 แบบ: ชื่อสั้นกระชับ (ไม่เกิน 25–30 ตัวอักษร) ใส่ในลิงก์ตะกร้าเหลือง TikTok Shop กระตุ้นให้คนกดซื้อ
+
+ตอบกลับเป็น JSON Object ตามโครงสร้างนี้เท่านั้น (ห้ามมีข้อความอื่นนอก JSON):
+{
+  "product_title": "ชื่อสินค้าและรุ่น/สีที่วิเคราะห์ได้",
+  "product_summary": "สรุปภาพรวมสินค้าและการใช้งาน 1-2 ประโยค",
+  "specs": [
+    {"label": "สินค้า", "value": "..."},
+    {"label": "สีและลายที่เลือก", "value": "..."},
+    {"label": "ขนาด / ในเซ็ตประกอบด้วย", "value": "..."},
+    {"label": "วัสดุ", "value": "..."},
+    {"label": "คุณสมบัติเด่น", "value": "..."},
+    {"label": "ราคา / โปรโมชัน", "value": "..."},
+    {"label": "คะแนนรีวิว / ยอดขาย", "value": "..."}
+  ],
+  "voiceover_10s": "บทพูด TikTok 10 วินาที...",
+  "storyboard": [
+    {"time": "0–2 วินาที", "visual": "รายละเอียดภาพและมุมกล้อง...", "onscreen_text": "ข้อความขึ้นจอ..."},
+    {"time": "2–4 วินาที", "visual": "...", "onscreen_text": "..."},
+    {"time": "4–6 วินาที", "visual": "...", "onscreen_text": "..."},
+    {"time": "6–8 วินาที", "visual": "...", "onscreen_text": "..."},
+    {"time": "8–10 วินาที", "visual": "...", "onscreen_text": "..."}
+  ],
+  "kling_master_prompt": "[Subject]: ...\\n\\n[Subject Motion]: ...\\n\\n[Scene]: ...\\n\\n[Spatial]: ...\\n\\n[Camera]: ...\\n\\n[Negative / Constraints]: ...",
+  "cover_headlines": [
+    "ข้อความปกแบบที่ 1",
+    "ข้อความปกแบบที่ 2",
+    "ข้อความปกแบบที่ 3",
+    "ข้อความปกแบบที่ 4",
+    "ข้อความปกแบบที่ 5"
+  ],
+  "caption_body": "เนื้อหาแคปชั่นพร้อมโพสต์ (ไม่ต้องใส่แฮชแท็กท้ายแคปชั่นนี้ เพราะแยกอยู่ใน hashtag_sets แล้ว)",
+  "hashtag_sets": [
+    {"style_name": "แบบที่ 1: สายตรงสินค้า & พิกัดใช้งาน", "tags": ["#แท็ก1", "#แท็ก2", "#แท็ก3", "#แท็ก4", "#แท็ก5"]},
+    {"style_name": "แบบที่ 2: สายป้ายยา & รีวิวของใช้จริง", "tags": ["#แท็ก1", "#แท็ก2", "#แท็ก3", "#แท็ก4", "#แท็ก5"]},
+    {"style_name": "แบบที่ 3: สายแต่งบ้านมินิมอล / คาเฟ่", "tags": ["#แท็ก1", "#แท็ก2", "#แท็ก3", "#แท็ก4", "#แท็ก5"]},
+    {"style_name": "แบบที่ 4: สายคุ้มค่า / ของดีราคาโดน", "tags": ["#แท็ก1", "#แท็ก2", "#แท็ก3", "#แท็ก4", "#แท็ก5"]},
+    {"style_name": "แบบที่ 5: สายไวรัลดันฟีด TikTok Shop", "tags": ["#แท็ก1", "#แท็ก2", "#แท็ก3", "#แท็ก4", "#แท็ก5"]}
+  ],
+  "basket_titles": [
+    "ชื่อตะกร้าแบบที่ 1",
+    "ชื่อตะกร้าแบบที่ 2",
+    "ชื่อตะกร้าแบบที่ 3",
+    "ชื่อตะกร้าแบบที่ 4",
+    "ชื่อตะกร้าแบบที่ 5"
+  ]
+}`;
+
+    function normalizeFiveTags(tagsArr) {
+      const defaults = ['#ป้ายยาTikTok', '#ของดีบอกต่อ', '#รีวิวของใช้', '#ของแต่งบ้าน', '#TikTokShop'];
+      const cleaned = (Array.isArray(tagsArr) ? tagsArr : [])
+        .map(t => String(t || '').trim().replace(/\s+/g, ''))
+        .filter(Boolean)
+        .map(t => t.startsWith('#') ? t : '#' + t);
+      for (const d of defaults) {
+        if (cleaned.length >= 5) break;
+        if (!cleaned.includes(d)) cleaned.push(d);
+      }
+      return cleaned.slice(0, 5);
+    }
+
+    async function generateAll() {
+      const apiKey = getApiKey();
+      if (!apiKey) {
+        document.getElementById('keyPanel').classList.add('open');
+        alert('กรุณาใส่ Gemini API Key ด้านบนก่อนเริ่มใช้งานครับ');
+        return;
+      }
+
+      const infoText = document.getElementById('productInfo').value.trim();
+      const customStyle = document.getElementById('customStyle').value.trim();
+
+      if (uploadedImages.length === 0 && !infoText) {
+        alert('กรุณาอัปโหลดรูปสินค้าอย่างน้อย 1 รูป หรือพิมพ์รายละเอียดสินค้าก่อนครับ');
+        return;
+      }
+
+      const btn = document.getElementById('btnGenerate');
+      const statusBox = document.getElementById('statusBox');
+      const statusText = document.getElementById('statusText');
+      btn.disabled = true;
+      statusBox.classList.add('show');
+      statusText.textContent = 'กำลังวิเคราะห์รูปสินค้าและรันสกิล Video-Studio + Kling 5-Aspect Prompt...';
+
+      const styleInstruction = customStyle
+        ? `แนวความต้องการของผู้ใช้: ${customStyle} (สไตล์เสริม: ${selectedChipStyle})`
+        : (selectedChipStyle === 'auto'
+            ? 'แนวความต้องการ: ให้ระบบเลือกสไตล์การป้ายยาที่เหมาะกับสินค้าชิ้นนี้และดึงดูดยอดขายได้ดีที่สุดโดยอัตโนมัติ'
+            : `แนวความต้องการ: ${selectedChipStyle}`);
+
+      const userPromptParts = [];
+      uploadedImages.forEach(img => {
+        userPromptParts.push({
+          inline_data: {
+            mime_type: img.mimeType,
+            data: img.base64
+          }
+        });
+      });
+
+      userPromptParts.push({
+        text: `กรุณาวิเคราะห์ข้อมูลจากภาพสินค้าที่แนบมานี้ ${infoText ? `(ข้อมูลเพิ่มเติมจากผู้ใช้: ${infoText})` : ''}\n${styleInstruction}\nสร้างผลลัพธ์ให้ครบทุกข้อตาม JSON Schema ที่กำหนด โดยชุดแฮชแท็กต้องมี 5 แบบ แบบละ 5 แฮชแท็กเป๊ะๆ`
+      });
+
+      let lastErr = null;
+      for (const modelName of MODELS) {
+        try {
+          statusText.textContent = `กำลังประมวลผลด้วยโมเดล ${modelName}...`;
+          const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${encodeURIComponent(apiKey)}`;
+          const resp = await fetch(url, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'x-goog-api-key': apiKey
+            },
+            body: JSON.stringify({
+              system_instruction: { parts: [{ text: SYSTEM_PROMPT }] },
+              contents: [{ role: 'user', parts: userPromptParts }],
+              generationConfig: {
+                temperature: 0.35,
+                responseMimeType: 'application/json'
+              }
+            })
+          });
+
+          const data = await resp.json();
+          if (!resp.ok) {
+            throw new Error(data.error?.message || `HTTP ${resp.status}`);
+          }
+
+          const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+          const parsed = JSON.parse(rawText.replace(/^```json\s*/i, '').replace(/```\s*$/i, '').trim());
+          lastResultData = parsed;
+          renderOutput(parsed);
+          statusBox.classList.remove('show');
+          btn.disabled = false;
+          document.getElementById('outputArea').scrollIntoView({ behavior: 'smooth' });
+          return;
+        } catch (err) {
+          console.warn(`Model ${modelName} failed:`, err);
+          lastErr = err;
+        }
+      }
+
+      statusBox.classList.remove('show');
+      btn.disabled = false;
+      alert('เกิดข้อผิดพลาดในการเรียก API: ' + (lastErr ? lastErr.message : 'Unknown error'));
+    }
+
+    function escapeHtml(str) {
+      return String(str || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    function renderOutput(d) {
+      document.getElementById('outputArea').classList.add('show');
+
+      // 0. Analysis
+      document.getElementById('analysisTitle').textContent = `📊 วิเคราะห์สินค้า: ${d.product_title || ''}`;
+      document.getElementById('analysisSummary').textContent = d.product_summary || '';
+      const specs = d.specs || [];
+      document.getElementById('analysisTable').innerHTML = `
+        <thead><tr><th>รายละเอียด</th><th>ข้อมูลจากภาพ</th></tr></thead>
+        <tbody>
+          ${specs.map(s => `<tr><th>${escapeHtml(s.label)}</th><td>${escapeHtml(s.value)}</td></tr>`).join('')}
+        </tbody>
+      `;
+      document.getElementById('analysisRaw').textContent =
+        `วิเคราะห์สินค้า: ${d.product_title || ''}\n${d.product_summary || ''}\n` +
+        specs.map(s => `- ${s.label}: ${s.value}`).join('\n');
+
+      // 1. Script 10s
+      const cleanScript = sanitizeTikTokText((d.voiceover_10s || '').replace(/^"|"$/g, ''));
+      document.getElementById('scriptBox').textContent = `"${cleanScript}"`;
+
+      // 2. Storyboard
+      const sb = d.storyboard || [];
+      document.getElementById('storyboardTable').innerHTML = `
+        <thead><tr><th style="width:18%">เวลา</th><th style="width:52%">ภาพวิดีโอ & มุมกล้อง</th><th>ข้อความบนจอ</th></tr></thead>
+        <tbody>
+          ${sb.map(r => `<tr><th>${escapeHtml(r.time)}</th><td>${escapeHtml(r.visual)}</td><td style="color:var(--gold);font-weight:600;">${escapeHtml(r.onscreen_text || '')}</td></tr>`).join('')}
+        </tbody>
+      `;
+      document.getElementById('storyboardRaw').textContent =
+        sb.map(r => `${r.time}: ${r.visual} ${r.onscreen_text ? `[ข้อความบนจอ: ${r.onscreen_text}]` : ''}`).join('\n');
+
+      // 3. Kling Master Prompt
+      document.getElementById('klingPromptBox').textContent = d.kling_master_prompt || '';
+
+      // 4. Cover Headlines (5)
+      const covers = (d.cover_headlines || []).slice(0, 5);
+      document.getElementById('coversList').innerHTML = covers.map((c, idx) => `
+        <div class="copy-item">
+          <div class="copy-item-text"><strong>${idx + 1}.</strong> ${escapeHtml(c)}</div>
+          <button class="btn-copy" onclick="copyDirectText(${JSON.stringify(c).replace(/"/g, '&quot;')}, this)">📋 คัดลอก</button>
+        </div>
+      `).join('');
+      document.getElementById('coversRaw').textContent = covers.map((c, i) => `${i + 1}. ${c}`).join('\n');
+
+      // 5. Caption + 5 Hashtag Sets (strictly 5 sets x 5 tags each)
+      const captionBody = sanitizeTikTokText((d.caption_body || '').trim());
+      document.getElementById('captionOnlyBox').textContent = captionBody;
+
+      const hSets = (d.hashtag_sets || []).slice(0, 5);
+      document.getElementById('hashtagSetsContainer').innerHTML = hSets.map((hs, idx) => {
+        const fiveTagsArr = normalizeFiveTags(hs.tags);
+        const fiveTags = fiveTagsArr.join(' ');
+        const combinedCaption = `${captionBody}\n\n${fiveTags}`;
+        return `
+          <div class="hashtag-card">
+            <div class="hashtag-top">
+              <div class="hashtag-label">${escapeHtml(hs.style_name || `แบบที่ ${idx + 1}`)} (5 แฮชแท็ก)</div>
+              <div class="btn-group">
+                <button class="btn-copy" onclick="copyDirectText(${JSON.stringify(fiveTags).replace(/"/g, '&quot;')}, this)">📋 คัดลอกเฉพาะ 5 แฮชแท็กนี้</button>
+                <button class="btn-copy" style="border-color:var(--accent); color:#fff;" onclick="copyDirectText(${JSON.stringify(combinedCaption).replace(/"/g, '&quot;')}, this)">📋 คัดลอก Caption + แฮชแท็กชุดนี้</button>
+              </div>
+            </div>
+            <div class="hashtag-tags">${escapeHtml(fiveTags)}</div>
+          </div>
+        `;
+      }).join('');
+
+      // 6. Basket Titles (5)
+      const baskets = (d.basket_titles || []).slice(0, 5);
+      document.getElementById('basketsList').innerHTML = baskets.map((b, idx) => `
+        <div class="copy-item">
+          <div class="copy-item-text"><strong>${idx + 1}.</strong> ${escapeHtml(b)}</div>
+          <button class="btn-copy" onclick="copyDirectText(${JSON.stringify(b).replace(/"/g, '&quot;')}, this)">📋 คัดลอก</button>
+        </div>
+      `).join('');
+      document.getElementById('basketsRaw').textContent = baskets.map((b, i) => `${i + 1}. ${b}`).join('\n');
+    }
+
+    function flashCopied(btn) {
+      if (!btn) return;
+      const orig = btn.innerHTML;
+      btn.classList.add('copied');
+      btn.innerHTML = '✅ คัดลอกแล้ว!';
+      setTimeout(() => {
+        btn.classList.remove('copied');
+        btn.innerHTML = orig;
+      }, 1600);
+    }
+
+    function copyTextById(id, btn) {
+      const txt = document.getElementById(id).textContent;
+      copyToClipboard(txt);
+      flashCopied(btn);
+    }
+
+    function copyDirectText(txt, btn) {
+      copyToClipboard(txt);
+      flashCopied(btn);
+    }
+
+    function copyEntirePackage(btn) {
+      if (!lastResultData) return;
+      const d = lastResultData;
+      const hSetsText = (d.hashtag_sets || []).slice(0, 5).map((hs, i) =>
+        `${hs.style_name || `แบบที่ ${i+1}`}: ${normalizeFiveTags(hs.tags).join(' ')}`
+      ).join('\n');
+
+      const fullText = [
+        `=== วิเคราะห์สินค้า: ${d.product_title || ''} ===`,
+        document.getElementById('analysisRaw').textContent,
+        `\n=== 1. บทพูด TikTok 10 วินาที ===`,
+        document.getElementById('scriptBox').textContent,
+        `\n=== 2. Storyboard วิดีโอ 10 วินาที ===`,
+        document.getElementById('storyboardRaw').textContent,
+        `\n=== 3. Kling Omni Master Prompt ===`,
+        document.getElementById('klingPromptBox').textContent,
+        `\n=== 4. ข้อความปกคลิป 5 แบบ ===`,
+        document.getElementById('coversRaw').textContent,
+        `\n=== 5. Caption พร้อมโพสต์ + แฮชแท็ก 5 แบบ (แบบละ 5 อัน) ===`,
+        sanitizeTikTokText(d.caption_body || ''),
+        `\n[ชุดแฮชแท็ก 5 แบบ เลือกใช้ได้ตามต้องการ]:\n${hSetsText}`,
+        `\n=== 6. ข้อความตะกร้าสินค้า 5 แบบ ===`,
+        document.getElementById('basketsRaw').textContent
+      ].join('\n');
+
+      copyToClipboard(fullText);
+      flashCopied(btn);
+    }
+
+    function loadDemoSample() {
+      const sample = {
+        "product_title": "พรมห้องครัวเซ็ต 2 ชิ้น ลายหมากรุกขาวดำ สไตล์มินิมอล",
+        "product_summary": "เซ็ตพรมปูพื้นห้องครัว 2 ชิ้น ลายหมากรุกขาวดำสุดฮิต เปลี่ยนบรรยากาศห้องครัวให้เป็นสไตล์คาเฟ่มินิมอล ซับน้ำไว แผ่นหลังกันลื่นได้อย่างดีเยี่ยม",
+        "specs": [
+          {"label": "สินค้า", "value": "พรมห้องครัวเซ็ต 2 ชิ้น"},
+          {"label": "สีและลายที่เลือก", "value": "ลายหมากรุกขาวดำ (Checkerboard)"},
+          {"label": "ขนาด / ในเซ็ตประกอบด้วย", "value": "ผืนยาว 120 x 40 ซม. และผืนสั้น 60 x 40 ซม."},
+          {"label": "วัสดุ", "value": "ผ้าโพลีเอสเตอร์ นุ่มสบายเท้า"},
+          {"label": "คุณสมบัติเด่น", "value": "ฐานกันลื่น ซับน้ำดีเยี่ยม ถอดซักทำความสะอาดได้"},
+          {"label": "ราคา / โปรโมชัน", "value": "59 บาท (คุ้มค่าได้ 2 ชิ้นครบเซ็ต)"},
+          {"label": "คะแนนรีวิว / ยอดขาย", "value": "4.8/5 ดาว (ยอดขายมากกว่า 36.7K ชิ้น)"}
+        ],
+        "voiceover_10s": "แต่งครัวสไตล์คาเฟ่ง่ายๆ ด้วยพรมเซ็ตสองชิ้นลายหมากรุก! ได้ทั้งผืนยาวผืนสั้น นุ่มเท้า ซับน้ำไว แถมกันลื่นด้วยนะ คุ้มสุดๆ กดตะกร้าเหลืองซ้ายล่างเลย!",
+        "storyboard": [
+          {"time": "0–2 วินาที", "visual": "ภาพมุมสูงค่อยๆ แพนลง เห็นเท้าเปล่าก้าวลงบนพรมลายหมากรุกผืนนุ่มอย่างสบายในห้องครัวโทนอบอุ่น", "onscreen_text": "เปลี่ยนครัวธรรมดาเป็นคาเฟ่! ☕️"},
+          {"time": "2–4 วินาที", "visual": "กล้องเคลื่อนตามยาวแสดงให้เห็นการวางพรมทั้งเซ็ต 2 ชิ้น (ผืนยาวหน้าเคาน์เตอร์ และผืนสั้นหน้าอ่างล้างจาน)", "onscreen_text": "เซ็ต 2 ชิ้นสุดคุ้ม ลายหมากรุกสุดฮิต ✨"},
+          {"time": "4–6 วินาที", "visual": "ซูมใกล้เห็นหยดน้ำหยดลงบนพื้นผิวพรมแล้วซึมซับอย่างรวดเร็ว พร้อมมือลูบเนื้อผ้าโพลีเอสเตอร์", "onscreen_text": "ซับน้ำไว ซักทำความสะอาดง่าย 💦"},
+          {"time": "6–8 วินาที", "visual": "มือพลิกพรมให้เห็นด้านหลังที่เป็นยางกันลื่น ยึดเกาะพื้นกระเบื้องแน่นไม่ลื่นไถล", "onscreen_text": "พื้นกันลื่น หนึบแน่นไม่ลื่นล้ม 🦶"},
+          {"time": "8–10 วินาที", "visual": "กล้องถอยออกเห็นภาพรวมห้องครัวสวยสะอาดตา พร้อมลูกศรชี้ไปที่มุมซ้ายล่าง", "onscreen_text": "ราคาหลักสิบ! พิกัดตะกร้าเหลืองซ้ายล่าง 👇🟡"}
+        ],
+        "kling_master_prompt": "[Subject]: <<<image_1>>>, ++black and white checkerboard kitchen mat set++, 2-piece set including one long runner mat (120x40cm aspect ratio block) and one short accent mat (60x40cm block), premium woven polyester fabric texture with sharp checker patterns.\n\n[Subject Motion]: Zero warping or morphing of grid pattern, realistic plush texture detail, smooth movement as bare feet gently step onto the plush mat surface without altering the straight pattern alignment.\n\n[Scene]: Modern minimalist kitchen interior, light oak wood cabinet accents, bright white polished tile floor, soft ambient afternoon sunlight from a side window creating an aesthetic cafe vibe.\n\n[Spatial]: Vertical 9:16 frame, foreground close-up on mat fabric texture, midground shows wide placement along kitchen counter and sink area, background softened clean kitchen decor.\n\n[Camera]: Smooth high-angle dolly-in gliding into low-angle lateral tracking shot, 35mm lens style, shallow depth of field, photorealistic commercial UGC aesthetic.\n\n[Negative / Constraints]: No distorted checkerboard lines, no warped grid pattern, no extra feet or floating elements, blurry textures, fuzzy low quality rendering.",
+        "cover_headlines": [
+          "พรมห้องครัวลายหมากรุก แต่งครัวสไตล์คาเฟ่!",
+          "เซ็ต 2 ชิ้นสุดคุ้ม! หลักสิบแต่งครัวสวยกริ๊บ",
+          "พรมกันลื่นซับน้ำไว ลายหมากรุกยอดฮิต",
+          "ครัวสวยขึ้น 300% ด้วยพรมเซ็ตนี้!",
+          "ขายแล้วกว่า 3.6 หมื่นชิ้น! พรมแต่งครัวถูกและดี"
+        ],
+        "caption_body": "ใครกำลังหาพรมแต่งห้องครัวสไตล์มินิมอล แนะนำเซ็ตนี้เลย! พรมห้องครัวลายหมากรุกสุดฮิต ในเซ็ตได้ 2 ชิ้นครบ ทั้งผืนยาวหน้าเคาน์เตอร์และผืนสั้นหน้าอ่างล้างจาน\n\nเนื้อผ้านุ่มสบายเท้า ซับน้ำได้ดีเยี่ยม แถมด้านหลังมีแผ่นกันลื่นหนึบแน่น ปลอดภัยสุดๆ แต่งแล้วครัวดูสวยมินิมอลเหมือนคาเฟ่เลย คุ้มค่าเกินราคามาก\n\nพิกัดรีบไปตำที่ตะกร้าเหลืองซ้ายล่างได้เลยน้า 🛒✨",
+        "hashtag_sets": [
+          {"style_name": "แบบที่ 1: สายตรงสินค้า & พิกัดใช้งาน", "tags": ["#พรมห้องครัว", "#พรมปูพื้นห้องครัว", "#พรมลายหมากรุก", "#พรมซับน้ำ", "#พรมกันลื่น"]},
+          {"style_name": "แบบที่ 2: สายป้ายยา & รีวิวของใช้จริง", "tags": ["#ป้ายยาของใช้ในบ้าน", "#ของดีบอกต่อ", "#รีวิวของใช้ในบ้าน", "#ของใช้ในครัว", "#ของดีราคาถูก"]},
+          {"style_name": "แบบที่ 3: สายแต่งบ้านมินิมอล / คาเฟ่", "tags": ["#แต่งบ้านสไตล์มินิมอล", "#แต่งห้องครัว", "#ครัวสไตล์คาเฟ่", "#แต่งบ้านงบน้อย", "#มินิมอลสไตล์"]},
+          {"style_name": "แบบที่ 4: สายคุ้มค่า / ของดีราคาโดน", "tags": ["#หลักสิบก็สวยได้", "#ของคุ้มค่า", "#โปรโมชั่นพิเศษ", "#ถูกและดีมีอยู่จริง", "#ของขวัญเข้าบ้าน"]},
+          {"style_name": "แบบที่ 5: สายไวรัลดันฟีด TikTok Shop", "tags": ["#TikTokShopครีเอเตอร์", "#พิกัดตะกร้าเหลือง", "#ป้ายยาTikTokShop", "#ของมันต้องมี", "#รีวิวTikTokShop"]}
+        ],
+        "basket_titles": [
+          "พรมห้องครัวเซ็ต2ชิ้น ลายหมากรุก",
+          "พรมปูครัวมินิมอล ซับน้ำกันลื่น",
+          "เซ็ตพรมห้องครัว 2 ชิ้นสุดคุ้ม",
+          "พรมลายหมากรุก แต่งครัวคาเฟ่",
+          "พรมซับน้ำห้องครัว ลายหมากรุก"
+        ]
+      };
+      lastResultData = sample;
+      renderOutput(sample);
+      document.getElementById('outputArea').scrollIntoView({ behavior: 'smooth' });
+    }
+  </script>
+</body>
+</html>
