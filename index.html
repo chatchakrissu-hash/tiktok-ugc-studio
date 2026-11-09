@@ -628,10 +628,9 @@
         <div>
           <h1>
             TikTok UGC & Kling Prompt Studio
-            <span class="badge-skill">🛡️ TikTok Safe 2026 + 12 Creative Styles</span>
+            <span class="badge-skill">🎬 /video-studio (video-shotcraft + DirectorSKILL) + /socialmedia + 🛡️ TikTok Safe 2026</span>
           </h1>
-          <p>อัปโหลดรูปสินค้า ➡️ สร้างบทพูด 10 วิ + Storyboard (ไร้ตัวหนังสือรกจอ) + Kling Prompt (รวมบทพูดไทย) + ปกคลิป
-            + แฮชแท็ก 5×5</p>
+          <p>ผสานพลังจิตวิทยาการขาย (/socialmedia) + กำกับมุมกล้องโฆษณา & แสงวัสดุ (video-shotcraft 124 สูตร + DirectorSKILL) + เสียง Foley (earshot) + กฎกันแบน 2026</p>
         </div>
       </div>
       <div class="header-actions">
@@ -864,12 +863,17 @@
         </div>
 
         <!-- Exact Product Name OCR Box -->
-        <div style="background: var(--card-2); border: 1px solid rgba(37, 244, 238, 0.35); border-radius: 12px; padding: 14px 16px; margin-bottom: 14px;">
-          <div style="display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 8px;">
-            <div style="font-size: 14px; font-weight: 700; color: var(--accent-2);">🏷️ ชื่อสินค้าเต็มที่ถอดจากรูปภาพทั้งหมด (Exact OCR Text)</div>
+        <div
+          style="background: var(--card-2); border: 1px solid rgba(37, 244, 238, 0.35); border-radius: 12px; padding: 14px 16px; margin-bottom: 14px;">
+          <div
+            style="display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 8px;">
+            <div style="font-size: 14px; font-weight: 700; color: var(--accent-2);">🏷️
+              ชื่อสินค้าเต็มที่ถอดจากรูปภาพทั้งหมด (Exact OCR Text)</div>
             <button class="btn-copy" onclick="copyTextById('ocrProductNameBox', this)">📋 คัดลอกชื่อสินค้าเต็ม</button>
           </div>
-          <div id="ocrProductNameBox" style="font-size: 15px; font-weight: 500; color: var(--text); word-break: break-word; line-height: 1.55;"></div>
+          <div id="ocrProductNameBox"
+            style="font-size: 15px; font-weight: 500; color: var(--text); word-break: break-word; line-height: 1.55;">
+          </div>
         </div>
 
         <p id="analysisSummary" style="color: var(--muted); font-size: 14px; margin-bottom: 12px;"></p>
@@ -886,24 +890,33 @@
         <div class="code-box" id="scriptBox"></div>
       </div>
 
-      <!-- 2. Storyboard 10s (NO on-screen text) -->
+      <!-- 2. Storyboard 10s (DirectorSKILL + video-shotcraft 4-Column Commercial Shot Table) -->
       <div class="card">
         <div class="out-header">
-          <div class="out-title">2. 🎬 Storyboard วิดีโอ 10 วินาที (เน้นภาพและการกระทำล้วน ไม่มีข้อความรกบนจอ)</div>
-          <button class="btn-copy" onclick="copyTextById('storyboardRaw', this)">📋 คัดลอก Storyboard</button>
+          <div class="out-title">2. 🎬 ตารางกำกับช็อตโฆษณา 10 วินาที (DirectorSKILL + video-shotcraft: มุมกล้อง · เลนส์ · แสงวัสดุ · Start→Action→End State)</div>
+          <button class="btn-copy" onclick="copyTextById('storyboardRaw', this)">📋 คัดลอกตารางกำกับช็อต</button>
         </div>
-        <table class="data-table" id="storyboardTable"></table>
+        <div style="overflow-x: auto;">
+          <table class="data-table" id="storyboardTable"></table>
+        </div>
         <pre id="storyboardRaw" style="display:none;"></pre>
       </div>
 
-      <!-- 3. Kling Omni Master Prompt (Includes Voiceover Script & No Text Rule) -->
+      <!-- 3. Kling Omni Master Prompt + DirectorSKILL Multi-Shot Timestamped Prompt -->
       <div class="card">
         <div class="out-header">
-          <div class="out-title">3. 🤖 Kling Omni Master Prompt (รวมสคริปต์เสียงพากย์ไทย + ล็อกทรงสินค้า +
-            ห้ามมีข้อความขึ้นในคลิป)</div>
-          <button class="btn-copy" onclick="copyTextById('klingPromptBox', this)">📋 คัดลอก Kling Prompt</button>
+          <div class="out-title">3A. 🤖 Kling Omni Master Prompt (แบบ Single-Take ล็อกทรงสินค้า + แสงตามวัสดุ + บทพูดไทย + เสียง Foley)</div>
+          <button class="btn-copy" onclick="copyTextById('klingPromptBox', this)">📋 คัดลอก Kling Single-Take Prompt</button>
         </div>
         <div class="code-box mono" id="klingPromptBox"></div>
+
+        <div style="margin-top: 18px; border-top: 1px dashed var(--border); padding-top: 16px;">
+          <div class="out-header">
+            <div class="out-title" style="color: var(--accent-2);">3B. 🎞️ DirectorSKILL Multi-Shot Timestamped Prompt (Shape S4 — สำหรับโหมด Multi-Shot ใน Kling 3.0 / Seedance 2.0 / Veo)</div>
+            <button class="btn-copy" onclick="copyTextById('multiShotPromptBox', this)">📋 คัดลอก Multi-Shot Prompt</button>
+          </div>
+          <div class="code-box mono" id="multiShotPromptBox"></div>
+        </div>
       </div>
 
       <!-- 4. Cover Text 5 Variations -->
@@ -936,6 +949,16 @@
         </div>
         <div class="copy-list" id="basketsList"></div>
         <pre id="basketsRaw" style="display:none;"></pre>
+      </div>
+
+      <!-- 7. Pinned Comments 3 Variations (from social-media-skills/pinned-comment) -->
+      <div class="card">
+        <div class="out-header">
+          <div class="out-title">7. 📌 คอมเมนต์ปักหมุดใต้คลิป 3 แบบ (สกิล pinned-comment: เม้นต์ปักหมุดตัวเองหลังโพสต์ ดึงคนกดตะกร้าเหลือง)</div>
+          <button class="btn-copy" onclick="copyTextById('pinnedRaw', this)">📋 คัดลอกทั้ง 3 แบบ</button>
+        </div>
+        <div class="copy-list" id="pinnedList"></div>
+        <pre id="pinnedRaw" style="display:none;"></pre>
       </div>
     </div>
   </div>
@@ -1143,8 +1166,10 @@
       selectedChipStyle = el.getAttribute('data-val');
     }
 
-    // 3. Core Skill System Prompt (Creative Director v3.1 + TikTok Affiliate Gem 2026 + Social Media Skills + Hard-Sell Warehouse/Storefront + 5-Aspect Kling + Anti-Ban 2026)
-    const SYSTEM_PROMPT = `คุณคือ "TikTok AI Affiliate Creative Director & Kling Prompt Designer (2026 Edition)" ที่ผสาน 5 สกิลจากชุด social-media-skills (hook-generator, reels-scripting, post-formatter, youtube-thumbnail, brand-voice) เข้ากับโครงสร้าง 16 แนวคลิปยอดฮิต:
+    // 3. Core Skill System Prompt (/video-studio: video-shotcraft + DirectorSKILL + earshot + /socialmedia + Anti-Ban 2026)
+    const SYSTEM_PROMPT = `คุณคือ "TikTok AI Affiliate Creative Director & Commercial Cinematographer (2026 Edition)" ที่ผสานพลังของ 2 ระบบใหญ่เข้าด้วยกัน:
+1) สกิลสายขายและโซเชียล (/socialmedia: hook-generator, reels-scripting, post-formatter, youtube-thumbnail, brand-voice, pinned-comment)
+2) สกิลสายกำกับภาพและโฆษณาสินค้า (/video-studio: video-shotcraft 124 สูตรมุมกล้องโฆษณา + DirectorSKILL product-and-macro & shot-plan + earshot real-sound Foley)
 
 ============================================================
 กฎเหล็กข้อที่ 1: ความเป็นมนุษย์ & แนวฮาร์ดเซลขายตรง (HUMAN COPY FILTER + HARD-SELL STYLES 13-16)
@@ -1154,12 +1179,12 @@
 - ให้เปิดด้วย Hook ที่เห็นภาพหรือความขัดแย้งเฉพาะของสินค้าชิ้นนี้ทันทีตามหลัก hook-generator & reels-scripting (Visual Strike / Product-Specific Tension / Factory Direct Shock)
 - **กรณีเลือกแนวที่ 13–16 (สายฮาร์ดเซลเน้นขาย: โกดัง/โรงงานปล่อยของ, พ่อค้าแม่ค้าตลาดค้าส่ง/หน้าร้าน, พนักงานขายในห้าง/โชว์รูม, คนงานแพ็กของหน้าคลัง):**
   1) บทพูด (voiceover_10s): ใช้โทนเสียงกระตือรือร้น จริงใจ เร่งจังหวะขายแบบมืออาชีพ เปิดด้วยความคุ้มค่าหน้างาน เช่น "บุกโกดังตัดสต็อกตรงไม่ผ่านคนกลาง!", "หน้าร้านจัดโปรปล่อยของเอง!", "พนักงานพาส่องโปรหน้าเชลฟ์ลดจุกๆ!" พร้อมย้ำจุดเด่นสินค้า 2–3 ข้อที่จับต้องได้ แล้วตบเข้าโปรโมชันและราคาแบบเซฟตามกฎข้อที่ 2
-  2) ฉากและมุมกล้อง (Storyboard & Kling Prompt): ต้องเซ็ตฉากให้ตรงกับแนวที่เลือก เช่น โกดังสินค้าที่มีพาเลทและกล่องลังเรียงรายด้านหลัง (Warehouse racks & shipping cartons), หน้าร้านตลาดค้าส่งที่คึกคัก, โชว์รูมห้างสรรพสินค้าไฟสว่างสวย, หรือโต๊ะแพ็กของหน้าคลังสินค้า โดยให้เห็นเจ้าของโกดัง/พนักงานขาย/คนงาน (สวมชุดทำงานจริง เช่น เสื้อโปโลร้าน ผ้ากันเปื้อน หรือเสื้อกั๊กคลังสินค้า) กำลังหยิบจับสาธิตสินค้าชิ้นนั้นให้ดูสดๆ หน้ากล้อง
+  2) ฉากและมุมกล้อง (Storyboard & Kling Prompt): ต้องเซ็ตฉากให้ตรงกับแนวที่เลือก เช่น โกดังสินค้าที่มีพาเลทและกล่องลังเรียงรายด้านหลัง (Warehouse racks & shipping cartons), หน้าร้านตลาดค้าส่งที่คึกคัก, โชว์รูมห้างสรรพสินค้าไฟสว่างสวย, หรือโต๊ะแพ็กของหน้าคลังสินค้า โดยให้เห็นเจ้าของโกดัง/พนักงานขาย/คนงานกำลังหยิบจับสาธิตสินค้าชิ้นนั้นให้ดูสดๆ หน้ากล้อง
 
 ============================================================
 กฎเหล็กข้อที่ 2: การพูดราคาและส่วนลดแบบเซฟ 100% (SAFE PRICE & DISCOUNT RULE)
 ============================================================
-ผู้ใช้อาจโดน TikTok แบนหากพูดคำว่า "ราคาหลักสิบ" หรือบอกราคาต่ำกว่าหน้าชำระเงินจริง ดังนั้นต้องปฏิบัติตามกฎนี้ในทุกส่วน (บทพูด, ปกคลิป, แคปชั่น, ข้อความตะกร้า):
+ผู้ใช้อาจโดน TikTok แบนหากพูดคำว่า "ราคาหลักสิบ" หรือบอกราคาต่ำกว่าหน้าชำระเงินจริง ดังนั้นต้องปฏิบัติตามกฎนี้ในทุกส่วน (บทพูด, ปกคลิป, แคปชั่น, ข้อความตะกร้า, คอมเมนต์ปักหมุด):
 1. ห้ามใช้คำว่า "ราคาหลักสิบ", "หลักสิบ", "แค่หลักสิบ", หรือระบุตัวเลขราคาเป๊ะๆ (เช่น "59 บาท", "79 บาท") ในบทพูดและแคปชั่นเด็ดขาด (ยกเว้นในตารางวิเคราะห์สินค้าข้อ 0 ซึ่งแสดงไว้ให้ผู้ใช้ดูอ้างอิงเท่านั้น)
 2. เมื่อต้องการสื่อความคุ้มค่าเรื่องราคา ให้ปัดขึ้นเป็น "เพดานราคาที่สูงกว่าไว้ก่อน (Price Cushion)" เสมอ:
    - ถ้าราคาในภาพ 1–99 บาท (เช่น 59 หรือ 79 บาท) ➡️ ให้พูดว่า "งบไม่ถึงร้อย", "แบงก์ร้อยมีทอน", หรือ "ไม่เกินร้อย" เท่านั้น
@@ -1183,45 +1208,77 @@
 4. ห้ามสร้าง FOMO ปลอมหรือบังคับซื้อรุนแรง: ห้ามใช้ "วันสุดท้ายแล้ว", "เหลือชิ้นสุดท้าย", "ไม่ซื้อถือว่าพลาดมาก", "ของมันต้องมี", "ซื้อเลยด่วนๆ"
 
 ============================================================
-กฎเหล็กข้อที่ 4: ไม่มีข้อความขึ้นในคลิป/Storyboard และเอาบทพูดใส่ใน Kling Prompt
+กฎเหล็กข้อที่ 4: การกำกับมุมกล้อง แสงวัสดุ และเสียงตามสกิล /video-studio (video-shotcraft + DirectorSKILL + earshot)
 ============================================================
-1. ใน Storyboard วิดีโอ 10 วินาที: ห้ามมีข้อความขึ้นบนจอ (No On-Screen Text) ให้ระบุเฉพาะ "เวลา" และ "ภาพวิดีโอ & มุมกล้อง (Visual & Camera Action)" ที่เห็นการกระทำชัดเจนแม้ปิดเสียง
-2. ใน Kling Omni Master Prompt:
-   - เขียนโครงสร้าง 5-Aspect Cinematography ภาษาอังกฤษที่ล็อกรูปทรงสินค้าจาก <<<image_1>>> และใช้ ++...++ เน้นจุดเด่นสินค้า
-   - **ต้องใส่บล็อก [Voiceover / Thai Dialogue Script] ไว้ใน Kling Prompt ด้วยเสมอ** โดยนำบทพูดภาษาไทย 10 วินาทีใส่ไว้ในเครื่องหมายคำพูด "..." พร้อมระบุโทนเสียงพูดธรรมชาติ (หรือโทนเสียงเจ้าของโกดัง/พนักงานขายที่กระตือรือร้นหากเป็นแนว 13–16)
-   - **ต้องใส่ข้อห้ามท้าย Kling Prompt เสมอว่า:** "No text, no on-screen text, no captions, no subtitles, no logos, no watermarks, no animation overlays, no deformed hands, no extra fingers, no object morphing, no distorted product."
+1. ห้ามใช้คำคุณศัพท์ลอยๆ แบบ "cinematic, masterpiece, 8K" (Adjective Soup) ให้ระบุค่ากล้องทางกายภาพตามหลัก DirectorSKILL:
+   - ขนาดภาพ + เลนส์ + มุมกล้อง + การเคลื่อนกล้องเพียง 1 อย่างต่อช็อต (เช่น "MCU · 35mm · High +20° · Slow Push-in" หรือ "ECU Macro · 100mm f/4 · Raking Side Angle · Locked Camera")
+2. กฎการจัดแสงตามพื้นผิววัสดุ (DirectorSKILL 3 Material Lighting Classes):
+   - **ผ้า / พรม / เนื้อแมตต์ / อาหารแห้ง (Matte & Fabric):** ใช้ "Shallow Raking Side Light" (ไฟส่องเฉียงระนาบพื้นผิวเพื่อให้เห็นเส้นใยทอ ตะเข็บ และความนูนหนาชัดเจน ไม่แบน)
+   - **โลหะ / พลาสติกเงา / เครื่องใช้ไฟฟ้า (Specular & Gloss):** ใช้ "Travelling Softbox Highlight" (ล็อกสินค้าให้นิ่งแล้วให้แสง Softbox เคลื่อนผ่านผิวเงา เกิดไฮไลต์วิ่งสวยโดยรูปทรงสินค้าไม่บิดเบี้ยว)
+   - **ขวดใส / เซรั่ม / น้ำ / แก้ว (Transparent & Liquid):** ใช้ "Dark-Field / Bright-Field Edge Rim Light" (ไฟตัดขอบซ้ายขวาและไฟส่องทะลุจากด้านหลังให้เห็นความใสและเนื้อของเหลว)
+3. กฎการบล็อกกิ้ง (Blocking: Start → Action → End State + Hold 0.5s จาก video-shotcraft R1–R3):
+   - ทุกช็อตใน Storyboard และใน Prompt ต้องระบุ "จุดเริ่มต้น ➡️ การกระทำ 1 อย่าง ➡️ จุดจบที่หยุดนิ่ง (End State + Hold 0.5s)" เสมอ เพื่อป้องกันอาการ AI เจนภาพละลายหรือมือขยับมั่วตอนท้ายช็อต
+4. กฎการออกแบบเสียงจริง (earshot Real-Sound Foley + video-shotcraft S1):
+   - ระบุเสียง Foley ธรรมชาติของวัสดุจริงในบล็อก [Audio & Foley Design] (เช่น เสียงสะบัดผ้าพรมทอแน่น เสียงฝ่ามือลูบเนื้อผ้า เสียงยางกันลื่นดูดเกาะพื้นกระเบื้อง) ห้ามใช้เสียงสังเคราะห์แบบเกม
+5. ใน Storyboard และในคลิป ห้ามมีข้อความลอยบนจอเด็ดขาด (No On-Screen Text) และต้องฝังบทพูดภาษาไทย 10 วินาทีไว้ในทั้ง `kling_master_prompt` (Single-Take) และ `multishot_prompt` (Shape S4 Timestamped)
 
 ============================================================
-กฎเหล็กข้อที่ 5: ชุด Hashtag 5 แบบ (แบบละ 5 อันเป๊ะ!)
+กฎเหล็กข้อที่ 5: ชุด Hashtag 5 แบบ (แบบละ 5 อันเป๊ะ!) + คอมเมนต์ปักหมุด 3 แบบ (pinned-comment)
 ============================================================
-- ในส่วนที่ 5 แคปชั่นหลักไม่ต้องใส่แฮชแท็กปน (เพราะแยกออกเป็น 5 ชุดให้กดก๊อปปี้แล้ว)
 - ชุดแฮชแท็ก (hashtag_sets) ต้องมี **5 แบบ** และ **แต่ละแบบต้องมีแฮชแท็ก 5 อันเป๊ะๆ (ห้ามขาดห้ามเกิน)**
+- คอมเมนต์ปักหมุด (pinned_comments) ต้องมี **3 แบบ** ตามสกิล `pinned-comment` (ชวนคนกดตะกร้าเหลืองซ้ายล่าง + กระตุ้นให้คนถามสี/ขนาดใต้เม้นต์เพื่อดันอัลกอริทึม)
 
 ตอบกลับเป็น JSON Object ตามโครงสร้างนี้เท่านั้น (ห้ามมีข้อความอื่นนอก JSON):
 {
-  "exact_product_name_from_image": "ถอดข้อความชื่อสินค้าทั้งหมดที่ปรากฏในรูปภาพแบบคำต่อคำ (Exact OCR Verbatim) ทุกตัวอักษร ไม่ตัดคำ ไม่สรุปย่อ (หากในรูปมีข้อความชื่อสินค้า + ตัวเลือกสี/ขนาดที่แสดงอยู่ ให้ถอดมาให้ครบถ้วน)",
+  "exact_product_name_from_image": "ถอดข้อความชื่อสินค้าทั้งหมดที่ปรากฏในรูปภาพแบบคำต่อคำ (Exact OCR Verbatim) ทุกตัวอักษร ไม่ตัดคำ ไม่สรุปย่อ",
   "selected_style_name": "ชื่อแนวคลิปที่เลือกใช้จาก 16 แนว พร้อมเหตุผลสั้นๆ 1 ประโยค",
   "product_title": "ชื่อสินค้าและรุ่น/สีที่วิเคราะห์ได้",
-  "product_summary": "สรุปภาพรวมสินค้า จุดขายหลัก และเพดานราคาแบบเซฟ",
+  "product_summary": "สรุปภาพรวมสินค้า จุดขายหลัก การจัดแสงตามวัสดุ (DirectorSKILL) และเพดานราคาแบบเซฟ",
   "specs": [
     {"label": "ชื่อสินค้าเต็มที่ถอดจากภาพ (OCR)", "value": "ข้อความชื่อสินค้าทั้งหมดที่แกะได้จากในรูปภาพแบบคำต่อคำ..."},
     {"label": "สินค้า", "value": "..."},
     {"label": "สีและลายที่เลือก", "value": "..."},
     {"label": "ขนาด / ในเซ็ตประกอบด้วย", "value": "..."},
-    {"label": "วัสดุ", "value": "..."},
+    {"label": "วัสดุ & การจัดแสง (DirectorSKILL)", "value": "เช่น ผ้าโพลีเอสเตอร์ทอแน่น (Matte/Fabric) ➡️ ใช้ Shallow Raking Side Light ส่องเฉียงให้เห็นมิติเส้นใยชัด"},
     {"label": "คุณสมบัติเด่น", "value": "..."},
     {"label": "ราคาในภาพ ➡️ คำพูดราคาแบบเซฟ", "value": "เช่น ในภาพ 79 บาท (ลด 78%) ➡️ ใช้คำว่า 'งบไม่ถึงร้อย / แบงก์ร้อยมีทอน' และ 'ลด 75%'"},
     {"label": "แนวคลิปที่ใช้ (จาก 16 แนว)", "value": "..."}
   ],
   "voiceover_10s": "บทพูด TikTok 10 วินาที (ประมาณ 25-32 คำไทย พูดเป็นธรรมชาติเหมือนคนจริง เซฟราคาและส่วนลดตามกฎ ปิดท้ายชวนดูที่ตะกร้าเหลืองซ้ายล่าง)...",
   "storyboard": [
-    {"time": "0–2 วินาที", "visual": "Frame Zero หยุดนิ้วทันที: รายละเอียดภาพ การกระทำ และมุมกล้อง (ไม่มีข้อความบนจอ)..."},
-    {"time": "2–4 วินาที", "visual": "รายละเอียดภาพ การกระทำ และมุมกล้อง..."},
-    {"time": "4–6 วินาที", "visual": "รายละเอียดภาพ การสาธิตใช้งานจริง (Visual Proof) และมุมกล้อง..."},
-    {"time": "6–8 วินาที", "visual": "รายละเอียดภาพ ผลลัพธ์ที่เห็นชัด และมุมกล้อง..."},
-    {"time": "8–10 วินาที", "visual": "รายละเอียดภาพจบคลิปอย่างนุ่มนวลเห็นสินค้าชัดเจน..."}
+    {
+      "time": "0–2 วินาที (Hook / Visual Strike)",
+      "camera_lens": "เช่น MCU · 35mm · High +20° · Slow Push-in",
+      "lighting": "เช่น Shallow Raking Side Light ส่องเฉียงเห็นลายผ้าคมชัด",
+      "visual": "Start: ... ➡️ Action: ... ➡️ End State: ... (ไม่มีข้อความบนจอ)"
+    },
+    {
+      "time": "2–4 วินาที (Scale & Setup Proof)",
+      "camera_lens": "เช่น MS · 35mm · Low Angle · Lateral Tracking Glide",
+      "lighting": "เช่น Natural Daylight + Soft Fill",
+      "visual": "Start: ... ➡️ Action: ... ➡️ End State: ..."
+    },
+    {
+      "time": "4–6 วินาที (Texture Macro Proof)",
+      "camera_lens": "เช่น ECU Macro · 100mm f/4 · Locked Camera",
+      "lighting": "เช่น Hard Raking Light เน้นเส้นใย/พื้นผิววัสดุ",
+      "visual": "Start: ... ➡️ Action: ... ➡️ End State: ..."
+    },
+    {
+      "time": "6–8 วินาที (Function / Grip Test)",
+      "camera_lens": "เช่น CU · 50mm · Eye Level · Locked Camera",
+      "lighting": "เช่น Controlled Side Key + Floor Bounce",
+      "visual": "Start: ... ➡️ Action: ... ➡️ End State: ..."
+    },
+    {
+      "time": "8–10 วินาที (Hero Hold & Loop)",
+      "camera_lens": "เช่น WS · 35mm · High +15° · Gentle Pull-back + Hold 0.5s",
+      "lighting": "เช่น Warm Balanced Commercial Lighting",
+      "visual": "Start: ... ➡️ Action: ... ➡️ End State: หยุดนิ่ง Hold 0.5s เห็นสินค้าเต็มตา"
+    }
   ],
-  "kling_master_prompt": "[Subject]: <<<image_1>>>, ++exact product description++...\\n\\n[Subject Motion]: ...\\n\\n[Scene]: ...\\n\\n[Spatial]: Vertical 9:16 frame...\\n\\n[Camera]: ...\\n\\n[Voiceover / Thai Dialogue Script]: Natural Thai creator voice speaking clearly and warmly (10s): \\"ใส่บทพูดภาษาไทยตรงกับ voiceover_10s ทุกคำที่นี่\\"\\n\\n[Negative / Constraints]: No text, no on-screen text, no captions, no subtitles, no Thai letters on screen, no logos, no watermarks, no animation overlays, no deformed hands, no extra fingers, no object morphing, no distorted product.",
+  "kling_master_prompt": "[Subject & Invariant Lock]: <<<image_1>>>, ++exact product description++...\\n\\n[Blocking: Start -> Action -> End State]: Starts with ... -> performs one clear physical action ... -> ends in a stable final hold for 0.5s with ...\\n\\n[Scene & Material Lighting (DirectorSKILL)]: ... (specify Shallow Raking Light / Travelling Softbox Highlight / Edge Rim Light matching the product surface)...\\n\\n[Spatial & Aspect]: Vertical 9:16 frame, safe margins top 12% and bottom 20% clear...\\n\\n[Camera & Lens (video-shotcraft)]: 35mm / 100mm macro lens, one dominant camera move, zero handheld shake...\\n\\n[Audio & Real-Sound Foley (earshot)]: Authentic physical material foley (...) + Natural Thai voiceover (10s): \\"ใส่บทพูดภาษาไทยตรงกับ voiceover_10s ทุกคำที่นี่\\"\\n\\n[Instance-Level Negatives (DirectorSKILL)]: No text, no on-screen text, no captions, no subtitles, no Thai letters on screen, no logos, no watermarks, no lighting rig reflected, no deformed hands, no extra fingers, no object morphing, no distorted product.",
+  "multishot_prompt": "Overall Continuity Lock: Vertical 9:16, <<<image_1>>> exact product geometry and color lock, consistent lighting direction, hard cuts only, no on-screen text.\\n[00:00-00:02] Shot 1 (Hook): [Size/Angle/Lens]. [Start -> Action -> End State]. Camera: [Move]. Light/Foley: [Cue].\\n[00:02-00:04] Shot 2 (Scale/Setup): [Size/Angle/Lens]. [Start -> Action -> End State]. Camera: [Move]. Light/Foley: [Cue].\\n[00:04-00:06] Shot 3 (Texture Macro): [100mm Macro, Locked]. [Start -> Action -> End State]. Light: [Raking/Travelling Highlight].\\n[00:06-00:08] Shot 4 (Function Proof): [Size/Angle/Lens]. [Start -> Action -> End State]. Camera: [Move].\\n[00:08-00:10] Shot 5 (Hero Hold): [Size/Angle/Lens]. [End State Hold 0.5s].\\n[Voiceover / Thai Dialogue Script (10s)]: \\"ใส่บทพูดภาษาไทยตรงกับ voiceover_10s ทุกคำที่นี่\\"\\n[Global Exclusions]: No text, no subtitles, no logos, no watermarks, no extra fingers, no warped product geometry.",
   "cover_headlines": [
     "ข้อความปกแบบที่ 1 (3-7 คำ ชวนสงสัย/หยุดนิ้ว เซฟราคา)",
     "ข้อความปกแบบที่ 2",
@@ -1243,6 +1300,11 @@
     "ชื่อตะกร้าแบบที่ 3",
     "ชื่อตะกร้าแบบที่ 4",
     "ชื่อตะกร้าแบบที่ 5"
+  ],
+  "pinned_comments": [
+    "คอมเมนต์ปักหมุดแบบที่ 1 (ชี้เป้าโปรในตะกร้าเหลืองซ้ายล่าง + เซฟราคาตามกฎ)",
+    "คอมเมนต์ปักหมุดแบบที่ 2 (ชวนคนดูคอมเมนต์ถามสี/ขนาด หรือบอกปัญหาที่เจอ เพื่อดัน Engagement)",
+    "คอมเมนต์ปักหมุดแบบที่ 3 (สรุปจุดเด่นสั้นๆ ว่าในเซ็ตได้อะไรบ้าง + พิกัดตะกร้าเหลือง)"
   ]
 }`;
 
@@ -1417,20 +1479,39 @@
       const cleanScript = sanitizeTikTokText((d.voiceover_10s || '').replace(/^"|"$/g, ''));
       document.getElementById('scriptBox').textContent = `"${cleanScript}"`;
 
-      // 2. Storyboard (Strictly NO on-screen text column)
+      // 2. Storyboard (4-Column DirectorSKILL + video-shotcraft Commercial Shot Table)
       const sb = d.storyboard || [];
       document.getElementById('storyboardTable').innerHTML = `
-        <thead><tr><th style="width:22%">เวลา</th><th>ภาพวิดีโอ & การเคลื่อนกล้อง (ไม่มีข้อความขึ้นในคลิป)</th></tr></thead>
+        <thead>
+          <tr>
+            <th style="width:16%">เวลา & Beat</th>
+            <th style="width:22%">มุมกล้อง & เลนส์ (video-shotcraft)</th>
+            <th style="width:20%">แสงตามพื้นผิววัสดุ (DirectorSKILL)</th>
+            <th>การแสดง Start → Action → End State (ไร้ข้อความบนจอ)</th>
+          </tr>
+        </thead>
         <tbody>
-          ${sb.map(r => `<tr><th>${escapeHtml(r.time)}</th><td>${escapeHtml(r.visual)}</td></tr>`).join('')}
+          ${sb.map(r => `
+            <tr>
+              <th>${escapeHtml(r.time || '')}</th>
+              <td><span style="color:var(--accent-2);font-weight:600;">${escapeHtml(r.camera_lens || 'MCU · 35mm · Slow Push-in')}</span></td>
+              <td><span style="color:var(--gold);">${escapeHtml(r.lighting || 'Shallow Raking Side Light')}</span></td>
+              <td>${escapeHtml(r.visual || '')}</td>
+            </tr>
+          `).join('')}
         </tbody>
       `;
       document.getElementById('storyboardRaw').textContent =
-        sb.map(r => `${r.time}: ${r.visual}`).join('\n');
+        sb.map(r => `${r.time} | กล้อง: ${r.camera_lens || '-'} | แสง: ${r.lighting || '-'} | ภาพ: ${r.visual}`).join('\n');
 
-      // 3. Kling Master Prompt (with embedded Thai speech + no-text lock)
+      // 3A. Kling Master Prompt (Single-Take with embedded Thai speech + no-text lock)
       const finalKlingPrompt = ensureVoiceAndNoTextInKlingPrompt(d.kling_master_prompt, cleanScript);
       document.getElementById('klingPromptBox').textContent = finalKlingPrompt;
+
+      // 3B. DirectorSKILL Multi-Shot Timestamped Prompt (Shape S4)
+      const rawMultiShot = d.multishot_prompt || sb.map((r, i) => `[Shot ${i + 1} - ${r.time}]: ${r.camera_lens || '35mm'} | ${r.lighting || 'Natural Light'} | ${r.visual}`).join('\n');
+      const finalMultiShot = ensureVoiceAndNoTextInKlingPrompt(rawMultiShot, cleanScript);
+      document.getElementById('multiShotPromptBox').textContent = finalMultiShot;
 
       // 4. Cover Headlines (5)
       const covers = (d.cover_headlines || []).slice(0, 5).map(c => sanitizeTikTokText(c));
@@ -1474,6 +1555,23 @@
         </div>
       `).join('');
       document.getElementById('basketsRaw').textContent = baskets.map((b, i) => `${i + 1}. ${b}`).join('\n');
+
+      // 7. Pinned Comments (3) from social-media-skills/pinned-comment
+      const defaultPinned = [
+        'พิกัดโปรลดหนัก 75% งบไม่ถึงร้อย กดดูสีและขนาดที่ตะกร้าเหลืองซ้ายล่างได้เลยนะคะ 👇🛒',
+        'ใครกำลังลังเลว่าจะเอาสีไหนหรือขนาดไหนดี คอมเมนต์ถามไว้ใต้คลิปได้เลยน้า เดี๋ยวมาช่วยเทียบให้ค่ะ 💬✨',
+        'สรุปให้ครบ: ได้ครบเซ็ตตามในคลิป งานตรงปก ซับน้ำไว กดเช็กโปรวันนี้ที่ตะกร้าเหลืองหน้าคลิปได้เลยค่ะ 🔥'
+      ];
+      const pinned = ((d.pinned_comments && d.pinned_comments.length > 0) ? d.pinned_comments : defaultPinned)
+        .slice(0, 3)
+        .map(p => sanitizeTikTokText(p));
+      document.getElementById('pinnedList').innerHTML = pinned.map((p, idx) => `
+        <div class="copy-item">
+          <div class="copy-item-text"><strong>📌 แบบที่ ${idx + 1}:</strong> ${escapeHtml(p)}</div>
+          <button class="btn-copy" onclick="copyDirectText(${JSON.stringify(p).replace(/"/g, '&quot;')}, this)">📋 คัดลอก</button>
+        </div>
+      `).join('');
+      document.getElementById('pinnedRaw').textContent = pinned.map((p, i) => `${i + 1}. ${p}`).join('\n');
     }
 
     function flashCopied(btn) {
@@ -1510,17 +1608,21 @@
         document.getElementById('analysisRaw').textContent,
         `\n=== 1. บทพูด TikTok 10 วินาที ===`,
         document.getElementById('scriptBox').textContent,
-        `\n=== 2. Storyboard วิดีโอ 10 วินาที (ไม่มีข้อความในคลิป) ===`,
+        `\n=== 2. ตารางกำกับช็อตโฆษณา 10 วินาที (DirectorSKILL + video-shotcraft) ===`,
         document.getElementById('storyboardRaw').textContent,
-        `\n=== 3. Kling Omni Master Prompt (รวมบทพูดไทย) ===`,
+        `\n=== 3A. Kling Omni Single-Take Master Prompt (รวมบทพูดไทย + Foley) ===`,
         document.getElementById('klingPromptBox').textContent,
+        `\n=== 3B. DirectorSKILL Multi-Shot Timestamped Prompt (Shape S4) ===`,
+        document.getElementById('multiShotPromptBox').textContent,
         `\n=== 4. ข้อความปกคลิป 5 แบบ ===`,
         document.getElementById('coversRaw').textContent,
         `\n=== 5. Caption พร้อมโพสต์ + แฮชแท็ก 5 แบบ (แบบละ 5 อัน) ===`,
         document.getElementById('captionOnlyBox').textContent,
         `\n[ชุดแฮชแท็ก 5 แบบ เลือกใช้ได้ตามต้องการ]:\n${hSetsText}`,
         `\n=== 6. ข้อความตะกร้าสินค้า 5 แบบ ===`,
-        document.getElementById('basketsRaw').textContent
+        document.getElementById('basketsRaw').textContent,
+        `\n=== 7. คอมเมนต์ปักหมุดใต้คลิป 3 แบบ (Pinned Comments) ===`,
+        document.getElementById('pinnedRaw').textContent
       ].join('\n');
 
       copyToClipboard(fullText);
@@ -1545,13 +1647,14 @@
         ],
         "voiceover_10s": "ยืนล้างจานน้ำกระเด็นพื้นลื่น ลองเปลี่ยนมาปูพรมหมากรุกเซ็ตสองชิ้นคู่นี้ดูค่ะ ได้ทั้งผืนยาวผืนสั้น ซับน้ำไว ฐานหนึบไม่ลื่นไถล ตอนนี้จัดโปรลดหนัก 75% งบไม่ถึงร้อยได้ครบเซ็ต กดดูที่ตะกร้าเหลืองซ้ายล่างได้เลยนะ!",
         "storyboard": [
-          { "time": "0–2 วินาที", "visual": "ภาพเปิด Frame Zero: เท้าเปล่าก้าวเหยียบลงบนพรมลายหมากรุกขาวดำผืนยาวหน้าอ่างล้างจานอย่างมั่นคง พรมยึดเกาะพื้นกระเบื้องแน่นไม่ขยับ" },
-          { "time": "2–4 วินาที", "visual": "กล้องแพนมุมต่ำตามแนวยาวให้เห็นพรมทั้ง 2 ชิ้นวางเข้าชุดกัน (ผืนยาว 120×40 ซม. หน้าเคาน์เตอร์ครัว และผืนสั้น 60×40 ซม. หน้าซิงก์ล้างจาน)" },
-          { "time": "4–6 วินาที", "visual": "มุมใกล้ Close-up มือลูบเนื้อผ้าโพลีเอสเตอร์ให้เห็นความนุ่มและลายตารางหมากรุกคมชัด" },
-          { "time": "6–8 วินาที", "visual": "มือเปิดมุมพรมด้านหลังขึ้นเล็กน้อย โชว์แผ่นฐานกันลื่นที่ยึดติดกับพื้นกระเบื้องห้องครัว" },
-          { "time": "8–10 วินาที", "visual": "กล้องถอยออกช้าๆ เห็นภาพรวมห้องครัวมินิมอลสะอาดตาที่มีพรมหมากรุกทั้งสองผืนวางเข้าชุดกันอย่างสวยงาม" }
+          { "time": "0–2 วินาที (Hook / Visual Strike)", "camera_lens": "MS · 35mm · High +20° · Slow Push-in", "lighting": "Shallow Raking Side Light ส่องเฉียงเน้นตารางหมากรุก", "visual": "Start: พื้นกระเบื้องหน้าซิงก์ ➡️ Action: เท้าเปล่าก้าวเหยียบลงบนพรมลายหมากรุกผืนยาวอย่างมั่นคง ➡️ End State: พรมยึดเกาะพื้นแน่นไม่ขยับ Hold 0.5s" },
+          { "time": "2–4 วินาที (Scale & Setup Proof)", "camera_lens": "WS · 35mm · Low Angle · Lateral Tracking Glide", "lighting": "Natural Window Daylight + Soft Warm Fill", "visual": "Start: มุมเคาน์เตอร์ครัว ➡️ Action: กล้องแพนตามแนวยาวโชว์พรมทั้ง 2 ชิ้น (ผืนยาว 120×40 + ผืนสั้น 60×40 ซม.) ➡️ End State: เห็นพรมสองผืนวางเข้าชุดกัน" },
+          { "time": "4–6 วินาที (Texture Macro Proof)", "camera_lens": "ECU Macro · 100mm f/4 · Locked Camera", "lighting": "Hard Raking Side Light เน้นเส้นใยผ้าโพลีเอสเตอร์", "visual": "Start: กล้องนิ่งโฟกัสผิวพรม ➡️ Action: มือลูบและกดเนื้อผ้าโพลีเอสเตอร์เบาๆ โชว์ความนุ่มและซับน้ำ ➡️ End State: ผ้าคืนตัวทรงสวย ลายตารางคมชัด" },
+          { "time": "6–8 วินาที (Grip & Backing Test)", "camera_lens": "CU · 50mm · Low 25cm off floor · Locked Camera", "lighting": "Controlled Key + Floor Bounce", "visual": "Start: มือจับมุมพรม ➡️ Action: เปิดมุมพรมด้านหลังขึ้นโชว์ปุ่มยางกันลื่นแล้ววางทาบลงพื้น ➡️ End State: มือดันทดสอบความหนึบ พรมนิ่งสนิท" },
+          { "time": "8–10 วินาที (Hero Packshot Hold)", "camera_lens": "WS · 35mm · Eye-level +15° · Gentle Pull-back", "lighting": "Balanced Commercial Daylight", "visual": "Start: มุมกลางครัว ➡️ Action: กล้องถอยออกช้าๆ เห็นห้องครัวมินิมอลสะอาดตา ➡️ End State: พรมทั้ง 2 ผืนวางเด่นชัด Hold 0.5s" }
         ],
-        "kling_master_prompt": "[Subject]: <<<image_1>>>, ++black and white checkerboard kitchen mat 2-piece set++, consisting of one long rectangular runner mat (approx 3:1 length-to-width proportion) and one matching shorter rectangular mat (approx 3:2 proportion), crisp woven polyester fabric texture with sharp black-and-white checker grid.\n\n[Subject Motion]: Zero warping or morphing of the checkerboard pattern; natural human action as bare feet gently step onto the mat in front of the kitchen sink, followed by a single adult hand lightly pressing the fabric surface to demonstrate softness and non-slip stability against the floor.\n\n[Scene]: Clean minimalist home kitchen, warm oak cabinets, bright white floor tiles, soft natural daylight streaming from a side window.\n\n[Spatial]: Vertical 9:16 composition; foreground shows tactile mat surface and foot/hand interaction, midground shows the 2-piece mat placement along the kitchen counter and sink, softly blurred clean kitchen background.\n\n[Camera]: Continuous smooth high-angle push-in transitioning into a gentle low-angle lateral tracking glide along the mats, 35mm lens, shallow depth of field, authentic native TikTok UGC realism.\n\n[Voiceover / Thai Dialogue Script]: Natural Thai female creator voice speaking warmly and conversationally (10s): \"ยืนล้างจานน้ำกระเด็นพื้นลื่น ลองเปลี่ยนมาปูพรมหมากรุกเซ็ตสองชิ้นคู่นี้ดูค่ะ ได้ทั้งผืนยาวผืนสั้น ซับน้ำไว ฐานหนึบไม่ลื่นไถล ตอนนี้จัดโปรลดหนัก 75% งบไม่ถึงร้อยได้ครบเซ็ต กดดูที่ตะกร้าเหลืองซ้ายล่างได้เลยนะ!\"\n\n[Negative / Constraints]: No text, no on-screen text, no captions, no subtitles, no Thai characters on screen, no logos, no watermarks, no animation overlays, no distorted checkerboard lines, no warped grid pattern, no deformed hands, no extra fingers, no duplicate extra mats.",
+        "kling_master_prompt": "[Subject & Invariant Lock]: <<<image_1>>>, ++black and white checkerboard kitchen mat 2-piece set++, consisting of one long rectangular runner mat (120x40 cm, 3:1 proportion) and one matching shorter rectangular mat (60x40 cm, 3:2 proportion), crisp woven polyester fabric texture with sharp black-and-white checker grid.\n\n[Blocking: Start -> Action -> End State]: Starts with the two mats laid neatly in front of the kitchen counter and sink -> bare feet step onto the long runner mat while a single adult hand presses the woven surface and lifts one corner slightly to prove non-slip grip -> ends in a stable 0.5s hold with both mats flat and unwarped on the floor.\n\n[Scene & Material Lighting (DirectorSKILL)]: Clean minimalist home kitchen, warm oak cabinets, bright white floor tiles; Shallow Raking Side Light from a camera-left window casting subtle micro-shadows across the woven polyester fibers so texture reads clearly without glare.\n\n[Spatial & Aspect]: Vertical 9:16 composition, safe margins top 12% and bottom 20% clear; foreground shows tactile mat surface, midground shows the 2-piece set alignment.\n\n[Camera & Lens (video-shotcraft)]: 35mm spherical lens, one smooth high-angle push-in transitioning into a stable hold, zero handheld shake, focus plane locked on the front checkerboard weave.\n\n[Audio & Real-Sound Foley (earshot)]: Soft tactile fabric brush foley and firm rubber-grip floor contact sound (no game-like synth SFX) + Natural Thai female creator voice speaking warmly (10s): \"ยืนล้างจานน้ำกระเด็นพื้นลื่น ลองเปลี่ยนมาปูพรมหมากรุกเซ็ตสองชิ้นคู่นี้ดูค่ะ ได้ทั้งผืนยาวผืนสั้น ซับน้ำไว ฐานหนึบไม่ลื่นไถล ตอนนี้จัดโปรลดหนัก 75% งบไม่ถึงร้อยได้ครบเซ็ต กดดูที่ตะกร้าเหลืองซ้ายล่างได้เลยนะ!\"\n\n[Instance-Level Negatives (DirectorSKILL)]: No text, no on-screen text, no captions, no subtitles, no Thai characters on screen, no logos, no watermarks, no lighting rig reflected, no distorted checkerboard lines, no warped grid pattern, no deformed hands, no extra fingers, no duplicate extra mats.",
+        "multishot_prompt": "Overall Continuity Lock: Vertical 9:16, <<<image_1>>> exact black-and-white checkerboard 2-piece kitchen mat set (120x40cm + 60x40cm), minimalist oak-and-white tile kitchen, shallow raking side daylight from camera-left, hard cuts only, zero on-screen text.\n[00:00-00:02] Shot 1 (Hook): MS, 35mm, high +20°, slow push-in. Bare feet step onto the long checkerboard mat in front of the sink -> mat holds firm against wet tile. Foley: soft footstep on woven fabric.\n[00:02-00:04] Shot 2 (Scale Proof): WS, 35mm, low angle, lateral glide. Camera tracks along both the 120x40cm runner and 60x40cm short mat aligned along the counter -> ends framing both pieces together.\n[00:04-00:06] Shot 3 (Texture Macro): ECU Macro, 100mm f/4, locked camera, hard raking side light. One hand presses and strokes the woven polyester checkerboard surface -> fabric rebounds cleanly.\n[00:06-00:08] Shot 4 (Non-Slip Proof): CU, 50mm, locked camera. Hand flips the mat corner to reveal the non-slip backing dots, then presses it flat onto the tile floor -> zero sliding.\n[00:08-00:10] Shot 5 (Hero Hold): WS, 35mm, gentle pull-back -> ends on a 0.5s stationary hold of the complete 2-piece mat set in the clean kitchen.\n[Voiceover / Thai Dialogue Script (10s)]: \"ยืนล้างจานน้ำกระเด็นพื้นลื่น ลองเปลี่ยนมาปูพรมหมากรุกเซ็ตสองชิ้นคู่นี้ดูค่ะ ได้ทั้งผืนยาวผืนสั้น ซับน้ำไว ฐานหนึบไม่ลื่นไถล ตอนนี้จัดโปรลดหนัก 75% งบไม่ถึงร้อยได้ครบเซ็ต กดดูที่ตะกร้าเหลืองซ้ายล่างได้เลยนะ!\"\n[Global Exclusions]: No text, no subtitles, no logos, no watermarks, no warped checkerboard grid, no extra fingers.",
         "cover_headlines": [
           "ได้ครบ 2 ผืน! พรมครัวหมากรุกงบไม่ถึงร้อย",
           "พื้นครัวเปียกลื่น จบด้วยพรมหมากรุกเซ็ตคู่",
@@ -1598,13 +1701,14 @@
         ],
         "voiceover_10s": "บุกโกดังมาปล่อยของเอง! พรมห้องครัวลายหมากรุกยกเซ็ตสองผืน ได้ทั้งผืนยาวผืนสั้น งานทอแน่นซับน้ำไว ฐานกันลื่นหนึบๆ วันนี้จัดโปรหน้าโรงงานลดหนัก 75% แบงก์ร้อยมีทอนได้ครบสองชิ้น จิ้มตะกร้าเหลืองซ้ายล่างได้เลยครับ!",
         "storyboard": [
-          { "time": "0–2 วินาที", "visual": "ภาพเปิด Frame Zero ในโกดังสินค้า: เจ้าของโกดังยืนหน้าชั้นวางพาเลทสต็อกพรม คลี่พรมลายหมากรุกขาวดำผืนยาว 120×40 ซม. คู่กับผืนสั้น 60×40 ซม. โชว์หน้ากล้องอย่างกระฉับกระเฉง" },
-          { "time": "2–4 วินาที", "visual": "กล้องซูมเข้าใกล้ขณะมือเจ้าของโกดังดึงและบิดเนื้อผ้าโพลีเอสเตอร์โชว์ความหนาแน่นและลวดลายตารางหมากรุกคมชัด" },
-          { "time": "4–6 วินาที", "visual": "พลิกด้านหลังพรมโชว์แผ่นปุ่มกันลื่น แล้วโยนพรมวางลงบนพื้นปูนขัดมันในโกดัง ใช้เท้าดันทดสอบความหนึบว่าพรมไม่ลื่นไถล" },
-          { "time": "6–8 วินาที", "visual": "มือหยิบพรมทั้ง 2 ผืน (ผืนยาว + ผืนสั้น) มารวมคู่กันตรงหน้าลังพัสดุที่เตรียมแพ็กส่ง โชว์ว่าได้ครบเซ็ต 2 ชิ้น" },
-          { "time": "8–10 วินาที", "visual": "เจ้าของโกดังถือเซ็ตพรมคู่โชว์ชัดๆ หน้าชั้นวางสินค้าในโกดังไฟสว่างคมชัด จบคลิปอย่างมืออาชีพ" }
+          { "time": "0–2 วินาที (Hook / Factory Direct Shock)", "camera_lens": "MS · 35mm · Eye-level · Fast Push-in", "lighting": "Bright Industrial LED + Side Raking Key", "visual": "Start: เจ้าของโกดังยืนหน้าพาเลทสต็อกพรม ➡️ Action: สะบัดคลี่พรมหมากรุกขาวดำผืนยาว 120×40 คู่ผืนสั้น 60×40 ซม. โชว์หน้ากล้อง ➡️ End State: ถือพรมตึงเห็นลายชัด Hold 0.5s" },
+          { "time": "2–4 วินาที (Texture Macro Proof)", "camera_lens": "ECU Macro · 85mm · Locked Camera", "lighting": "Hard Raking Side Light เน้นเส้นใยทอแน่น", "visual": "Start: โฟกัสเนื้อพรมใกล้ๆ ➡️ Action: มือดึงและกดเนื้อผ้าโพลีเอสเตอร์โชว์ความหนาแน่นและซับน้ำ ➡️ End State: เนื้อผ้าคืนตัวแน่นไม่ย้วย" },
+          { "time": "4–6 วินาที (Grip & Backing Proof)", "camera_lens": "MS · 35mm · High +25° Tilted Down · Locked", "lighting": "Warehouse Overhead + Floor Bounce", "visual": "Start: พลิกโชว์ปุ่มยางกันลื่นด้านหลัง ➡️ Action: โยนพรมวางลงบนพื้นปูนขัดมันในโกดังแล้วใช้เท้าดันทดสอบความหนึบ ➡️ End State: พรมเกาะพื้นแน่นไม่ขยับ" },
+          { "time": "6–8 วินาที (2-Piece Set Value)", "camera_lens": "MCU · 50mm · Eye-level · Slow Dolly-in", "lighting": "Clean Side Key 45°", "visual": "Start: โต๊ะแพ็กของหน้าลังพัสดุ ➡️ Action: หยิบพรมทั้ง 2 ผืน (ยาว+สั้น) มารวมคู่กันโชว์ว่าได้ครบเซ็ต ➡️ End State: ชู 2 ชิ้นคู่กันชัดเจน" },
+          { "time": "8–10 วินาที (Warehouse Hero Hold)", "camera_lens": "MS · 35mm · Eye-level · Locked Hold 0.5s", "lighting": "Bright Balanced Warehouse Daylight", "visual": "Start: หน้าชั้นวางสต็อกพรมเรียงแน่น ➡️ Action: เจ้าของโกดังถือเซ็ตพรมคู่โชว์เต็มเฟรม ➡️ End State: หยุดนิ่ง Hold 0.5s เห็นสินค้าชัดเจน" }
         ],
-        "kling_master_prompt": "[Subject]: <<<image_1>>>, ++black and white checkerboard kitchen mat 2-piece set++, consisting of one long rectangular runner mat (120x40 cm proportion) and one matching shorter rectangular mat (60x40 cm proportion), held and demonstrated by an energetic Thai warehouse owner wearing a neat dark polo work shirt.\n\n[Subject Motion]: Fast-paced authentic hard-sell demonstration; the warehouse owner briskly unrolls the two checkerboard mats in front of stacked inventory shelves, flips the mat edge to show the non-slip backing texture, and places it firmly on the clean warehouse floor to prove grip stability without any pattern warping.\n\n[Scene]: Authentic modern wholesale distribution warehouse in Thailand, stacked brown shipping cartons and neat product racks in the background, bright industrial daylight LED lighting.\n\n[Spatial]: Vertical 9:16 frame; foreground highlights the crisp black-and-white checkerboard mats in the seller's hands, midground shows the active warehouse packing station, background features deep industrial shelves with soft depth-of-field.\n\n[Camera]: Dynamic handheld commercial tracking shot starting with a punchy medium close-up, pushing in on the fabric texture and backing grip, 35mm lens, high clarity realistic TikTok Shop warehouse live-sell aesthetic.\n\n[Voiceover / Thai Dialogue Script]: Energetic and trustworthy Thai male warehouse owner voice speaking with exciting factory-direct sales rhythm (10s): \"บุกโกดังมาปล่อยของเอง! พรมห้องครัวลายหมากรุกยกเซ็ตสองผืน ได้ทั้งผืนยาวผืนสั้น งานทอแน่นซับน้ำไว ฐานกันลื่นหนึบๆ วันนี้จัดโปรหน้าโรงงานลดหนัก 75% แบงก์ร้อยมีทอนได้ครบสองชิ้น จิ้มตะกร้าเหลืองซ้ายล่างได้เลยครับ!\"\n\n[Negative / Constraints]: No text, no on-screen text, no captions, no subtitles, no Thai characters on screen, no logos, no watermarks, no animation overlays, no distorted checkerboard lines, no warped grid pattern, no deformed hands, no extra fingers, no object morphing.",
+        "kling_master_prompt": "[Subject & Invariant Lock]: <<<image_1>>>, ++black and white checkerboard kitchen mat 2-piece set++, consisting of one long rectangular runner mat (120x40 cm proportion) and one matching shorter rectangular mat (60x40 cm proportion), held and demonstrated by an energetic Thai warehouse owner wearing a neat dark polo work shirt.\n\n[Blocking: Start -> Action -> End State]: Starts standing in front of stacked warehouse inventory pallets holding the 2-piece mat set -> briskly unrolls the mats, flips the corner to reveal the non-slip rubber backing dots, and places the mat firmly onto the warehouse floor to prove grip stability -> ends holding both mats proudly in a clean 0.5s final hold.\n\n[Scene & Material Lighting (DirectorSKILL)]: Authentic modern wholesale distribution warehouse in Thailand, stacked brown shipping cartons and neat product racks in the background; bright industrial LED daylight combined with a 45-degree Shallow Raking Side Light across the woven polyester fabric so the checkerboard weave and backing dots read with high tactile relief.\n\n[Spatial & Aspect]: Vertical 9:16 frame, safe margins top 12% and bottom 20% clear; foreground highlights the crisp black-and-white checkerboard mats, midground shows the warehouse packing station, background features deep industrial shelves.\n\n[Camera & Lens (video-shotcraft)]: 35mm spherical lens, punchy medium close-up push-in followed by a stable locked frame, zero chaotic camera shake.\n\n[Audio & Real-Sound Foley (earshot)]: Crisp fabric unroll snap, tactile hand-press foley on woven polyester, and firm rubber-grip contact on concrete floor + Energetic Thai male warehouse owner voice (10s): \"บุกโกดังมาปล่อยของเอง! พรมห้องครัวลายหมากรุกยกเซ็ตสองผืน ได้ทั้งผืนยาวผืนสั้น งานทอแน่นซับน้ำไว ฐานกันลื่นหนึบๆ วันนี้จัดโปรหน้าโรงงานลดหนัก 75% แบงก์ร้อยมีทอนได้ครบสองชิ้น จิ้มตะกร้าเหลืองซ้ายล่างได้เลยครับ!\"\n\n[Instance-Level Negatives (DirectorSKILL)]: No text, no on-screen text, no captions, no subtitles, no Thai characters on screen, no logos, no watermarks, no lighting rig reflected, no distorted checkerboard lines, no warped grid pattern, no deformed hands, no extra fingers, no object morphing.",
+        "multishot_prompt": "Overall Continuity Lock: Vertical 9:16, <<<image_1>>> exact black-and-white checkerboard 2-piece kitchen mat set (120x40cm + 60x40cm), Thai wholesale warehouse with stacked brown cartons and inventory racks, energetic Thai male warehouse owner in dark polo shirt, bright industrial daylight + raking side light, hard cuts only, zero on-screen text.\n[00:00-00:02] Shot 1 (Factory Shock Hook): MS, 35mm, fast push-in. Warehouse owner briskly unrolls both the long and short checkerboard mats in front of inventory racks -> ends holding both mats taut. Foley: crisp fabric snap.\n[00:02-00:04] Shot 2 (Texture Macro): ECU Macro, 85mm, locked camera, hard raking side light. Hands stretch and press the dense woven polyester checkerboard fabric -> fibers rebound cleanly.\n[00:04-00:06] Shot 3 (Grip Test): MS, 35mm, high +25° angle, locked. Owner flips mat to show non-slip backing dots, drops it onto polished concrete floor, and pushes with foot -> mat stays locked in place.\n[00:06-00:08] Shot 4 (2-Piece Bundle): MCU, 50mm, slow dolly-in. Owner pairs the 120x40cm runner and 60x40cm mat together at the packing table -> proves 2-piece bundle value.\n[00:08-00:10] Shot 5 (Hero Hold): MS, 35mm, locked 0.5s stationary hold of the warehouse owner presenting the complete 2-piece mat set clearly.\n[Voiceover / Thai Dialogue Script (10s)]: \"บุกโกดังมาปล่อยของเอง! พรมห้องครัวลายหมากรุกยกเซ็ตสองผืน ได้ทั้งผืนยาวผืนสั้น งานทอแน่นซับน้ำไว ฐานกันลื่นหนึบๆ วันนี้จัดโปรหน้าโรงงานลดหนัก 75% แบงก์ร้อยมีทอนได้ครบสองชิ้น จิ้มตะกร้าเหลืองซ้ายล่างได้เลยครับ!\"\n[Global Exclusions]: No text, no subtitles, no logos, no watermarks, no warped checkerboard grid, no extra fingers.",
         "cover_headlines": [
           "โกดังมาเอง! พรมครัว 2 ผืน แบงก์ร้อยมีทอน",
           "โปรหน้าโรงงานลด 75% ได้ครบผืนยาว+ผืนสั้น",
