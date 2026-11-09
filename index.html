@@ -902,21 +902,13 @@
         <pre id="storyboardRaw" style="display:none;"></pre>
       </div>
 
-      <!-- 3. Kling Omni Master Prompt + DirectorSKILL Multi-Shot Timestamped Prompt -->
+      <!-- 3. Kling Omni Master Prompt -->
       <div class="card">
         <div class="out-header">
-          <div class="out-title">3A. 🤖 Kling Omni Master Prompt (แบบ Single-Take ล็อกทรงสินค้า + แสงตามวัสดุ + บทพูดไทย + เสียง Foley)</div>
-          <button class="btn-copy" onclick="copyTextById('klingPromptBox', this)">📋 คัดลอก Kling Single-Take Prompt</button>
+          <div class="out-title">3. 🤖 Kling Omni Master Prompt (ล็อกทรงสินค้า + กำกับมุมกล้อง/แสงวัสดุ DirectorSKILL + บทพูดไทย + เสียง Foley)</div>
+          <button class="btn-copy" onclick="copyTextById('klingPromptBox', this)">📋 คัดลอก Kling Omni Prompt</button>
         </div>
         <div class="code-box mono" id="klingPromptBox"></div>
-
-        <div style="margin-top: 18px; border-top: 1px dashed var(--border); padding-top: 16px;">
-          <div class="out-header">
-            <div class="out-title" style="color: var(--accent-2);">3B. 🎞️ DirectorSKILL Multi-Shot Timestamped Prompt (Shape S4 — สำหรับโหมด Multi-Shot ใน Kling 3.0 / Seedance 2.0 / Veo)</div>
-            <button class="btn-copy" onclick="copyTextById('multiShotPromptBox', this)">📋 คัดลอก Multi-Shot Prompt</button>
-          </div>
-          <div class="code-box mono" id="multiShotPromptBox"></div>
-        </div>
       </div>
 
       <!-- 4. Cover Text 5 Variations -->
@@ -1220,7 +1212,7 @@
    - ทุกช็อตใน Storyboard และใน Prompt ต้องระบุ "จุดเริ่มต้น ➡️ การกระทำ 1 อย่าง ➡️ จุดจบที่หยุดนิ่ง (End State + Hold 0.5s)" เสมอ เพื่อป้องกันอาการ AI เจนภาพละลายหรือมือขยับมั่วตอนท้ายช็อต
 4. กฎการออกแบบเสียงจริง (earshot Real-Sound Foley + video-shotcraft S1):
    - ระบุเสียง Foley ธรรมชาติของวัสดุจริงในบล็อก [Audio & Foley Design] (เช่น เสียงสะบัดผ้าพรมทอแน่น เสียงฝ่ามือลูบเนื้อผ้า เสียงยางกันลื่นดูดเกาะพื้นกระเบื้อง) ห้ามใช้เสียงสังเคราะห์แบบเกม
-5. ใน Storyboard และในคลิป ห้ามมีข้อความลอยบนจอเด็ดขาด (No On-Screen Text) และต้องฝังบทพูดภาษาไทย 10 วินาทีไว้ในทั้ง `kling_master_prompt` (Single-Take) และ `multishot_prompt` (Shape S4 Timestamped)
+5. ใน Storyboard และในคลิป ห้ามมีข้อความลอยบนจอเด็ดขาด (No On-Screen Text) และต้องฝังบทพูดภาษาไทย 10 วินาทีไว้ใน `kling_master_prompt` เสมอ
 
 ============================================================
 กฎเหล็กข้อที่ 5: ชุด Hashtag 5 แบบ (แบบละ 5 อันเป๊ะ!) + คอมเมนต์ปักหมุด 3 แบบ (pinned-comment)
@@ -1278,7 +1270,6 @@
     }
   ],
   "kling_master_prompt": "[Subject & Invariant Lock]: <<<image_1>>>, ++exact product description++...\\n\\n[Blocking: Start -> Action -> End State]: Starts with ... -> performs one clear physical action ... -> ends in a stable final hold for 0.5s with ...\\n\\n[Scene & Material Lighting (DirectorSKILL)]: ... (specify Shallow Raking Light / Travelling Softbox Highlight / Edge Rim Light matching the product surface)...\\n\\n[Spatial & Aspect]: Vertical 9:16 frame, safe margins top 12% and bottom 20% clear...\\n\\n[Camera & Lens (video-shotcraft)]: 35mm / 100mm macro lens, one dominant camera move, zero handheld shake...\\n\\n[Audio & Real-Sound Foley (earshot)]: Authentic physical material foley (...) + Natural Thai voiceover (10s): \\"ใส่บทพูดภาษาไทยตรงกับ voiceover_10s ทุกคำที่นี่\\"\\n\\n[Instance-Level Negatives (DirectorSKILL)]: No text, no on-screen text, no captions, no subtitles, no Thai letters on screen, no logos, no watermarks, no lighting rig reflected, no deformed hands, no extra fingers, no object morphing, no distorted product.",
-  "multishot_prompt": "Overall Continuity Lock: Vertical 9:16, <<<image_1>>> exact product geometry and color lock, consistent lighting direction, hard cuts only, no on-screen text.\\n[00:00-00:02] Shot 1 (Hook): [Size/Angle/Lens]. [Start -> Action -> End State]. Camera: [Move]. Light/Foley: [Cue].\\n[00:02-00:04] Shot 2 (Scale/Setup): [Size/Angle/Lens]. [Start -> Action -> End State]. Camera: [Move]. Light/Foley: [Cue].\\n[00:04-00:06] Shot 3 (Texture Macro): [100mm Macro, Locked]. [Start -> Action -> End State]. Light: [Raking/Travelling Highlight].\\n[00:06-00:08] Shot 4 (Function Proof): [Size/Angle/Lens]. [Start -> Action -> End State]. Camera: [Move].\\n[00:08-00:10] Shot 5 (Hero Hold): [Size/Angle/Lens]. [End State Hold 0.5s].\\n[Voiceover / Thai Dialogue Script (10s)]: \\"ใส่บทพูดภาษาไทยตรงกับ voiceover_10s ทุกคำที่นี่\\"\\n[Global Exclusions]: No text, no subtitles, no logos, no watermarks, no extra fingers, no warped product geometry.",
   "cover_headlines": [
     "ข้อความปกแบบที่ 1 (3-7 คำ ชวนสงสัย/หยุดนิ้ว เซฟราคา)",
     "ข้อความปกแบบที่ 2",
@@ -1504,14 +1495,9 @@
       document.getElementById('storyboardRaw').textContent =
         sb.map(r => `${r.time} | กล้อง: ${r.camera_lens || '-'} | แสง: ${r.lighting || '-'} | ภาพ: ${r.visual}`).join('\n');
 
-      // 3A. Kling Master Prompt (Single-Take with embedded Thai speech + no-text lock)
+      // 3. Kling Omni Master Prompt (with embedded Thai speech + DirectorSKILL lighting/blocking + Foley + no-text lock)
       const finalKlingPrompt = ensureVoiceAndNoTextInKlingPrompt(d.kling_master_prompt, cleanScript);
       document.getElementById('klingPromptBox').textContent = finalKlingPrompt;
-
-      // 3B. DirectorSKILL Multi-Shot Timestamped Prompt (Shape S4)
-      const rawMultiShot = d.multishot_prompt || sb.map((r, i) => `[Shot ${i + 1} - ${r.time}]: ${r.camera_lens || '35mm'} | ${r.lighting || 'Natural Light'} | ${r.visual}`).join('\n');
-      const finalMultiShot = ensureVoiceAndNoTextInKlingPrompt(rawMultiShot, cleanScript);
-      document.getElementById('multiShotPromptBox').textContent = finalMultiShot;
 
       // 4. Cover Headlines (5)
       const covers = (d.cover_headlines || []).slice(0, 5).map(c => sanitizeTikTokText(c));
@@ -1610,10 +1596,8 @@
         document.getElementById('scriptBox').textContent,
         `\n=== 2. ตารางกำกับช็อตโฆษณา 10 วินาที (DirectorSKILL + video-shotcraft) ===`,
         document.getElementById('storyboardRaw').textContent,
-        `\n=== 3A. Kling Omni Single-Take Master Prompt (รวมบทพูดไทย + Foley) ===`,
+        `\n=== 3. Kling Omni Master Prompt (รวมบทพูดไทย + แสงวัสดุ DirectorSKILL + เสียง Foley) ===`,
         document.getElementById('klingPromptBox').textContent,
-        `\n=== 3B. DirectorSKILL Multi-Shot Timestamped Prompt (Shape S4) ===`,
-        document.getElementById('multiShotPromptBox').textContent,
         `\n=== 4. ข้อความปกคลิป 5 แบบ ===`,
         document.getElementById('coversRaw').textContent,
         `\n=== 5. Caption พร้อมโพสต์ + แฮชแท็ก 5 แบบ (แบบละ 5 อัน) ===`,
@@ -1654,7 +1638,6 @@
           { "time": "8–10 วินาที (Hero Packshot Hold)", "camera_lens": "WS · 35mm · Eye-level +15° · Gentle Pull-back", "lighting": "Balanced Commercial Daylight", "visual": "Start: มุมกลางครัว ➡️ Action: กล้องถอยออกช้าๆ เห็นห้องครัวมินิมอลสะอาดตา ➡️ End State: พรมทั้ง 2 ผืนวางเด่นชัด Hold 0.5s" }
         ],
         "kling_master_prompt": "[Subject & Invariant Lock]: <<<image_1>>>, ++black and white checkerboard kitchen mat 2-piece set++, consisting of one long rectangular runner mat (120x40 cm, 3:1 proportion) and one matching shorter rectangular mat (60x40 cm, 3:2 proportion), crisp woven polyester fabric texture with sharp black-and-white checker grid.\n\n[Blocking: Start -> Action -> End State]: Starts with the two mats laid neatly in front of the kitchen counter and sink -> bare feet step onto the long runner mat while a single adult hand presses the woven surface and lifts one corner slightly to prove non-slip grip -> ends in a stable 0.5s hold with both mats flat and unwarped on the floor.\n\n[Scene & Material Lighting (DirectorSKILL)]: Clean minimalist home kitchen, warm oak cabinets, bright white floor tiles; Shallow Raking Side Light from a camera-left window casting subtle micro-shadows across the woven polyester fibers so texture reads clearly without glare.\n\n[Spatial & Aspect]: Vertical 9:16 composition, safe margins top 12% and bottom 20% clear; foreground shows tactile mat surface, midground shows the 2-piece set alignment.\n\n[Camera & Lens (video-shotcraft)]: 35mm spherical lens, one smooth high-angle push-in transitioning into a stable hold, zero handheld shake, focus plane locked on the front checkerboard weave.\n\n[Audio & Real-Sound Foley (earshot)]: Soft tactile fabric brush foley and firm rubber-grip floor contact sound (no game-like synth SFX) + Natural Thai female creator voice speaking warmly (10s): \"ยืนล้างจานน้ำกระเด็นพื้นลื่น ลองเปลี่ยนมาปูพรมหมากรุกเซ็ตสองชิ้นคู่นี้ดูค่ะ ได้ทั้งผืนยาวผืนสั้น ซับน้ำไว ฐานหนึบไม่ลื่นไถล ตอนนี้จัดโปรลดหนัก 75% งบไม่ถึงร้อยได้ครบเซ็ต กดดูที่ตะกร้าเหลืองซ้ายล่างได้เลยนะ!\"\n\n[Instance-Level Negatives (DirectorSKILL)]: No text, no on-screen text, no captions, no subtitles, no Thai characters on screen, no logos, no watermarks, no lighting rig reflected, no distorted checkerboard lines, no warped grid pattern, no deformed hands, no extra fingers, no duplicate extra mats.",
-        "multishot_prompt": "Overall Continuity Lock: Vertical 9:16, <<<image_1>>> exact black-and-white checkerboard 2-piece kitchen mat set (120x40cm + 60x40cm), minimalist oak-and-white tile kitchen, shallow raking side daylight from camera-left, hard cuts only, zero on-screen text.\n[00:00-00:02] Shot 1 (Hook): MS, 35mm, high +20°, slow push-in. Bare feet step onto the long checkerboard mat in front of the sink -> mat holds firm against wet tile. Foley: soft footstep on woven fabric.\n[00:02-00:04] Shot 2 (Scale Proof): WS, 35mm, low angle, lateral glide. Camera tracks along both the 120x40cm runner and 60x40cm short mat aligned along the counter -> ends framing both pieces together.\n[00:04-00:06] Shot 3 (Texture Macro): ECU Macro, 100mm f/4, locked camera, hard raking side light. One hand presses and strokes the woven polyester checkerboard surface -> fabric rebounds cleanly.\n[00:06-00:08] Shot 4 (Non-Slip Proof): CU, 50mm, locked camera. Hand flips the mat corner to reveal the non-slip backing dots, then presses it flat onto the tile floor -> zero sliding.\n[00:08-00:10] Shot 5 (Hero Hold): WS, 35mm, gentle pull-back -> ends on a 0.5s stationary hold of the complete 2-piece mat set in the clean kitchen.\n[Voiceover / Thai Dialogue Script (10s)]: \"ยืนล้างจานน้ำกระเด็นพื้นลื่น ลองเปลี่ยนมาปูพรมหมากรุกเซ็ตสองชิ้นคู่นี้ดูค่ะ ได้ทั้งผืนยาวผืนสั้น ซับน้ำไว ฐานหนึบไม่ลื่นไถล ตอนนี้จัดโปรลดหนัก 75% งบไม่ถึงร้อยได้ครบเซ็ต กดดูที่ตะกร้าเหลืองซ้ายล่างได้เลยนะ!\"\n[Global Exclusions]: No text, no subtitles, no logos, no watermarks, no warped checkerboard grid, no extra fingers.",
         "cover_headlines": [
           "ได้ครบ 2 ผืน! พรมครัวหมากรุกงบไม่ถึงร้อย",
           "พื้นครัวเปียกลื่น จบด้วยพรมหมากรุกเซ็ตคู่",
@@ -1708,7 +1691,6 @@
           { "time": "8–10 วินาที (Warehouse Hero Hold)", "camera_lens": "MS · 35mm · Eye-level · Locked Hold 0.5s", "lighting": "Bright Balanced Warehouse Daylight", "visual": "Start: หน้าชั้นวางสต็อกพรมเรียงแน่น ➡️ Action: เจ้าของโกดังถือเซ็ตพรมคู่โชว์เต็มเฟรม ➡️ End State: หยุดนิ่ง Hold 0.5s เห็นสินค้าชัดเจน" }
         ],
         "kling_master_prompt": "[Subject & Invariant Lock]: <<<image_1>>>, ++black and white checkerboard kitchen mat 2-piece set++, consisting of one long rectangular runner mat (120x40 cm proportion) and one matching shorter rectangular mat (60x40 cm proportion), held and demonstrated by an energetic Thai warehouse owner wearing a neat dark polo work shirt.\n\n[Blocking: Start -> Action -> End State]: Starts standing in front of stacked warehouse inventory pallets holding the 2-piece mat set -> briskly unrolls the mats, flips the corner to reveal the non-slip rubber backing dots, and places the mat firmly onto the warehouse floor to prove grip stability -> ends holding both mats proudly in a clean 0.5s final hold.\n\n[Scene & Material Lighting (DirectorSKILL)]: Authentic modern wholesale distribution warehouse in Thailand, stacked brown shipping cartons and neat product racks in the background; bright industrial LED daylight combined with a 45-degree Shallow Raking Side Light across the woven polyester fabric so the checkerboard weave and backing dots read with high tactile relief.\n\n[Spatial & Aspect]: Vertical 9:16 frame, safe margins top 12% and bottom 20% clear; foreground highlights the crisp black-and-white checkerboard mats, midground shows the warehouse packing station, background features deep industrial shelves.\n\n[Camera & Lens (video-shotcraft)]: 35mm spherical lens, punchy medium close-up push-in followed by a stable locked frame, zero chaotic camera shake.\n\n[Audio & Real-Sound Foley (earshot)]: Crisp fabric unroll snap, tactile hand-press foley on woven polyester, and firm rubber-grip contact on concrete floor + Energetic Thai male warehouse owner voice (10s): \"บุกโกดังมาปล่อยของเอง! พรมห้องครัวลายหมากรุกยกเซ็ตสองผืน ได้ทั้งผืนยาวผืนสั้น งานทอแน่นซับน้ำไว ฐานกันลื่นหนึบๆ วันนี้จัดโปรหน้าโรงงานลดหนัก 75% แบงก์ร้อยมีทอนได้ครบสองชิ้น จิ้มตะกร้าเหลืองซ้ายล่างได้เลยครับ!\"\n\n[Instance-Level Negatives (DirectorSKILL)]: No text, no on-screen text, no captions, no subtitles, no Thai characters on screen, no logos, no watermarks, no lighting rig reflected, no distorted checkerboard lines, no warped grid pattern, no deformed hands, no extra fingers, no object morphing.",
-        "multishot_prompt": "Overall Continuity Lock: Vertical 9:16, <<<image_1>>> exact black-and-white checkerboard 2-piece kitchen mat set (120x40cm + 60x40cm), Thai wholesale warehouse with stacked brown cartons and inventory racks, energetic Thai male warehouse owner in dark polo shirt, bright industrial daylight + raking side light, hard cuts only, zero on-screen text.\n[00:00-00:02] Shot 1 (Factory Shock Hook): MS, 35mm, fast push-in. Warehouse owner briskly unrolls both the long and short checkerboard mats in front of inventory racks -> ends holding both mats taut. Foley: crisp fabric snap.\n[00:02-00:04] Shot 2 (Texture Macro): ECU Macro, 85mm, locked camera, hard raking side light. Hands stretch and press the dense woven polyester checkerboard fabric -> fibers rebound cleanly.\n[00:04-00:06] Shot 3 (Grip Test): MS, 35mm, high +25° angle, locked. Owner flips mat to show non-slip backing dots, drops it onto polished concrete floor, and pushes with foot -> mat stays locked in place.\n[00:06-00:08] Shot 4 (2-Piece Bundle): MCU, 50mm, slow dolly-in. Owner pairs the 120x40cm runner and 60x40cm mat together at the packing table -> proves 2-piece bundle value.\n[00:08-00:10] Shot 5 (Hero Hold): MS, 35mm, locked 0.5s stationary hold of the warehouse owner presenting the complete 2-piece mat set clearly.\n[Voiceover / Thai Dialogue Script (10s)]: \"บุกโกดังมาปล่อยของเอง! พรมห้องครัวลายหมากรุกยกเซ็ตสองผืน ได้ทั้งผืนยาวผืนสั้น งานทอแน่นซับน้ำไว ฐานกันลื่นหนึบๆ วันนี้จัดโปรหน้าโรงงานลดหนัก 75% แบงก์ร้อยมีทอนได้ครบสองชิ้น จิ้มตะกร้าเหลืองซ้ายล่างได้เลยครับ!\"\n[Global Exclusions]: No text, no subtitles, no logos, no watermarks, no warped checkerboard grid, no extra fingers.",
         "cover_headlines": [
           "โกดังมาเอง! พรมครัว 2 ผืน แบงก์ร้อยมีทอน",
           "โปรหน้าโรงงานลด 75% ได้ครบผืนยาว+ผืนสั้น",
