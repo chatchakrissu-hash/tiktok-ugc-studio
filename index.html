@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>TikTok Shop UGC & Kling Prompt Studio (2026 Anti-Ban Edition)</title>
+  <title>TikTok Shop UGC & Gemini Omni Video Prompt Studio (2026 Anti-Ban Edition)</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
@@ -627,7 +627,7 @@
         <div class="brand-logo">🎬</div>
         <div>
           <h1>
-            TikTok UGC & Kling Prompt Studio
+            TikTok UGC & Gemini Omni Video Prompt Studio
             <span class="badge-skill">🎬 /video-studio (video-shotcraft + DirectorSKILL) + /socialmedia + 🛡️ TikTok Safe 2026</span>
           </h1>
           <p>ผสานพลังจิตวิทยาการขาย (/socialmedia) + กำกับมุมกล้องโฆษณา & แสงวัสดุ (video-shotcraft 124 สูตร + DirectorSKILL) + เสียง Foley (earshot) + กฎกันแบน 2026</p>
@@ -672,7 +672,7 @@
         </li>
         <li><b>ห้ามดึงคนออกนอกแอป/พูดแอปคู่แข่ง:</b> ห้ามพูด "ตะกร้าส้ม, ถุงส้ม, แอปส้ม, Shopee, Lazada, แอดไลน์"
           (บังคับใช้ "ตะกร้าเหลืองซ้ายล่าง" เท่านั้น)</li>
-        <li><b>ไร้ข้อความรกในคลิป & Storyboard:</b> ไม่ใส่ข้อความลอยในคลิปและใน Storyboard และฝังบทพูดภาษาไทยลงใน Kling
+        <li><b>ไร้ข้อความรกในคลิป & Storyboard:</b> ไม่ใส่ข้อความลอยในคลิปและใน Storyboard และฝังบทพูดภาษาไทยลงใน Video Prompt (Gemini Omni)
           Prompt โดยตรง</li>
       </ul>
     </div>
@@ -822,7 +822,7 @@
       </div>
 
       <button class="btn-generate" id="btnGenerate" onclick="generateAll()">
-        <span>🚀 วิเคราะห์ภาพ & สร้างชุดสคริปต์ + Kling Prompt (รวมบทพูดไทย) ทั้งหมด</span>
+        <span>🚀 วิเคราะห์ภาพ & สร้างชุดสคริปต์ + Gemini Omni Video Prompt (รวมบทพูดไทย) ทั้งหมด</span>
       </button>
       <div
         style="text-align: center; margin-top: 10px; display: flex; justify-content: center; gap: 8px; flex-wrap: wrap;">
@@ -838,7 +838,7 @@
 
       <div class="status-box" id="statusBox">
         <div class="spinner"></div>
-        <span id="statusText">กำลังอ่านรายละเอียดจากรูปภาพและรันสกิล Creative Director + 5-Aspect Kling...</span>
+        <span id="statusText">กำลังอ่านรายละเอียดจากรูปภาพและรันสกิล Creative Director + Gemini Omni Video Prompt...</span>
       </div>
     </div>
 
@@ -900,19 +900,59 @@
           <div class="out-title">2. 🎬 ตารางกำกับช็อตโฆษณา 10 วินาที (DirectorSKILL + video-shotcraft: มุมกล้อง · เลนส์ · แสงวัสดุ · Start→Action→End State)</div>
           <button class="btn-copy" onclick="copyTextById('storyboardRaw', this)">📋 คัดลอกตารางกำกับช็อต</button>
         </div>
+        <p style="font-size: 13px; color: var(--muted); margin-bottom: 10px;">👉 ตารางนี้เป็นแผนของผู้กำกับไว้ให้คุณอ่านและใช้ตรวจคลิปที่ได้ (ไม่ต้องวางใน Gemini Omni — ใช้ข้อ 3 แทน)</p>
         <div style="overflow-x: auto;">
           <table class="data-table" id="storyboardTable"></table>
         </div>
         <pre id="storyboardRaw" style="display:none;"></pre>
       </div>
 
-      <!-- 3. Kling Omni Master Prompt -->
+      <!-- 3. Gemini Omni Video Prompt -->
       <div class="card">
         <div class="out-header">
-          <div class="out-title">3. 🤖 Kling Omni Master Prompt (ล็อกทรงสินค้า + กำกับมุมกล้อง/แสงวัสดุ DirectorSKILL + บทพูดไทย + เสียง Foley)</div>
-          <button class="btn-copy" onclick="copyTextById('klingPromptBox', this)">📋 คัดลอก Kling Omni Prompt</button>
+          <div class="out-title">3. 🤖 Gemini Omni Video Prompt (ล็อกทรงสินค้า + กำกับมุมกล้อง/แสงวัสดุ DirectorSKILL + บทพูดไทย + เสียง Foley)</div>
         </div>
+        <div class="btn-group" style="margin-bottom: 10px;">
+          <button class="btn-copy" onclick="copyTextById('klingPromptBox', this)">📋 แบบไม่แนบภาพ (Text-to-Video)</button>
+          <button class="btn-copy" style="border-color: var(--accent-2);" onclick="copyVideoPromptWithFrames('start', this)">📋 แบบแนบภาพเฟรมแรก (ข้อ 3.1)</button>
+          <button class="btn-copy" style="border-color: var(--green);" onclick="copyVideoPromptWithFrames('startEnd', this)">📋 แบบแนบเฟรมแรก + เฟรมสุดท้าย (ข้อ 3.1 + 3.2) — คุมได้มากที่สุด</button>
+        </div>
+        <p style="font-size: 13px; color: var(--muted); margin-bottom: 10px;">👉 ข้อนี้คือตัวที่ก๊อปไปวางใน Gemini Omni เพื่อสร้างคลิป เลือกปุ่มให้ตรงกับจำนวนภาพที่แนบ (ข้อ 2 เป็นแผนไว้ให้คุณอ่าน/ตรวจคลิป ไม่ต้องวาง)</p>
         <div class="code-box mono" id="klingPromptBox"></div>
+      </div>
+
+      <!-- 3.1 / 3.2 / 3.3 Frame + Storyboard Image Prompts -->
+      <div class="card">
+        <div class="out-header">
+          <div class="out-title">3.1 🖼️ Prompt สร้างภาพเฟรมแรก (Start Frame) — คุมฉาก คน สินค้า แสง ให้ตรงตั้งแต่วินาทีแรก</div>
+          <button class="btn-copy" onclick="copyTextById('keyframePromptBox', this)">📋 คัดลอก Prompt เฟรมแรก</button>
+        </div>
+        <div style="background: var(--card-2); border: 1px solid rgba(37, 244, 238, 0.35); border-radius: 12px; padding: 12px 14px; margin-bottom: 12px; font-size: 13.5px; line-height: 1.7;">
+          <b>วิธีใช้กับ Gemini Omni:</b><br>
+          1) นำ Prompt 3.1 (และ 3.2 ถ้าต้องการ) ไปสร้างภาพใน Gemini <b>พร้อมแนบรูปสินค้าจริง</b> เพื่อให้สินค้าตรงปก แล้วเช็กว่าสินค้าในภาพเหมือนของจริง<br>
+          2) ใน Gemini Omni แนบ <b>ภาพเฟรมแรก</b> (หรือ <b>เฟรมแรก + เฟรมสุดท้าย</b> เรียงตามลำดับ) — ภาพเหล่านี้มีสินค้าอยู่แล้ว ไม่ต้องแนบรูปสินค้าซ้ำ<br>
+          3) กดปุ่มในข้อ 3 ให้ตรงกับจำนวนภาพที่แนบ แล้ววาง Prompt นั้นใน Gemini Omni<br>
+          4) ถ้าคลิปออกมาเกือบดีแล้ว ให้พิมพ์สั่งแก้ต่อในแชตเดิมได้เลย (เช่น "ขอแสงอุ่นขึ้น" / "ให้มือขยับช้าลง") ไม่ต้องเริ่มใหม่
+        </div>
+        <div class="code-box mono" id="keyframePromptBox"></div>
+
+        <div style="margin-top: 18px; border-top: 1px dashed var(--border); padding-top: 16px;">
+          <div class="out-header">
+            <div class="out-title" style="color: var(--green);">3.2 🏁 Prompt สร้างภาพเฟรมสุดท้าย (End Frame) — ใช้คู่กับเฟรมแรก ให้คลิปจบตรงท่าที่ต้องการ</div>
+            <button class="btn-copy" onclick="copyTextById('endFramePromptBox', this)">📋 คัดลอก Prompt เฟรมสุดท้าย</button>
+          </div>
+          <p style="font-size: 13px; color: var(--muted); margin-bottom: 10px;">💡 สร้างภาพนี้ต่อในแชตเดียวกับเฟรมแรก แล้วสั่งว่า "ใช้คน ฉาก และสินค้าเดิมจากภาพก่อนหน้า" เพื่อให้สองภาพต่อเนื่องกัน</p>
+          <div class="code-box mono" id="endFramePromptBox"></div>
+        </div>
+
+        <div style="margin-top: 18px; border-top: 1px dashed var(--border); padding-top: 16px;">
+          <div class="out-header">
+            <div class="out-title" style="color: var(--accent-2);">3.3 🎞️ Prompt สร้างภาพสตอรี่บอร์ด 5 ช่อง (ไว้ดูภาพรวม/เทียบกับคลิปที่ได้)</div>
+            <button class="btn-copy" onclick="copyTextById('storyboardImagePromptBox', this)">📋 คัดลอก Prompt สตอรี่บอร์ด</button>
+          </div>
+          <p style="font-size: 13px; color: var(--muted); margin-bottom: 10px;">⚠️ ใช้ดูภาพรวมก่อนเสียเครดิตสร้างคลิป ถ้าจะคุมคลิปให้ได้ผลจริง ให้ใช้เฟรมแรก/เฟรมสุดท้าย (3.1–3.2) เพราะสตอรี่บอร์ดหลายช่องเสี่ยงให้ AI ตัดฉากรัวหรือเอาตารางไปโผล่ในคลิป</p>
+          <div class="code-box mono" id="storyboardImagePromptBox"></div>
+        </div>
       </div>
 
       <!-- 4. Cover Text 5 Variations -->
@@ -1313,7 +1353,7 @@
 - ให้เปิดด้วย Hook ที่เห็นภาพหรือความขัดแย้งเฉพาะของสินค้าชิ้นนี้ทันทีตามหลัก hook-generator & reels-scripting (Visual Strike / Product-Specific Tension / Factory Direct Shock)
 - **กรณีเลือกแนวที่ 13–16 (สายฮาร์ดเซลเน้นขาย: โกดัง/โรงงานปล่อยของ, พ่อค้าแม่ค้าตลาดค้าส่ง/หน้าร้าน, พนักงานขายในห้าง/โชว์รูม, คนงานแพ็กของหน้าคลัง):**
   1) บทพูด (voiceover_10s): ใช้โทนเสียงกระตือรือร้น จริงใจ เร่งจังหวะขายแบบมืออาชีพ เปิดด้วยความคุ้มค่าหน้างาน เช่น "บุกโกดังตัดสต็อกตรงไม่ผ่านคนกลาง!", "หน้าร้านจัดโปรปล่อยของเอง!", "พนักงานพาส่องโปรหน้าเชลฟ์ลดจุกๆ!" พร้อมย้ำจุดเด่นสินค้า 2–3 ข้อที่จับต้องได้ แล้วตบเข้าโปรโมชันและราคาแบบเซฟตามกฎข้อที่ 2
-  2) ฉากและมุมกล้อง (Storyboard & Kling Prompt): ต้องเซ็ตฉากให้ตรงกับแนวที่เลือก เช่น โกดังสินค้าที่มีพาเลทและกล่องลังเรียงรายด้านหลัง (Warehouse racks & shipping cartons), หน้าร้านตลาดค้าส่งที่คึกคัก, โชว์รูมห้างสรรพสินค้าไฟสว่างสวย, หรือโต๊ะแพ็กของหน้าคลังสินค้า โดยให้เห็นเจ้าของโกดัง/พนักงานขาย/คนงานกำลังหยิบจับสาธิตสินค้าชิ้นนั้นให้ดูสดๆ หน้ากล้อง
+  2) ฉากและมุมกล้อง (Storyboard & Video Prompt): ต้องเซ็ตฉากให้ตรงกับแนวที่เลือก เช่น โกดังสินค้าที่มีพาเลทและกล่องลังเรียงรายด้านหลัง (Warehouse racks & shipping cartons), หน้าร้านตลาดค้าส่งที่คึกคัก, โชว์รูมห้างสรรพสินค้าไฟสว่างสวย, หรือโต๊ะแพ็กของหน้าคลังสินค้า โดยให้เห็นเจ้าของโกดัง/พนักงานขาย/คนงานกำลังหยิบจับสาธิตสินค้าชิ้นนั้นให้ดูสดๆ หน้ากล้อง
 
 ============================================================
 กฎเหล็กข้อที่ 2: การพูดราคาและส่วนลดแบบเซฟ 100% (SAFE PRICE & DISCOUNT RULE)
@@ -1355,6 +1395,15 @@
 4. กฎการออกแบบเสียงจริง (earshot Real-Sound Foley + video-shotcraft S1):
    - ระบุเสียง Foley ธรรมชาติของวัสดุจริงในบล็อก [Audio & Foley Design] (เช่น เสียงสะบัดผ้าพรมทอแน่น เสียงฝ่ามือลูบเนื้อผ้า เสียงยางกันลื่นดูดเกาะพื้นกระเบื้อง) ห้ามใช้เสียงสังเคราะห์แบบเกม
 5. ใน Storyboard และในคลิป ห้ามมีข้อความลอยบนจอเด็ดขาด (No On-Screen Text) และต้องฝังบทพูดภาษาไทย 10 วินาทีไว้ใน "kling_master_prompt" เสมอ
+6. กฎการเขียน Prompt ภาพนิ่งสำหรับคุม AI วิดีโอ (เป็นภาษาอังกฤษทั้งหมด):
+   - "keyframe_image_prompt" = Prompt สร้างภาพเฟรมแรก (Start Frame) 1 ภาพ แนวตั้ง 9:16 ภาพถ่ายสมจริง ต้องตรงกับ "Start" ของช็อตแรกใน storyboard และตรงกับฉาก คน แสง ใน kling_master_prompt ทุกอย่าง ระบุให้ใช้รูปสินค้าที่แนบเป็นต้นแบบเป๊ะ (รูปทรง สี ลาย สัดส่วน ขนาด) ระบุฉาก ตัวละคร (เพศ วัย การแต่งกาย ท่าทางเริ่มต้นที่มือจับสินค้าเป็นธรรมชาติ) มุมกล้อง+เลนส์ แสงตามวัสดุ เว้นพื้นที่บน 12% ล่าง 20% และปิดท้ายด้วย Negatives: no text, no captions, no logos, no watermarks, no extra products, natural hands with five fingers
+   - "end_frame_image_prompt" = Prompt สร้างภาพเฟรมสุดท้าย (End Frame) 1 ภาพ แนวตั้ง 9:16 ภาพถ่ายสมจริง ตรงกับ "End State" ของช็อตสุดท้าย (ท่าจบที่หยุดนิ่ง เห็นสินค้าเต็มตา) ต้องใช้คน ฉาก แสง และสินค้าเดียวกับเฟรมแรกทุกอย่าง (ระบุให้ชัดว่า same person, same outfit, same location, same lighting as the start frame) ปิดท้ายด้วย Negatives เดียวกับเฟรมแรก
+   - "storyboard_grid_prompt" = Prompt สร้างภาพสตอรี่บอร์ด 1 แผ่น มี 5 ช่อง (แถวบน 3 ช่อง แถวล่าง 2 ช่อง แต่ละช่องเป็นภาพแนวตั้ง 9:16 คั่นด้วยเส้นขาวบาง) ภาพสมจริงสไตล์เดียวกันทุกช่อง สินค้า ตัวละคร ฉาก แสง ต้องต่อเนื่องเหมือนกันทุกช่อง บรรยายทีละช่อง Panel 1–5 ตรงกับ storyboard 5 ช็อต (ใช้ภาพ End State หรือจังหวะเด่นของแต่ละช็อต) และห้ามมีตัวหนังสือ ตัวเลข หรือคำบรรยายใดๆ ในภาพ
+7. เครื่องมือสร้างคลิปปลายทางคือ "Gemini Omni" ของ Google ดังนั้น "kling_master_prompt" (ชื่อฟิลด์เดิม) ต้องเขียนสำหรับ Gemini Omni:
+   - เขียนเป็นภาษาอังกฤษแบบผู้กำกับสั่งงานด้วยประโยคธรรมชาติ แบ่งเป็นหัวข้อในวงเล็บเหลี่ยมได้ แต่ห้ามใช้ไวยากรณ์เฉพาะของ Kling เช่น <<<image_1>>> หรือ ++...++ เด็ดขาด
+   - อ้างอิงสินค้าว่า "the product in the attached photo" พร้อมบรรยายรูปทรง สี ลาย สัดส่วน ให้ชัด
+   - ต้องมีคำว่า "Single continuous shot, no scene cuts" เพื่อป้องกันคลิปตัดฉากเอง
+   - ความยาวคลิป 10 วินาที แนวตั้ง 9:16 และฝังบทพูดภาษาไทยในหัวข้อเสียงตามเดิม
 
 ============================================================
 กฎเหล็กข้อที่ 5: ชุด Hashtag 5 แบบ (แบบละ 5 อันเป๊ะ!) + คอมเมนต์ปักหมุด 3 แบบ (pinned-comment)
@@ -1411,7 +1460,10 @@
       "visual": "Start: ... ➡️ Action: ... ➡️ End State: หยุดนิ่ง Hold 0.5s เห็นสินค้าเต็มตา"
     }
   ],
-  "kling_master_prompt": "[Subject & Invariant Lock]: <<<image_1>>>, ++exact product description++...\\n\\n[Blocking: Start -> Action -> End State]: Starts with ... -> performs one clear physical action ... -> ends in a stable final hold for 0.5s with ...\\n\\n[Scene & Material Lighting (DirectorSKILL)]: ... (specify Shallow Raking Light / Travelling Softbox Highlight / Edge Rim Light matching the product surface)...\\n\\n[Spatial & Aspect]: Vertical 9:16 frame, safe margins top 12% and bottom 20% clear...\\n\\n[Camera & Lens (video-shotcraft)]: 35mm / 100mm macro lens, one dominant camera move, zero handheld shake...\\n\\n[Audio & Real-Sound Foley (earshot)]: Authentic physical material foley (...) + Natural Thai voiceover (10s): \\"ใส่บทพูดภาษาไทยตรงกับ voiceover_10s ทุกคำที่นี่\\"\\n\\n[Instance-Level Negatives (DirectorSKILL)]: No text, no on-screen text, no captions, no subtitles, no Thai letters on screen, no logos, no watermarks, no lighting rig reflected, no deformed hands, no extra fingers, no object morphing, no distorted product.",
+  "kling_master_prompt": "[Format]: Photorealistic vertical 9:16 TikTok product video, 10 seconds. Single continuous shot, no scene cuts.\\n\\n[Product Lock]: The product in the attached photo: exact product description (shape, colors, pattern, proportions, size)...\\n\\n[Blocking: Start -> Action -> End State]: Starts with ... -> performs one clear physical action ... -> ends in a stable final hold for 0.5s with ...\\n\\n[Scene & Material Lighting (DirectorSKILL)]: ... (specify Shallow Raking Light / Travelling Softbox Highlight / Edge Rim Light matching the product surface)...\\n\\n[Spatial & Aspect]: Vertical 9:16 frame, safe margins top 12% and bottom 20% clear...\\n\\n[Camera & Lens (video-shotcraft)]: 35mm / 100mm macro lens, one dominant camera move, zero handheld shake...\\n\\n[Audio & Real-Sound Foley (earshot)]: Authentic physical material foley (...) + Natural Thai voiceover (10s): \\"ใส่บทพูดภาษาไทยตรงกับ voiceover_10s ทุกคำที่นี่\\"\\n\\n[Instance-Level Negatives (DirectorSKILL)]: No text, no on-screen text, no captions, no subtitles, no Thai letters on screen, no logos, no watermarks, no lighting rig reflected, no deformed hands, no extra fingers, no object morphing, no distorted product.",
+  "keyframe_image_prompt": "Photorealistic vertical 9:16 start-frame photo for a TikTok product video. Use the attached product photo(s) as the exact product reference (same shape, colors, pattern, proportions, size)... Scene: ... Person: ... starting pose ... Camera: ... lens ... Lighting: ... (material-specific) ... Keep top 12% and bottom 20% free of key elements. Negatives: no text, no captions, no logos, no watermarks, no extra products, natural hands with five fingers.",
+  "end_frame_image_prompt": "Photorealistic vertical 9:16 end-frame photo, the final held moment of the same video. Same person, same outfit, same location, same lighting and the exact same product as the start frame... Moment: (End State of the last shot) ... Camera: ... Negatives: no text, no captions, no logos, no watermarks, no extra products, natural hands with five fingers.",
+  "storyboard_grid_prompt": "Single storyboard sheet, 5 photorealistic panels: top row 3 panels, bottom row 2 panels, each panel vertical 9:16, thin white gutters. Same product (exactly as the attached photos), same person, same location and lighting in every panel. Panel 1: ... Panel 2: ... Panel 3: ... Panel 4: ... Panel 5: ... No text, no numbers, no captions, no logos anywhere in the image.",
   "cover_headlines": [
     "ข้อความปกแบบที่ 1 (3-7 คำ ชวนสงสัย/หยุดนิ้ว เซฟราคา)",
     "ข้อความปกแบบที่ 2",
@@ -1502,7 +1554,7 @@
       });
 
       userPromptParts.push({
-        text: `กรุณาวิเคราะห์ข้อมูลจากภาพสินค้าที่แนบมานี้ ${infoText ? `(ข้อมูลเพิ่มเติมจากผู้ใช้: ${infoText})` : ''}\n${styleInstruction}\nจำกฎเหล็ก: 0) ต้องถอดข้อความชื่อสินค้าทั้งหมดที่ปรากฏในรูปภาพแบบคำต่อคำครบทุกตัวอักษรใส่ใน exact_product_name_from_image 1) ห้ามพูดคำว่า "ราคาหลักสิบ" เด็ดขาด ให้ปัดเป็นเพดานราคาปลอดภัย เช่น 79 บาท -> "งบไม่ถึงร้อย / แบงก์ร้อยมีทอน", 2XX บาท -> "สามร้อยมีทอน" 2) ถ้าพูด % ส่วนลด ต้องปัดลงให้ต่ำกว่าในภาพและลงท้ายด้วย 0 หรือ 5 เท่านั้น (เช่น 78% -> 75%, 72% -> 70%) 3) ห้ามมีข้อความขึ้นในคลิปและใน Storyboard 4) ต้องนำบทพูดภาษาไทยใส่ลงใน Kling Master Prompt ด้วย 5) ชุดแฮชแท็กต้องมี 5 แบบ แบบละ 5 แฮชแท็กเป๊ะๆ`
+        text: `กรุณาวิเคราะห์ข้อมูลจากภาพสินค้าที่แนบมานี้ ${infoText ? `(ข้อมูลเพิ่มเติมจากผู้ใช้: ${infoText})` : ''}\n${styleInstruction}\nจำกฎเหล็ก: 0) ต้องถอดข้อความชื่อสินค้าทั้งหมดที่ปรากฏในรูปภาพแบบคำต่อคำครบทุกตัวอักษรใส่ใน exact_product_name_from_image 1) ห้ามพูดคำว่า "ราคาหลักสิบ" เด็ดขาด ให้ปัดเป็นเพดานราคาปลอดภัย เช่น 79 บาท -> "งบไม่ถึงร้อย / แบงก์ร้อยมีทอน", 2XX บาท -> "สามร้อยมีทอน" 2) ถ้าพูด % ส่วนลด ต้องปัดลงให้ต่ำกว่าในภาพและลงท้ายด้วย 0 หรือ 5 เท่านั้น (เช่น 78% -> 75%, 72% -> 70%) 3) ห้ามมีข้อความขึ้นในคลิปและใน Storyboard 4) ต้องนำบทพูดภาษาไทยใส่ลงใน Video Prompt สำหรับ Gemini Omni (ฟิลด์ kling_master_prompt) ด้วย และห้ามใช้ไวยากรณ์ Kling อย่าง <<<image_1>>> หรือ ++ 5) ชุดแฮชแท็กต้องมี 5 แบบ แบบละ 5 แฮชแท็กเป๊ะๆ`
       });
 
       const modelsToTry = getModelQueue();
@@ -1601,7 +1653,16 @@
 
     function ensureVoiceAndNoTextInKlingPrompt(klingPrompt, cleanScript) {
       let kp = String(klingPrompt || '').trim();
-      // Ensure the Thai voiceover script is embedded inside the Kling prompt
+      // Convert any leftover Kling-only syntax into natural language for Gemini Omni
+      kp = kp
+        .replace(/\[Subject\s*&\s*Invariant Lock\]/gi, '[Product Lock]')
+        .replace(/<<<\s*image_\d+\s*>>>\s*,?\s*/gi, 'The product in the attached photo: ')
+        .replace(/\+\+([^+]+)\+\+/g, '$1');
+      // Prevent unwanted scene cuts (single continuous take is the most stable for product videos)
+      if (!/single continuous shot|no scene cuts/i.test(kp)) {
+        kp = `[Format]: Photorealistic vertical 9:16 TikTok product video, 10 seconds. Single continuous shot, no scene cuts.\n\n${kp}`;
+      }
+      // Ensure the Thai voiceover script is embedded inside the video prompt
       if (cleanScript && !kp.includes(cleanScript.slice(0, 15))) {
         kp += `\n\n[Voiceover / Thai Dialogue Script]: Natural Thai creator voice speaking warmly and clearly (10s): "${cleanScript}"`;
       }
@@ -1610,6 +1671,76 @@
         kp += `\n\n[Strict Visual Rule]: Generate NO text, no on-screen text, no captions, no subtitles, no logos, no watermarks, no animation overlays.`;
       }
       return kp;
+    }
+
+    const START_FRAME_LINE = '[Start Frame]: Starting from the attached image as the exact first frame (same composition, product, person, location and lighting), continue with the action below. Keep the product identical to the first frame throughout.';
+    const START_END_FRAME_LINE = '[First & Last Frame]: Use the first attached image as the exact first frame and the second attached image as the exact last frame. Animate smoothly from the first image to the last image following the action below. Keep the same person, location, lighting and the exact same product throughout.';
+
+    function stripThaiForImagePrompt(str) {
+      // Image prompts should be English-only; drop Thai fragments and arrows the storyboard may contain
+      const cleaned = String(str || '')
+        .replace(/[\u0E00-\u0E7F]+/g, ' ')
+        .replace(/➡️|➡|→|->/g, ' ')
+        .replace(/\b(Start|Action|End State)\s*:\s*(?=(Start|Action|End State)\s*:|$)/gi, ' ')
+        .replace(/[()]/g, ' ')
+        .replace(/\s{2,}/g, ' ')
+        .replace(/\s+([,.;:])/g, '$1')
+        .trim();
+      // If too little English is left, treat as empty so a generic description is used instead
+      return (cleaned.match(/[A-Za-z]{3,}/g) || []).length >= 3 ? cleaned : '';
+    }
+
+    function buildKeyframePromptFallback(d) {
+      const first = (d.storyboard || [])[0] || {};
+      const cam = stripThaiForImagePrompt(first.camera_lens) || 'MS, 35mm lens, eye level';
+      const light = stripThaiForImagePrompt(first.lighting) || 'soft natural daylight with material-appropriate side light';
+      return [
+        'Photorealistic vertical 9:16 start-frame photo for a TikTok product video.',
+        'Use the attached product photo(s) as the exact product reference: identical shape, colors, pattern, proportions and size. Do not redesign the product.',
+        'Moment: the opening pose of the video, the product clearly visible and in focus, hands (if any) holding it naturally.',
+        `Camera: ${cam}.`,
+        `Lighting: ${light}.`,
+        'Composition: keep the top 12% and bottom 20% of the frame free of key elements.',
+        'Negatives: no text, no captions, no logos, no watermarks, no extra products, natural hands with five fingers, no distorted product.'
+      ].join('\n');
+    }
+
+    function buildStoryboardGridPromptFallback(d) {
+      const panels = (d.storyboard || []).slice(0, 5).map((r, i) => {
+        const cam = stripThaiForImagePrompt(r.camera_lens);
+        const light = stripThaiForImagePrompt(r.lighting);
+        return `Panel ${i + 1}: ${cam || 'medium shot'}${light ? ', ' + light : ''}. ${stripThaiForImagePrompt(r.visual) || 'the key moment of this beat, product clearly visible and identical to the reference'}.`;
+      });
+      return [
+        `Single storyboard sheet with ${panels.length || 5} photorealistic panels: top row 3 panels, bottom row 2 panels, each panel vertical 9:16, separated by thin white gutters.`,
+        'Use the attached product photo(s) as the exact product reference. Same product, same person, same location and same lighting direction in every panel.',
+        ...panels,
+        'No text, no numbers, no captions, no logos, no watermarks anywhere in the image.'
+      ].join('\n');
+    }
+
+    function buildEndFramePromptFallback(d) {
+      const sb = d.storyboard || [];
+      const last = sb[sb.length - 1] || {};
+      const cam = stripThaiForImagePrompt(last.camera_lens) || 'MS, 35mm lens, eye level, locked camera';
+      const light = stripThaiForImagePrompt(last.lighting) || 'the same lighting as the start frame';
+      return [
+        'Photorealistic vertical 9:16 end-frame photo, the final held moment of the same TikTok product video.',
+        'Same person, same outfit, same location, same lighting and the exact same product as the start frame. Do not redesign the product.',
+        'Moment: the final hero pose, the product fully visible, centered and in sharp focus, everything still and settled.',
+        `Camera: ${cam}.`,
+        `Lighting: ${light}.`,
+        'Composition: keep the top 12% and bottom 20% of the frame free of key elements.',
+        'Negatives: no text, no captions, no logos, no watermarks, no extra products, natural hands with five fingers, no distorted product.'
+      ].join('\n');
+    }
+
+    function copyVideoPromptWithFrames(mode, btn) {
+      const kp = document.getElementById('klingPromptBox').textContent;
+      if (!kp) return;
+      const header = mode === 'startEnd' ? START_END_FRAME_LINE : START_FRAME_LINE;
+      copyToClipboard(`${header}\n\n${kp}`);
+      flashCopied(btn);
     }
 
     function renderOutput(d, usedModel = 'gemini-3.6-flash (ตัวอย่าง)', failedModels = []) {
@@ -1671,9 +1802,17 @@
       document.getElementById('storyboardRaw').textContent =
         sb.map(r => `${r.time} | กล้อง: ${r.camera_lens || '-'} | แสง: ${r.lighting || '-'} | ภาพ: ${r.visual}`).join('\n');
 
-      // 3. Kling Omni Master Prompt (with embedded Thai speech + DirectorSKILL lighting/blocking + Foley + no-text lock)
+      // 3. Gemini Omni Video Prompt (with embedded Thai speech + DirectorSKILL lighting/blocking + Foley + no-text lock)
       const finalKlingPrompt = ensureVoiceAndNoTextInKlingPrompt(d.kling_master_prompt, cleanScript);
       document.getElementById('klingPromptBox').textContent = finalKlingPrompt;
+
+      // 3.1 Start Frame + 3.2 End Frame + 3.3 Storyboard grid image prompts (AI output, or built from the storyboard)
+      const keyframePrompt = String(d.keyframe_image_prompt || '').trim() || buildKeyframePromptFallback(d);
+      const endFramePrompt = String(d.end_frame_image_prompt || '').trim() || buildEndFramePromptFallback(d);
+      const storyboardImgPrompt = String(d.storyboard_grid_prompt || '').trim() || buildStoryboardGridPromptFallback(d);
+      document.getElementById('keyframePromptBox').textContent = keyframePrompt;
+      document.getElementById('endFramePromptBox').textContent = endFramePrompt;
+      document.getElementById('storyboardImagePromptBox').textContent = storyboardImgPrompt;
 
       // 4. Cover Headlines (5)
       const covers = (d.cover_headlines || []).slice(0, 5).map(c => sanitizeTikTokText(c));
@@ -1773,8 +1912,14 @@
         document.getElementById('scriptBox').textContent,
         `\n=== 2. ตารางกำกับช็อตโฆษณา 10 วินาที (DirectorSKILL + video-shotcraft) ===`,
         document.getElementById('storyboardRaw').textContent,
-        `\n=== 3. Kling Omni Master Prompt (รวมบทพูดไทย + แสงวัสดุ DirectorSKILL + เสียง Foley) ===`,
+        `\n=== 3. Gemini Omni Video Prompt (รวมบทพูดไทย + แสงวัสดุ DirectorSKILL + เสียง Foley) ===`,
         document.getElementById('klingPromptBox').textContent,
+        `\n=== 3.1 Prompt สร้างภาพเฟรมแรก (Start Frame) ===`,
+        document.getElementById('keyframePromptBox').textContent,
+        `\n=== 3.2 Prompt สร้างภาพเฟรมสุดท้าย (End Frame) ===`,
+        document.getElementById('endFramePromptBox').textContent,
+        `\n=== 3.3 Prompt สร้างภาพสตอรี่บอร์ด 5 ช่อง ===`,
+        document.getElementById('storyboardImagePromptBox').textContent,
         `\n=== 4. ข้อความปกคลิป 5 แบบ ===`,
         document.getElementById('coversRaw').textContent,
         `\n=== 5. Caption พร้อมโพสต์ + แฮชแท็ก 5 แบบ (แบบละ 5 อัน) ===`,
@@ -1815,6 +1960,9 @@
           { "time": "8–10 วินาที (Hero Packshot Hold)", "camera_lens": "WS · 35mm · Eye-level +15° · Gentle Pull-back", "lighting": "Balanced Commercial Daylight", "visual": "Start: มุมกลางครัว ➡️ Action: กล้องถอยออกช้าๆ เห็นห้องครัวมินิมอลสะอาดตา ➡️ End State: พรมทั้ง 2 ผืนวางเด่นชัด Hold 0.5s" }
         ],
         "kling_master_prompt": "[Subject & Invariant Lock]: <<<image_1>>>, ++black and white checkerboard kitchen mat 2-piece set++, consisting of one long rectangular runner mat (120x40 cm, 3:1 proportion) and one matching shorter rectangular mat (60x40 cm, 3:2 proportion), crisp woven polyester fabric texture with sharp black-and-white checker grid.\n\n[Blocking: Start -> Action -> End State]: Starts with the two mats laid neatly in front of the kitchen counter and sink -> bare feet step onto the long runner mat while a single adult hand presses the woven surface and lifts one corner slightly to prove non-slip grip -> ends in a stable 0.5s hold with both mats flat and unwarped on the floor.\n\n[Scene & Material Lighting (DirectorSKILL)]: Clean minimalist home kitchen, warm oak cabinets, bright white floor tiles; Shallow Raking Side Light from a camera-left window casting subtle micro-shadows across the woven polyester fibers so texture reads clearly without glare.\n\n[Spatial & Aspect]: Vertical 9:16 composition, safe margins top 12% and bottom 20% clear; foreground shows tactile mat surface, midground shows the 2-piece set alignment.\n\n[Camera & Lens (video-shotcraft)]: 35mm spherical lens, one smooth high-angle push-in transitioning into a stable hold, zero handheld shake, focus plane locked on the front checkerboard weave.\n\n[Audio & Real-Sound Foley (earshot)]: Soft tactile fabric brush foley and firm rubber-grip floor contact sound (no game-like synth SFX) + Natural Thai female creator voice speaking warmly (10s): \"ยืนล้างจานน้ำกระเด็นพื้นลื่น ลองเปลี่ยนมาปูพรมหมากรุกเซ็ตสองชิ้นคู่นี้ดูค่ะ ได้ทั้งผืนยาวผืนสั้น ซับน้ำไว ฐานหนึบไม่ลื่นไถล ตอนนี้จัดโปรลดหนัก 75% งบไม่ถึงร้อยได้ครบเซ็ต กดดูที่ตะกร้าเหลืองซ้ายล่างได้เลยนะ!\"\n\n[Instance-Level Negatives (DirectorSKILL)]: No text, no on-screen text, no captions, no subtitles, no Thai characters on screen, no logos, no watermarks, no lighting rig reflected, no distorted checkerboard lines, no warped grid pattern, no deformed hands, no extra fingers, no duplicate extra mats.",
+        "keyframe_image_prompt": "Photorealistic vertical 9:16 start-frame photo for a TikTok product video. Use the attached product photo(s) as the exact product reference: a black-and-white checkerboard kitchen mat set, one long runner (120x40 cm, 3:1 proportion) and one short mat (60x40 cm, 3:2 proportion), identical checker size, colors and borderless edges. Scene: clean minimalist home kitchen, warm oak cabinets, white floor tiles; the long runner lies flat in front of the sink, the short mat in front of the counter. Moment: a bare adult foot is about to step onto the long runner, captured just before contact. Camera: MS, 35mm lens, high angle +20 degrees, product in sharp focus. Lighting: shallow raking side daylight from a camera-left window, subtle micro-shadows revealing the woven polyester texture, no glare. Composition: keep the top 12% and bottom 20% free of key elements. Negatives: no text, no captions, no logos, no watermarks, no extra mats, no warped checker grid, natural feet and hands.",
+        "end_frame_image_prompt": "Photorealistic vertical 9:16 end-frame photo, the final held moment of the same video. Same minimalist kitchen with warm oak cabinets and white floor tiles, same camera-left window daylight, and the exact same black-and-white checkerboard mat set as the start frame. Moment: wide eye-level hero shot, the long runner perfectly flat in front of the sink and the short mat in front of the counter, both centered and fully visible, the kitchen calm and tidy. Camera: WS, 35mm lens, eye level +15 degrees, locked. Composition: keep the top 12% and bottom 20% free of key elements. Negatives: no text, no captions, no logos, no watermarks, no extra mats, no warped checker grid.",
+        "storyboard_grid_prompt": "Single storyboard sheet with 5 photorealistic panels: top row 3 panels, bottom row 2 panels, each panel vertical 9:16, separated by thin white gutters. Use the attached product photo(s) as the exact product reference: black-and-white checkerboard kitchen mat set (120x40 cm runner + 60x40 cm mat). Same minimalist oak-and-white-tile kitchen and the same camera-left window daylight in every panel.\nPanel 1: high-angle medium shot, a bare foot stepping firmly onto the long runner in front of the sink, the mat staying flat.\nPanel 2: low-angle wide shot along the counter showing both mats laid out together as a matching set.\nPanel 3: extreme macro, an adult hand pressing the woven polyester checker surface, hard raking side light revealing fibers.\nPanel 4: close-up near the floor, a hand lifting one corner to reveal the non-slip rubber dots on the back.\nPanel 5: wide eye-level hero shot of the clean kitchen with both mats perfectly flat and centered.\nNo text, no numbers, no captions, no logos, no watermarks anywhere in the image.",
         "cover_headlines": [
           "ได้ครบ 2 ผืน! พรมครัวหมากรุกงบไม่ถึงร้อย",
           "พื้นครัวเปียกลื่น จบด้วยพรมหมากรุกเซ็ตคู่",
@@ -1868,6 +2016,9 @@
           { "time": "8–10 วินาที (Warehouse Hero Hold)", "camera_lens": "MS · 35mm · Eye-level · Locked Hold 0.5s", "lighting": "Bright Balanced Warehouse Daylight", "visual": "Start: หน้าชั้นวางสต็อกพรมเรียงแน่น ➡️ Action: เจ้าของโกดังถือเซ็ตพรมคู่โชว์เต็มเฟรม ➡️ End State: หยุดนิ่ง Hold 0.5s เห็นสินค้าชัดเจน" }
         ],
         "kling_master_prompt": "[Subject & Invariant Lock]: <<<image_1>>>, ++black and white checkerboard kitchen mat 2-piece set++, consisting of one long rectangular runner mat (120x40 cm proportion) and one matching shorter rectangular mat (60x40 cm proportion), held and demonstrated by an energetic Thai warehouse owner wearing a neat dark polo work shirt.\n\n[Blocking: Start -> Action -> End State]: Starts standing in front of stacked warehouse inventory pallets holding the 2-piece mat set -> briskly unrolls the mats, flips the corner to reveal the non-slip rubber backing dots, and places the mat firmly onto the warehouse floor to prove grip stability -> ends holding both mats proudly in a clean 0.5s final hold.\n\n[Scene & Material Lighting (DirectorSKILL)]: Authentic modern wholesale distribution warehouse in Thailand, stacked brown shipping cartons and neat product racks in the background; bright industrial LED daylight combined with a 45-degree Shallow Raking Side Light across the woven polyester fabric so the checkerboard weave and backing dots read with high tactile relief.\n\n[Spatial & Aspect]: Vertical 9:16 frame, safe margins top 12% and bottom 20% clear; foreground highlights the crisp black-and-white checkerboard mats, midground shows the warehouse packing station, background features deep industrial shelves.\n\n[Camera & Lens (video-shotcraft)]: 35mm spherical lens, punchy medium close-up push-in followed by a stable locked frame, zero chaotic camera shake.\n\n[Audio & Real-Sound Foley (earshot)]: Crisp fabric unroll snap, tactile hand-press foley on woven polyester, and firm rubber-grip contact on concrete floor + Energetic Thai male warehouse owner voice (10s): \"บุกโกดังมาปล่อยของเอง! พรมห้องครัวลายหมากรุกยกเซ็ตสองผืน ได้ทั้งผืนยาวผืนสั้น งานทอแน่นซับน้ำไว ฐานกันลื่นหนึบๆ วันนี้จัดโปรหน้าโรงงานลดหนัก 75% แบงก์ร้อยมีทอนได้ครบสองชิ้น จิ้มตะกร้าเหลืองซ้ายล่างได้เลยครับ!\"\n\n[Instance-Level Negatives (DirectorSKILL)]: No text, no on-screen text, no captions, no subtitles, no Thai characters on screen, no logos, no watermarks, no lighting rig reflected, no distorted checkerboard lines, no warped grid pattern, no deformed hands, no extra fingers, no object morphing.",
+        "keyframe_image_prompt": "Photorealistic vertical 9:16 start-frame photo for a TikTok product video. Use the attached product photo(s) as the exact product reference: a black-and-white checkerboard kitchen mat set, one long runner (120x40 cm proportion) and one short mat (60x40 cm proportion), identical checker size, colors and borderless edges. Scene: modern Thai wholesale warehouse, stacked brown shipping cartons and product racks behind. Person: energetic Thai man in his 30s, neat dark polo work shirt, standing at waist-up framing, holding the long runner partly unrolled with both hands so the checker pattern faces the camera, the short mat tucked under one arm. Camera: MS, 35mm lens, eye level, product in sharp focus. Lighting: bright industrial LED overhead plus a 45-degree shallow raking side light across the woven fabric. Composition: keep the top 12% and bottom 20% free of key elements. Negatives: no text, no captions, no logos, no watermarks, no price signs, no extra mats, no warped checker grid, natural hands with five fingers.",
+        "end_frame_image_prompt": "Photorealistic vertical 9:16 end-frame photo, the final held moment of the same video. Same Thai man in the same dark polo work shirt, same wholesale warehouse with stacked brown cartons and stock racks, same bright industrial lighting, and the exact same black-and-white checkerboard mat set as the start frame. Moment: waist-up hero pose, he holds the long runner and the short mat side by side toward the camera, both fully visible and flat, a confident smile, everything still. Camera: MS, 35mm lens, eye level, locked. Composition: keep the top 12% and bottom 20% free of key elements. Negatives: no text, no captions, no logos, no watermarks, no price signs, no extra mats, no warped checker grid, natural hands with five fingers.",
+        "storyboard_grid_prompt": "Single storyboard sheet with 5 photorealistic panels: top row 3 panels, bottom row 2 panels, each panel vertical 9:16, separated by thin white gutters. Use the attached product photo(s) as the exact product reference: black-and-white checkerboard kitchen mat set (120x40 cm runner + 60x40 cm mat). Same Thai wholesale warehouse, same man in a dark polo shirt and the same bright industrial lighting in every panel.\nPanel 1: medium shot, the man snapping both mats open in front of stacked carton pallets, holding them taut toward the camera.\nPanel 2: extreme macro, hands stretching the dense woven checker fabric under hard raking side light.\nPanel 3: high-angle shot, the mat lying on polished concrete with its non-slip backing dots visible as his foot pushes it and it stays in place.\nPanel 4: medium close-up at a packing table, the man holding the long and short mats side by side as a set.\nPanel 5: medium shot hero hold, the man presenting the complete 2-piece set in front of full stock racks.\nNo text, no numbers, no captions, no logos, no price signs, no watermarks anywhere in the image.",
         "cover_headlines": [
           "โกดังมาเอง! พรมครัว 2 ผืน แบงก์ร้อยมีทอน",
           "โปรหน้าโรงงานลด 75% ได้ครบผืนยาว+ผืนสั้น",
