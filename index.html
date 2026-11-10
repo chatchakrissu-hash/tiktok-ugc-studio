@@ -1125,6 +1125,14 @@
       }
     });
 
+    window.addEventListener('dragover', (e) => { e.preventDefault(); });
+    window.addEventListener('drop', (e) => {
+      e.preventDefault();
+      if (dropzone.contains(e.target)) return;
+      const dt = e.dataTransfer;
+      if (dt && dt.files && dt.files.length > 0) handleFiles(Array.from(dt.files));
+    });
+
     window.addEventListener('paste', (e) => {
       const clipboard = e.clipboardData || (e.originalEvent && e.originalEvent.clipboardData);
       if (!clipboard) return;
@@ -1338,13 +1346,13 @@
    - ทุกช็อตใน Storyboard และใน Prompt ต้องระบุ "จุดเริ่มต้น ➡️ การกระทำ 1 อย่าง ➡️ จุดจบที่หยุดนิ่ง (End State + Hold 0.5s)" เสมอ เพื่อป้องกันอาการ AI เจนภาพละลายหรือมือขยับมั่วตอนท้ายช็อต
 4. กฎการออกแบบเสียงจริง (earshot Real-Sound Foley + video-shotcraft S1):
    - ระบุเสียง Foley ธรรมชาติของวัสดุจริงในบล็อก [Audio & Foley Design] (เช่น เสียงสะบัดผ้าพรมทอแน่น เสียงฝ่ามือลูบเนื้อผ้า เสียงยางกันลื่นดูดเกาะพื้นกระเบื้อง) ห้ามใช้เสียงสังเคราะห์แบบเกม
-5. ใน Storyboard และในคลิป ห้ามมีข้อความลอยบนจอเด็ดขาด (No On-Screen Text) และต้องฝังบทพูดภาษาไทย 10 วินาทีไว้ใน `kling_master_prompt` เสมอ
+5. ใน Storyboard และในคลิป ห้ามมีข้อความลอยบนจอเด็ดขาด (No On-Screen Text) และต้องฝังบทพูดภาษาไทย 10 วินาทีไว้ใน "kling_master_prompt" เสมอ
 
 ============================================================
 กฎเหล็กข้อที่ 5: ชุด Hashtag 5 แบบ (แบบละ 5 อันเป๊ะ!) + คอมเมนต์ปักหมุด 3 แบบ (pinned-comment)
 ============================================================
 - ชุดแฮชแท็ก (hashtag_sets) ต้องมี **5 แบบ** และ **แต่ละแบบต้องมีแฮชแท็ก 5 อันเป๊ะๆ (ห้ามขาดห้ามเกิน)**
-- คอมเมนต์ปักหมุด (pinned_comments) ต้องมี **3 แบบ** ตามสกิล `pinned-comment` (ชวนคนกดตะกร้าเหลืองซ้ายล่าง + กระตุ้นให้คนถามสี/ขนาดใต้เม้นต์เพื่อดันอัลกอริทึม)
+- คอมเมนต์ปักหมุด (pinned_comments) ต้องมี **3 แบบ** ตามสกิล "pinned-comment" (ชวนคนกดตะกร้าเหลืองซ้ายล่าง + กระตุ้นให้คนถามสี/ขนาดใต้เม้นต์เพื่อดันอัลกอริทึม)
 
 ตอบกลับเป็น JSON Object ตามโครงสร้างนี้เท่านั้น (ห้ามมีข้อความอื่นนอก JSON):
 {
