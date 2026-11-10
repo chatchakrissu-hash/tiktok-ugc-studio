@@ -1728,9 +1728,13 @@
 
     function clearAllImages() {
       uploadedImages = [];
+      selectedKalodataProduct = null;
       const fileInput = document.getElementById('fileInput');
       if (fileInput) fileInput.value = '';
+      const skuInput = document.getElementById('productSkuInput');
+      if (skuInput) skuInput.value = '';
       renderPreviews();
+      updateLiveFilenamePreview();
     }
 
     function renderPreviews() {
@@ -2512,8 +2516,8 @@
         .replace(/[<>:"/\\|?*\x00-\x1F]/g, ' ')
         .replace(/\s+/g, ' ')
         .trim();
-      if (s.length > 140) {
-        s = s.slice(0, 140).trim();
+      if (s.length > 105) {
+        s = s.slice(0, 105).trim();
       }
       return s || 'คลิปสินค้า_TikTok';
     }
@@ -2745,16 +2749,11 @@
         const resp = await fetch(p.image, { mode: 'cors' });
         if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
         const blob = await resp.blob();
-        const dataUrl = await new Promise((resolve, reject) => {
-          const reader = new FileReader();
-          reader.onload = () => resolve(reader.result);
-          reader.onerror = reject;
-          reader.readAsDataURL(blob);
-        });
-        const cleanDataUrl = await normalizeImageDataUrl(dataUrl, blob.type || 'image/jpeg');
-        const base64 = cleanDataUrl.split(',')[1];
-        uploadedImages = [{ mimeType: 'image/jpeg', base64, dataUrl: cleanDataUrl }];
-        renderPreviews();
+        const imgObj = await normalizeImageForGemini(blob);
+        if (imgObj && imgObj.base64) {
+          uploadedImages = [imgObj];
+          renderPreviews();
+        }
       } catch (err) {
         console.warn('Could not auto-fetch product image:', err);
       }
