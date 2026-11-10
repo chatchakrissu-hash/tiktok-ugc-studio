@@ -635,15 +635,13 @@
       </div>
       <div class="header-actions">
         <select id="modelSelect" class="model-select" title="เลือกโมเดล AI">
-          <option value="auto">🤖 โมเดล: Auto (ใช้ Gemini 3.6 Flash ใหม่สุด + สลับสำรองอัตโนมัติ)</option>
-          <option value="gemini-3.6-flash">🚀 Gemini 3.6 Flash (ใหม่ล่าสุดที่รองรับคีย์ฟรี — แนะนำ)</option>
-          <option value="gemini-3.5-flash">⚡ Gemini 3.5 Flash (เร็ว + ภาษามนุษย์ธรรมชาติ)</option>
-          <option value="gemini-3.5-flash-lite">💨 Gemini 3.5 Flash Lite (ความเร็วสูงพิเศษ)</option>
-          <option value="gemini-3-flash-preview">✨ Gemini 3.0 Flash Preview</option>
-          <option value="gemini-2.5-flash">🛡️ Gemini 2.5 Flash (เสถียรสูง)</option>
-          <option value="gemini-4-argon">🔥 Gemini 4 Argon (ต้องผูก Billing — ถ้าคีย์ฟรีจะสลับไป 3.6 Flash)</option>
-          <option value="gemini-3.1-pro-preview">🧠 Gemini 3.1 Pro (ต้องผูก Billing — ถ้าคีย์ฟรีจะสลับไป 3.6 Flash)
-          </option>
+          <option value="auto">🤖 โมเดล: Auto (เลือกโมเดลที่พร้อมใช้งานเร็วที่สุดให้อัตโนมัติ — แนะนำ)</option>
+          <option value="gemini-2.5-flash">⚡ Gemini 2.5 Flash (เสถียรสุดสำหรับคีย์ฟรี + วิเคราะห์รูปแม่นยำ)</option>
+          <option value="gemini-3-flash-preview">✨ Gemini 3.0 Flash Preview (รุ่นใหม่ล่าสุด)</option>
+          <option value="gemini-2.5-flash-lite">💨 Gemini 2.5 Flash Lite (ความเร็วสูง ประหยัดโควตา)</option>
+          <option value="gemini-3.6-flash">🚀 Gemini 3.6 Flash (สลับสำรองอัตโนมัติหากคีย์ยังไม่เปิดสิทธิ์)</option>
+          <option value="gemini-3.5-flash">🔥 Gemini 3.5 Flash (สลับสำรองอัตโนมัติหากคีย์ยังไม่เปิดสิทธิ์)</option>
+          <option value="gemini-4-argon">🧠 Gemini 4 Argon (ต้องผูก Billing — สลับสำรองอัตโนมัติ)</option>
         </select>
         <button class="btn-key" onclick="toggleTheme()" id="themeBtn" title="สลับธีมมืด/สว่าง">
           🌙 โหมดมืด
@@ -697,17 +695,23 @@
 
     <!-- Input Card -->
     <div class="card">
-      <div class="section-label">
-        1. อัปโหลดรูปภาพสินค้า / รูปแคปหน้าจอ TikTok Shop
-        <span class="opt-tag">ใส่ได้ 1–5 รูป (หรือกด Ctrl+V วางรูปแคปจอได้เลย)</span>
+      <div class="section-label" style="justify-content: space-between;">
+        <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+          <span>1. อัปโหลดรูปภาพสินค้า / รูปแคปหน้าจอ TikTok Shop</span>
+          <span class="opt-tag" id="uploadCountBadge">ยังไม่ได้เลือกรูป (ใส่ได้ 1–5 รูป หรือกด Ctrl+V วางรูปแคปจอได้เลย)</span>
+        </div>
+        <button type="button" class="btn-copy" id="btnClearImages" onclick="clearAllImages()" style="display:none; font-size:12px; padding:4px 10px; color:#ef4444; border-color:rgba(239,68,68,0.4);">
+          🗑️ ล้างรูปทั้งหมด
+        </button>
       </div>
-      <div class="dropzone" id="dropzone" onclick="document.getElementById('fileInput').click()">
+      <input type="file" id="fileInput" accept="image/*,.png,.jpg,.jpeg,.webp,.jfif,.heic,.heif,.bmp" multiple
+        style="position:absolute; width:1px; height:1px; opacity:0; pointer-events:none;"
+        onchange="handleFileInputChange(this)" />
+      <label for="fileInput" class="dropzone" id="dropzone" style="display:block;">
         <div class="dropzone-icon">📸</div>
-        <h3>คลิกเพื่อเลือกรูปภาพ หรือ ลากไฟล์รูปมาวางที่นี่</h3>
-        <p>รองรับภาพถ่ายสินค้าจริง, ภาพหน้าสินค้า TikTok Shop, ภาพตารางขนาด หรือภาพคอมเมนต์รีวิวลูกค้า</p>
-        <input type="file" id="fileInput" accept="image/*" multiple style="display:none"
-          onchange="handleFiles(this.files)" />
-      </div>
+        <h3>คลิกที่นี่เพื่อเลือกรูปภาพ หรือ ลากไฟล์รูปมาวาง / กด Ctrl+V</h3>
+        <p>รองรับภาพถ่ายสินค้าจริง, ภาพแคปหน้าจอ TikTok Shop (.jpg, .png, .webp, .jfif) สูงสุด 5 รูป</p>
+      </label>
       <div class="preview-grid" id="previewGrid"></div>
 
       <div class="form-grid">
@@ -844,10 +848,10 @@
       <div class="card"
         style="padding: 16px 22px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; background: rgba(16, 185, 129, 0.1); border-color: rgba(16, 185, 129, 0.4);">
         <div>
-          <div style="font-weight: 700; color: var(--green);">✅ สร้างชุดข้อมูลครบทั้ง 6 ส่วน (ผ่านระบบตรวจคำต้องห้าม
+          <div style="font-weight: 700; color: var(--green);">✅ สร้างชุดข้อมูลครบทั้ง 7 หมวด + ถอดชื่อสินค้า OCR (ผ่านระบบตรวจคำต้องห้าม
             TikTok Shop 2026 เรียบร้อยแล้ว!)</div>
           <div id="modelUsedBadge" style="font-size: 13px; color: var(--muted); margin-top: 4px;">🤖 ประมวลผลด้วยโมเดล:
-            gemini-3.6-flash</div>
+            gemini-2.5-flash</div>
         </div>
         <button class="btn-copy" onclick="copyEntirePackage(this)"
           style="background: var(--green); border-color: var(--green); color: #fff;">
@@ -959,11 +963,9 @@
     const STORAGE_KEY = 'AGY_TIKTOK_STUDIO_GEMINI_KEY';
     const THEME_KEY = 'AGY_TIKTOK_STUDIO_THEME';
     const DEFAULT_MODELS = [
-      'gemini-3.6-flash',
-      'gemini-3.5-flash',
-      'gemini-3.5-flash-lite',
+      'gemini-2.5-flash',
       'gemini-3-flash-preview',
-      'gemini-2.5-flash'
+      'gemini-2.5-flash-lite'
     ];
     let uploadedImages = []; // { mimeType, base64, dataUrl }
     let selectedChipStyle = 'auto';
@@ -1101,37 +1103,138 @@
       alert('คัดลอกลิงก์พร้อมผูก API Key อัตโนมัติแล้ว!\nส่งลิงก์นี้ไปเปิดในมือถือหรือคอมเครื่องอื่นได้เลย ระบบจะจำคีย์ให้ทันทีครับ');
     }
 
-    // 2. Image Upload / Drag & Drop / Paste
+    // 2. Image Upload / Drag & Drop / Paste (Fixed & Hardened)
     const dropzone = document.getElementById('dropzone');
-    dropzone.addEventListener('dragover', (e) => { e.preventDefault(); dropzone.classList.add('dragover'); });
-    dropzone.addEventListener('dragleave', () => dropzone.classList.remove('dragover'));
+    ['dragenter', 'dragover'].forEach(evtName => {
+      dropzone.addEventListener(evtName, (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        dropzone.classList.add('dragover');
+      });
+    });
+    ['dragleave', 'drop'].forEach(evtName => {
+      dropzone.addEventListener(evtName, (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        dropzone.classList.remove('dragover');
+      });
+    });
     dropzone.addEventListener('drop', (e) => {
-      e.preventDefault();
-      dropzone.classList.remove('dragover');
-      if (e.dataTransfer.files) handleFiles(e.dataTransfer.files);
+      if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+        handleFiles(Array.from(e.dataTransfer.files));
+      }
     });
 
     window.addEventListener('paste', (e) => {
-      const items = (e.clipboardData || e.originalEvent.clipboardData).items;
+      const clipboard = e.clipboardData || (e.originalEvent && e.originalEvent.clipboardData);
+      if (!clipboard) return;
       const files = [];
-      for (const item of items) {
-        if (item.type.indexOf('image') === 0) {
-          files.push(item.getAsFile());
+      if (clipboard.items) {
+        for (const item of clipboard.items) {
+          if (item.kind === 'file' || (item.type && item.type.indexOf('image') === 0)) {
+            const f = item.getAsFile();
+            if (f) files.push(f);
+          }
         }
+      }
+      if (files.length === 0 && clipboard.files && clipboard.files.length > 0) {
+        files.push(...Array.from(clipboard.files));
       }
       if (files.length > 0) handleFiles(files);
     });
 
-    function handleFiles(fileList) {
-      Array.from(fileList).forEach(file => {
-        if (!file.type.startsWith('image/')) return;
-        if (uploadedImages.length >= 5) return;
+    function handleFileInputChange(inputEl) {
+      if (!inputEl || !inputEl.files || inputEl.files.length === 0) return;
+      const selectedFiles = Array.from(inputEl.files);
+      // Reset value AFTER cloning FileList into an Array so selecting the same file again still triggers onchange
+      inputEl.value = '';
+      handleFiles(selectedFiles);
+    }
+
+    function isLikelyImageFile(file) {
+      if (!file) return false;
+      if (file.type && file.type.startsWith('image/')) return true;
+      const name = (file.name || '').toLowerCase();
+      return /\.(jpg|jpeg|png|webp|jfif|gif|bmp|heic|heif|avif)$/i.test(name) || !name;
+    }
+
+    async function handleFiles(fileList) {
+      const filesArr = Array.from(fileList || []).filter(isLikelyImageFile);
+      if (filesArr.length === 0) {
+        alert('ไฟล์ที่เลือกไม่ใช่รูปภาพที่รองรับ กรุณาเลือกไฟล์รูปภาพ (.jpg, .png, .webp, .jfif) ครับ');
+        return;
+      }
+      if (uploadedImages.length >= 5) {
+        alert('อัปโหลดครบสูงสุด 5 รูปแล้วครับ หากต้องการเปลี่ยนรูป กรุณากดปุ่ม ✕ บนรูปเดิมหรือกด "ล้างรูปทั้งหมด"');
+        return;
+      }
+
+      const slotsLeft = 5 - uploadedImages.length;
+      const toProcess = filesArr.slice(0, slotsLeft);
+      if (filesArr.length > slotsLeft) {
+        alert(`ระบบรองรับสูงสุด 5 รูป จึงเพิ่มให้ ${slotsLeft} รูปแรกนะครับ`);
+      }
+
+      for (const file of toProcess) {
+        try {
+          const imgObj = await normalizeImageForGemini(file);
+          if (imgObj && uploadedImages.length < 5) {
+            uploadedImages.push(imgObj);
+            renderPreviews();
+          }
+        } catch (err) {
+          console.error('Image load error:', err);
+        }
+      }
+    }
+
+    function normalizeImageForGemini(file) {
+      return new Promise((resolve, reject) => {
         const reader = new FileReader();
+        reader.onerror = () => reject(new Error('ไม่สามารถอ่านไฟล์รูปได้'));
         reader.onload = (ev) => {
-          const dataUrl = ev.target.result;
-          const base64 = dataUrl.split(',')[1];
-          uploadedImages.push({ mimeType: file.type, base64, dataUrl });
-          renderPreviews();
+          const rawDataUrl = ev.target.result;
+          const img = new Image();
+          img.onload = () => {
+            try {
+              const MAX_DIM = 1600;
+              let w = img.naturalWidth || img.width || 800;
+              let h = img.naturalHeight || img.height || 800;
+              if (w > MAX_DIM || h > MAX_DIM) {
+                if (w >= h) {
+                  h = Math.round((h * MAX_DIM) / w);
+                  w = MAX_DIM;
+                } else {
+                  w = Math.round((w * MAX_DIM) / h);
+                  h = MAX_DIM;
+                }
+              }
+              const canvas = document.createElement('canvas');
+              canvas.width = w;
+              canvas.height = h;
+              const ctx = canvas.getContext('2d');
+              ctx.fillStyle = '#ffffff';
+              ctx.fillRect(0, 0, w, h);
+              ctx.drawImage(img, 0, 0, w, h);
+              const jpegDataUrl = canvas.toDataURL('image/jpeg', 0.90);
+              const base64 = jpegDataUrl.split(',')[1];
+              resolve({ mimeType: 'image/jpeg', base64, dataUrl: jpegDataUrl });
+            } catch (canvasErr) {
+              const fallbackMime = (file.type && file.type.startsWith('image/')) ? file.type : 'image/jpeg';
+              const base64 = String(rawDataUrl).split(',')[1] || '';
+              resolve({ mimeType: fallbackMime, base64, dataUrl: rawDataUrl });
+            }
+          };
+          img.onerror = () => {
+            const fallbackMime = (file.type && file.type.startsWith('image/')) ? file.type : 'image/jpeg';
+            const base64 = String(rawDataUrl).split(',')[1] || '';
+            if (base64) {
+              resolve({ mimeType: fallbackMime, base64, dataUrl: rawDataUrl });
+            } else {
+              reject(new Error('รูปแบบไฟล์ภาพไม่รองรับ'));
+            }
+          };
+          img.src = rawDataUrl;
         };
         reader.readAsDataURL(file);
       });
@@ -1142,12 +1245,35 @@
       renderPreviews();
     }
 
+    function clearAllImages() {
+      uploadedImages = [];
+      const fileInput = document.getElementById('fileInput');
+      if (fileInput) fileInput.value = '';
+      renderPreviews();
+    }
+
     function renderPreviews() {
       const grid = document.getElementById('previewGrid');
+      const badge = document.getElementById('uploadCountBadge');
+      const clearBtn = document.getElementById('btnClearImages');
+      if (badge) {
+        if (uploadedImages.length > 0) {
+          badge.textContent = `✅ อัปโหลดแล้ว ${uploadedImages.length}/5 รูป (พร้อมวิเคราะห์)`;
+          badge.style.color = 'var(--green)';
+          badge.style.borderColor = 'rgba(16,185,129,0.45)';
+        } else {
+          badge.textContent = 'ยังไม่ได้เลือกรูป (ใส่ได้ 1–5 รูป หรือกด Ctrl+V วางรูปแคปจอได้เลย)';
+          badge.style.color = '';
+          badge.style.borderColor = '';
+        }
+      }
+      if (clearBtn) {
+        clearBtn.style.display = uploadedImages.length > 0 ? 'inline-flex' : 'none';
+      }
       grid.innerHTML = uploadedImages.map((img, i) => `
         <div class="preview-item">
           <img src="${img.dataUrl}" alt="upload-${i}" />
-          <button class="preview-remove" onclick="removeImage(${i})">✕</button>
+          <button type="button" class="preview-remove" title="ลบรูปนี้" onclick="removeImage(${i})">✕</button>
         </div>
       `).join('');
     }
@@ -1396,7 +1522,7 @@
           }
 
           const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
-          const parsed = JSON.parse(rawText.replace(/^```json\s*/i, '').replace(/```\s*$/i, '').trim());
+          const parsed = parseGeminiJson(rawText);
           lastResultData = parsed;
           renderOutput(parsed, modelName, failedModels);
           statusBox.classList.remove('show');
@@ -1413,6 +1539,20 @@
       statusBox.classList.remove('show');
       btn.disabled = false;
       alert('เกิดข้อผิดพลาดในการเรียก API: ' + (lastErr ? lastErr.message : 'Unknown error'));
+    }
+
+    function parseGeminiJson(rawText) {
+      let cleaned = String(rawText || '').replace(/^```json\s*/i, '').replace(/```\s*$/i, '').trim();
+      try {
+        return JSON.parse(cleaned);
+      } catch (e1) {
+        const start = cleaned.indexOf('{');
+        const end = cleaned.lastIndexOf('}');
+        if (start !== -1 && end !== -1 && end > start) {
+          return JSON.parse(cleaned.slice(start, end + 1));
+        }
+        throw e1;
+      }
     }
 
     function escapeHtml(str) {
