@@ -635,7 +635,7 @@
       </div>
       <div class="header-actions">
         <select id="modelSelect" class="model-select" title="เลือกโมเดล AI">
-          <option value="auto">🤖 โมเดล: Auto (ใช้ Gemini 3.6 Flash ใหม่สุด + สลับสำรองอัตโนมัติ — แนะนำ)</option>
+          <option value="auto">🤖 โมเดล: Auto (เริ่มที่ 3.0 Flash Preview ที่เร็วและเสถียรสุด + สลับสำรองอัตโนมัติ — แนะนำ)</option>
           <option value="gemini-3.6-flash">🚀 Gemini 3.6 Flash (ใหม่ล่าสุด ภาษาไทยดีสุด แต่ช้ากว่าเล็กน้อย)</option>
           <option value="gemini-3.5-flash">🔥 Gemini 3.5 Flash (สมดุลคุณภาพ + ความเร็ว)</option>
           <option value="gemini-3-flash-preview">✨ Gemini 3.0 Flash Preview (เร็วมาก)</option>
@@ -963,10 +963,10 @@
     const STORAGE_KEY = 'AGY_TIKTOK_STUDIO_GEMINI_KEY';
     const THEME_KEY = 'AGY_TIKTOK_STUDIO_THEME';
     const DEFAULT_MODELS = [
-      'gemini-3.6-flash',
-      'gemini-3.5-flash',
       'gemini-3-flash-preview',
       'gemini-2.5-flash',
+      'gemini-3.5-flash',
+      'gemini-3.6-flash',
       'gemini-3.5-flash-lite'
     ];
     let uploadedImages = []; // { mimeType, base64, dataUrl }
@@ -1507,16 +1507,26 @@
       const modelsToTry = getModelQueue();
       let lastErr = null;
       const failedModels = [];
+      const PER_MODEL_TIMEOUT_MS = 75000;
+      const startedAt = Date.now();
+      let currentLabel = '';
+      const tick = setInterval(() => {
+        const secs = Math.round((Date.now() - startedAt) / 1000);
+        statusText.textContent = `${currentLabel} ⏱️ ${secs} วินาที (ปกติใช้ 15–40 วินาที)`;
+      }, 1000);
+
       for (const modelName of modelsToTry) {
+        const ac = new AbortController();
+        const timer = setTimeout(() => ac.abort(), PER_MODEL_TIMEOUT_MS);
         try {
-          if (failedModels.length > 0) {
-            statusText.textContent = `โมเดล ${failedModels[failedModels.length - 1]} ไม่พร้อมใช้งานในคีย์นี้ ➡️ สลับมาประมวลผลด้วย ${modelName} อัตโนมัติ...`;
-          } else {
-            statusText.textContent = `กำลังประมวลผลด้วยโมเดล ${modelName}...`;
-          }
-          const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${encodeURIComponent(apiKey)}`;
+          currentLabel = failedModels.length > 0
+            ? `โมเดล ${failedModels[failedModels.length - 1]} ไม่ว่าง ➡️ สลับมาใช้ ${modelName} อัตโนมัติ...`
+            : `กำลังวิเคราะห์ภาพและเขียนบทด้วย ${modelName}...`;
+          statusText.textContent = currentLabel;
+          const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent`;
           const resp = await fetch(url, {
             method: 'POST',
+            signal: ac.signal,
             headers: {
               'Content-Type': 'application/json',
               'x-goog-api-key': apiKey
@@ -1531,13 +1541,20 @@
             })
           });
 
-          const data = await resp.json();
+          const data = await resp.json().catch(() => ({}));
           if (!resp.ok) {
             throw new Error(data.error?.message || `HTTP ${resp.status}`);
           }
 
-          const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+          const cand = data.candidates?.[0] || {};
+          const parts = cand.content?.parts || [];
+          const rawText = parts.filter(p => p.text && !p.thought).map(p => p.text).join('');
+          if (!rawText) {
+            throw new Error(`โมเดลไม่ส่งข้อความกลับมา (finishReason: ${cand.finishReason || data.promptFeedback?.blockReason || 'unknown'})`);
+          }
           const parsed = parseGeminiJson(rawText);
+          clearTimeout(timer);
+          clearInterval(tick);
           lastResultData = parsed;
           renderOutput(parsed, modelName, failedModels);
           statusBox.classList.remove('show');
@@ -1545,15 +1562,18 @@
           document.getElementById('outputArea').scrollIntoView({ behavior: 'smooth' });
           return;
         } catch (err) {
-          console.warn(`Model ${modelName} failed:`, err);
+          clearTimeout(timer);
+          const reason = err.name === 'AbortError' ? `ตอบช้าเกิน ${PER_MODEL_TIMEOUT_MS / 1000} วินาที` : err.message;
+          console.warn(`Model ${modelName} failed:`, reason);
           failedModels.push(modelName);
-          lastErr = err;
+          lastErr = new Error(`${modelName}: ${reason}`);
         }
       }
 
+      clearInterval(tick);
       statusBox.classList.remove('show');
       btn.disabled = false;
-      alert('เกิดข้อผิดพลาดในการเรียก API: ' + (lastErr ? lastErr.message : 'Unknown error'));
+      alert('ตอนนี้เซิร์ฟเวอร์ Gemini ไม่ว่างทุกโมเดล (Google แจ้งว่ามีคนใช้งานหนาแน่น) กรุณารอ 1–2 นาทีแล้วกดใหม่อีกครั้งครับ\n\nรายละเอียด: ' + (lastErr ? lastErr.message : 'Unknown error'));
     }
 
     function parseGeminiJson(rawText) {
