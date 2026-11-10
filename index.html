@@ -616,6 +616,289 @@
       grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
       gap: 6px 18px;
     }
+
+    /* Kalodata Top 10 Analyzer */
+    .kalo-panel {
+      background: linear-gradient(180deg, rgba(254, 44, 85, 0.06), rgba(37, 244, 238, 0.04));
+      border: 1px solid rgba(37, 244, 238, 0.35);
+      border-radius: var(--radius);
+      padding: 20px 22px;
+      margin-bottom: 20px;
+      box-shadow: var(--shadow);
+    }
+
+    .kalo-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+
+    .kalo-controls {
+      display: grid;
+      grid-template-columns: 1.3fr 0.9fr 1.2fr auto;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    @media (max-width: 820px) {
+      .kalo-controls {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 520px) {
+      .kalo-controls {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .kalo-tabs {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    @media (max-width: 760px) {
+      .kalo-tabs {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .kalo-tab {
+      background: var(--card-2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px 14px;
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.18s ease;
+      color: var(--text);
+    }
+
+    .kalo-tab:hover {
+      border-color: var(--accent-2);
+      transform: translateY(-1px);
+    }
+
+    .kalo-tab.active {
+      background: linear-gradient(135deg, rgba(254, 44, 85, 0.16), rgba(37, 244, 238, 0.14));
+      border-color: var(--accent-2);
+      box-shadow: 0 0 0 1px rgba(37, 244, 238, 0.25);
+    }
+
+    .kalo-tab-title {
+      font-size: 14.5px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+      margin-bottom: 4px;
+    }
+
+    .kalo-tab-desc {
+      font-size: 12.2px;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+
+    .kalo-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(235px, 1fr));
+      gap: 14px;
+    }
+
+    .kalo-item {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.18s ease, border-color 0.18s ease;
+      position: relative;
+    }
+
+    .kalo-item:hover {
+      transform: translateY(-2px);
+      border-color: rgba(37, 244, 238, 0.55);
+    }
+
+    .kalo-thumb-wrap {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      background: #0d1017;
+      overflow: hidden;
+      display: block;
+      text-decoration: none;
+    }
+
+    .kalo-thumb-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.25s ease;
+      display: block;
+    }
+
+    .kalo-thumb-wrap:hover img {
+      transform: scale(1.04);
+    }
+
+    .kalo-rank {
+      position: absolute;
+      top: 8px;
+      left: 8px;
+      background: rgba(11, 13, 18, 0.88);
+      border: 1px solid rgba(255, 214, 0, 0.6);
+      color: var(--gold);
+      font-weight: 800;
+      font-size: 12.5px;
+      padding: 3px 9px;
+      border-radius: 999px;
+      backdrop-filter: blur(6px);
+      z-index: 2;
+    }
+
+    .kalo-open-hint {
+      position: absolute;
+      bottom: 8px;
+      right: 8px;
+      background: rgba(11, 13, 18, 0.86);
+      color: #fff;
+      border: 1px solid rgba(37, 244, 238, 0.5);
+      font-size: 11.5px;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 8px;
+      z-index: 2;
+    }
+
+    .kalo-body {
+      padding: 12px 13px 13px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      flex: 1;
+    }
+
+    .kalo-cat {
+      font-size: 11.5px;
+      color: var(--accent-2);
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .kalo-name {
+      font-size: 13.5px;
+      font-weight: 600;
+      line-height: 1.4;
+      color: var(--text);
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      min-height: 38px;
+    }
+
+    .kalo-price-row {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 6px;
+    }
+
+    .kalo-price {
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--gold);
+    }
+
+    .kalo-comm {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--green);
+      background: rgba(16, 185, 129, 0.14);
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      padding: 2px 7px;
+      border-radius: 999px;
+    }
+
+    .kalo-metrics {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 5px 8px;
+      font-size: 11.8px;
+      color: var(--muted);
+      background: var(--card-2);
+      padding: 8px 9px;
+      border-radius: 9px;
+      border: 1px solid var(--border);
+    }
+
+    .kalo-metrics b {
+      color: var(--text);
+    }
+
+    .kalo-actions {
+      margin-top: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .btn-kalo-use {
+      width: 100%;
+      padding: 8px 10px;
+      border-radius: 9px;
+      border: 1px solid rgba(16, 185, 129, 0.55);
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.22), rgba(37, 244, 238, 0.15));
+      color: var(--text);
+      font-family: inherit;
+      font-size: 12.8px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .btn-kalo-use:hover {
+      background: var(--green);
+      color: #fff;
+      border-color: var(--green);
+    }
+
+    .btn-kalo-copy {
+      width: 100%;
+      padding: 6px 10px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--card-2);
+      color: var(--muted);
+      font-family: inherit;
+      font-size: 11.8px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .btn-kalo-copy:hover {
+      color: var(--text);
+      border-color: var(--accent-2);
+    }
+
+    .filename-ready-box {
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.13), rgba(37, 244, 238, 0.08));
+      border: 1.5px solid rgba(16, 185, 129, 0.55);
+      border-radius: 12px;
+      padding: 14px 16px;
+      margin-bottom: 14px;
+    }
   </style>
 </head>
 
@@ -697,6 +980,74 @@
       </div>
     </div>
 
+    <!-- Kalodata Top 10 Analyzer (3 Formulas) -->
+    <div class="kalo-panel" id="kaloPanel">
+      <div class="kalo-header">
+        <div>
+          <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+            <span style="font-size:17px; font-weight:800; color:var(--text);">🔥 วิเคราะห์สินค้าขายดี Kalodata (Top 10 × 3 สูตรทำเงิน)</span>
+            <span class="badge-skill" id="kaloStatusBadge" style="background:rgba(16,185,129,0.16); color:var(--green); border-color:rgba(16,185,129,0.4);">กำลังคำนวณสด...</span>
+          </div>
+          <p style="font-size:12.8px; color:var(--muted); margin-top:4px;">
+            💡 <b>คลิกที่รูปสินค้า</b> เพื่อเปิดลิงก์สินค้าจริงบน TikTok Shop · หรือกดปุ่ม <b>"⚡ เลือกทำคลิป"</b> เพื่อดึงรูปเข้า Studio + สร้างชื่อไฟล์พร้อมส่งให้คนทำคลิปอัปขึ้น Google Drive
+          </p>
+        </div>
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+          <button type="button" class="btn-copy" onclick="refreshKalodataTop10(true)"
+            style="border-color:var(--accent-2); color:var(--accent-2); font-weight:700;">
+            🎲 สุ่ม/คำนวณ Top 10 ชุดใหม่
+          </button>
+          <button type="button" class="btn-copy" onclick="toggleKaloBody()" id="btnToggleKalo">
+            🔼 ย่อตารางสินค้า
+          </button>
+        </div>
+      </div>
+
+      <div id="kaloBodyWrap">
+        <div class="kalo-controls">
+          <select id="kaloCatSelect" onchange="refreshKalodataTop10(false)" style="padding:10px 12px; border-radius:10px; background:var(--card-2); color:var(--text); border:1px solid var(--border); font-family:inherit; font-size:13.5px;">
+            <option value="">📦 ทุกหมวดหมู่สินค้า (ทั้งหมด)</option>
+          </select>
+          <select id="kaloPriceSelect" onchange="refreshKalodataTop10(false)" style="padding:10px 12px; border-radius:10px; background:var(--card-2); color:var(--text); border:1px solid var(--border); font-family:inherit; font-size:13.5px;">
+            <option value="all">💰 ทุกระดับราคา</option>
+            <option value="u199">🪙 งบซื้อง่าย (ไม่เกิน ฿199)</option>
+            <option value="200to599">💵 ราคากลางขายดี (฿200 – ฿599)</option>
+            <option value="600plus">💎 ราคาสูง คอมฯ หนัก (฿600 ขึ้นไป)</option>
+          </select>
+          <input type="text" id="kaloSearchInput" oninput="refreshKalodataTop10(false)" placeholder="🔍 ค้นหาชื่อสินค้าในคลัง Kalodata เช่น พรม, ท็อปเปอร์, เซรั่ม..." style="padding:10px 12px; border-radius:10px;" />
+          <button type="button" class="btn-copy" onclick="clearKaloFilters()" style="white-space:nowrap;">↺ ล้างตัวกรอง</button>
+        </div>
+
+        <div class="kalo-tabs">
+          <button type="button" class="kalo-tab active" data-formula="blue_ocean" onclick="selectKaloFormula('blue_ocean', this)">
+            <div class="kalo-tab-title">
+              <span>🌊 สูตร 1: น่านน้ำสีคราม (Blue Ocean)</span>
+              <span class="opt-tag" style="color:var(--accent-2);">คู่แข่งน้อย</span>
+            </div>
+            <div class="kalo-tab-desc">ยอดขายจากคลิปสูงมาก แต่จำนวนครีเอเตอร์ที่ทำคลิปยังน้อย โอกาสคลิปปังและแย่งยอดขายง่ายที่สุด</div>
+          </button>
+          <button type="button" class="kalo-tab" data-formula="cash_cow" onclick="selectKaloFormula('cash_cow', this)">
+            <div class="kalo-tab-title">
+              <span>💰 สูตร 2: คอมมิชชั่นคุ้ม & ปิดไว (Cash Cow)</span>
+              <span class="opt-tag" style="color:var(--green);">กำไรต่อชิ้นสูง</span>
+            </div>
+            <div class="kalo-tab-desc">คำนวณจาก (ค่าคอมมิชชั่นบาท/ชิ้น × อัตรา Conversion × ยอดขายจริง) เน้นตัวที่คนกดตะกร้าแล้วได้เงินเนื้อๆ</div>
+          </button>
+          <button type="button" class="kalo-tab" data-formula="rising_star" onclick="selectKaloFormula('rising_star', this)">
+            <div class="kalo-tab-title">
+              <span>🚀 สูตร 3: ดาวรุ่งพุ่งแรง (Rising Stars)</span>
+              <span class="opt-tag" style="color:var(--gold);">กระแสกำลังมา</span>
+            </div>
+            <div class="kalo-tab-desc">อัตราการเติบโต (% Growth) พุ่งแรง + สัดส่วนยอดขายมาจากคลิปวิดีโอเป็นหลัก (ไม่ใช่ไลฟ์สด) + AI Score สูง</div>
+          </button>
+        </div>
+
+        <div class="kalo-grid" id="kaloTopGrid">
+          <div style="grid-column:1/-1; text-align:center; padding:24px; color:var(--muted);">กำลังโหลดคลังสินค้าขายดี Kalodata...</div>
+        </div>
+      </div>
+    </div>
+
     <!-- Input Card -->
     <div class="card">
       <div class="section-label" style="justify-content: space-between;">
@@ -723,11 +1074,33 @@
       <div class="form-grid">
         <div>
           <div class="section-label">
-            2. รายละเอียดสินค้าเพิ่มเติม
-            <span class="opt-tag">ไม่บังคับ — ถ้าในรูปมีข้อมูลครบแล้ว เว้นว่างได้เลย</span>
+            2. รายละเอียดสินค้าเพิ่มเติม & รหัสสินค้า (SKU 19 หลักสำหรับบอทปักตะกร้า)
+            <span class="opt-tag">ถ้ากดเลือกจากตาราง Kalodata ด้านบน ระบบจะกรอกให้อัตโนมัติครบ</span>
           </div>
-          <textarea id="productInfo" rows="2"
+          <div style="display:grid; grid-template-columns: 1fr auto; gap:8px; margin-bottom:8px;">
+            <input type="text" id="productSkuInput" oninput="updateLiveFilenamePreview()"
+              placeholder="🔗 วางรหัสสินค้า 19 หลัก หรือลิงก์สินค้า TikTok Shop ที่นี่ (ไม่บังคับ — ถ้ามี บอทจะแอดเข้าโชว์เคสให้อัตโนมัติ)" />
+            <a id="selectedProductExternalLink" href="#" target="_blank" rel="noopener" class="btn-copy"
+              style="display:none; text-decoration:none; align-items:center; gap:6px; border-color:var(--accent-2); color:var(--accent-2); white-space:nowrap;">
+              🛒 เปิดหน้าสินค้าจริง TikTok
+            </a>
+          </div>
+          <textarea id="productInfo" rows="2" oninput="updateLiveFilenamePreview()"
             placeholder="เช่น พรมห้องครัวเซ็ต 2 ชิ้น ลายหมากรุกขาวดำ ราคา 79 บาท ลด 78% กันลื่น ซับน้ำ (ถ้าในรูปมีอยู่แล้วไม่ต้องพิมพ์ก็ได้ครับ)"></textarea>
+
+          <!-- Instant Video Filename Box for Google Drive Workers -->
+          <div id="liveFilenameBanner" class="filename-ready-box" style="display:none; margin-top:10px; margin-bottom:0;">
+            <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:6px;">
+              <div style="font-size:13.5px; font-weight:800; color:var(--green);">
+                📁 ชื่อไฟล์สำหรับตั้งชื่อคลิป .mp4 (ส่งให้คนทำคลิปอัปขึ้น Google Drive / บอทโพสต์ออโต้)
+              </div>
+              <button type="button" class="btn-copy" onclick="copyTextById('liveFilenameText', this)"
+                style="background:var(--green); border-color:var(--green); color:#fff; font-weight:700;">
+                📋 คัดลอกชื่อไฟล์คลิป
+              </button>
+            </div>
+            <div id="liveFilenameText" class="mono" style="font-size:14px; font-weight:600; color:var(--text); word-break:break-all; background:var(--card); padding:8px 12px; border-radius:8px; border:1px solid var(--border);"></div>
+          </div>
         </div>
 
         <div>
@@ -874,6 +1247,27 @@
           <button class="btn-copy" onclick="copyTextById('analysisRaw', this)">📋 คัดลอกตารางวิเคราะห์</button>
         </div>
 
+        <!-- Dedicated Video Filename Box for Google Drive / Auto-Post Bot -->
+        <div class="filename-ready-box">
+          <div
+            style="display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 8px;">
+            <div>
+              <div style="font-size: 14.5px; font-weight: 800; color: var(--green);">📁
+                ข้อ 0: ชื่อไฟล์สำหรับตั้งชื่อคลิป .mp4 (ให้คนทำคลิปตั้งชื่อนี้ตอนอัปลง Google Drive)</div>
+              <div style="font-size: 12px; color: var(--muted); margin-top: 2px;">
+                ✅ ล้างอักขระต้องห้ามของ Windows ออกให้แล้ว · รองรับทั้งการแปลง <code>4K_</code> และบอทปักตะกร้าอัตโนมัติ
+              </div>
+            </div>
+            <button class="btn-copy" onclick="copyTextById('videoFilenameBox', this)"
+              style="background: var(--green); border-color: var(--green); color: #fff; font-weight: 700;">
+              📋 คัดลอกชื่อไฟล์คลิป (.mp4)
+            </button>
+          </div>
+          <div id="videoFilenameBox" class="mono"
+            style="font-size: 15px; font-weight: 700; color: var(--text); word-break: break-all; line-height: 1.55; background: var(--card); padding: 10px 14px; border-radius: 9px; border: 1px solid var(--border);">
+          </div>
+        </div>
+
         <!-- Exact Product Name OCR Box -->
         <div
           style="background: var(--card-2); border: 1px solid rgba(37, 244, 238, 0.35); border-radius: 12px; padding: 14px 16px; margin-bottom: 14px;">
@@ -925,15 +1319,19 @@
         </div>
         <div class="btn-group" style="margin-bottom: 10px;">
           <button class="btn-copy" style="border-color: var(--green); background: rgba(16, 185, 129, 0.14);"
-            onclick="copyVideoPromptWithFrames('ingredientsStoryboard', this)">🧩 โหมดองค์ประกอบ: แนบรูปสินค้า + ภาพสตอรี่บอร์ด (ข้อ 3.3) — แนะนำสำหรับโหมดองค์ประกอบ</button>
+            onclick="copyVideoPromptWithFrames('ingredientsStoryboard', this)">🧩 โหมดองค์ประกอบ: แนบรูปสินค้า +
+            ภาพสตอรี่บอร์ด (ข้อ 3.3) — แนะนำสำหรับโหมดองค์ประกอบ</button>
           <button class="btn-copy" style="border-color: var(--accent-2);"
-            onclick="copyVideoPromptWithFrames('ingredientsProductOnly', this)">🧩 โหมดองค์ประกอบ: แนบเฉพาะรูปสินค้าจริง</button>
-          <button class="btn-copy"
-            onclick="copyVideoPromptWithFrames('start', this)">🖼️ โหมดเฟรม: แนบภาพเฟรมแรก (ข้อ 3.1)</button>
-          <button class="btn-copy"
-            onclick="copyVideoPromptWithFrames('startEnd', this)">🏁 โหมดเฟรม: แนบเฟรมแรก + เฟรมสุดท้าย (ข้อ 3.1 + 3.2)</button>
+            onclick="copyVideoPromptWithFrames('ingredientsProductOnly', this)">🧩 โหมดองค์ประกอบ:
+            แนบเฉพาะรูปสินค้าจริง</button>
+          <button class="btn-copy" onclick="copyVideoPromptWithFrames('start', this)">🖼️ โหมดเฟรม: แนบภาพเฟรมแรก (ข้อ
+            3.1)</button>
+          <button class="btn-copy" onclick="copyVideoPromptWithFrames('startEnd', this)">🏁 โหมดเฟรม: แนบเฟรมแรก +
+            เฟรมสุดท้าย (ข้อ 3.1 + 3.2)</button>
         </div>
-        <p style="font-size: 13px; color: var(--muted); margin-bottom: 10px;">👉 กดเลือกปุ่มตามโหมดใน Omni 1.1 Flash ที่คุณใช้: ถ้าใช้ <b>"โหมดองค์ประกอบ"</b> แนะนำกดปุ่มแรกแล้วแนบ <b>รูปสินค้าจริง + ภาพสตอรี่บอร์ดจากข้อ 3.3</b> คู่กันได้เลย!</p>
+        <p style="font-size: 13px; color: var(--muted); margin-bottom: 10px;">👉 กดเลือกปุ่มตามโหมดใน Omni 1.1 Flash
+          ที่คุณใช้: ถ้าใช้ <b>"โหมดองค์ประกอบ"</b> แนะนำกดปุ่มแรกแล้วแนบ <b>รูปสินค้าจริง + ภาพสตอรี่บอร์ดจากข้อ
+            3.3</b> คู่กันได้เลย!</p>
         <div class="code-box mono" id="klingPromptBox"></div>
       </div>
 
@@ -948,9 +1346,14 @@
         <div
           style="background: var(--card-2); border: 1px solid rgba(16, 185, 129, 0.4); border-radius: 12px; padding: 12px 14px; margin-bottom: 12px; font-size: 13.5px; line-height: 1.7;">
           <b>✅ วิธีใช้ใน "โหมดองค์ประกอบ" (Omni 1.1 Flash · 10 วินาที · 9:16):</b><br>
-          1) ก๊อป Prompt 3.3 นี้ไปสร้างภาพสตอรี่บอร์ดในโหมด <b>รูปภาพ</b> (พร้อมแนบรูปสินค้าจริง) — Prompt นี้ล็อกไว้ให้แล้วว่า <b>"ห้ามมีป้ายตัวหนังสือคาดบนภาพ (No Text / No Labels)"</b> เพื่อไม่ให้ AI เผลอก๊อปปี้ป้ายตัวหนังสือติดเข้าไปในคลิปวิดีโอ<br>
-          2) เปิดโหมด <b>วิดีโอ → องค์ประกอบ → 9:16 → 10 วินาที</b> แล้วแนบภาพ 2 ใบคู่กัน: <b>(1) รูปสินค้าจริง + (2) ภาพสตอรี่บอร์ดที่ได้จากข้อ 3.3</b><br>
-          3) กลับมากดปุ่มสีเขียว <b>"🧩 โหมดองค์ประกอบ: แนบรูปสินค้า + ภาพสตอรี่บอร์ด (ข้อ 3.3)"</b> ในข้อ 3 ด้านบนไปวางสร้างคลิปได้เลย (ระบบจะใส่คำสั่งกำกับให้ AI ใช้สตอรี่บอร์ดเป็นไกด์ลำดับท่าทาง โดยแสดงผลเป็นคลิปเต็มจอ 9:16 ไม่แบ่งช่องตาราง)
+          1) ก๊อป Prompt 3.3 นี้ไปสร้างภาพสตอรี่บอร์ดในโหมด <b>รูปภาพ</b> (พร้อมแนบรูปสินค้าจริง) — Prompt
+          นี้ล็อกไว้ให้แล้วว่า <b>"ห้ามมีป้ายตัวหนังสือคาดบนภาพ (No Text / No Labels)"</b> เพื่อไม่ให้ AI
+          เผลอก๊อปปี้ป้ายตัวหนังสือติดเข้าไปในคลิปวิดีโอ<br>
+          2) เปิดโหมด <b>วิดีโอ → องค์ประกอบ → 9:16 → 10 วินาที</b> แล้วแนบภาพ 2 ใบคู่กัน: <b>(1) รูปสินค้าจริง + (2)
+            ภาพสตอรี่บอร์ดที่ได้จากข้อ 3.3</b><br>
+          3) กลับมากดปุ่มสีเขียว <b>"🧩 โหมดองค์ประกอบ: แนบรูปสินค้า + ภาพสตอรี่บอร์ด (ข้อ 3.3)"</b> ในข้อ 3
+          ด้านบนไปวางสร้างคลิปได้เลย (ระบบจะใส่คำสั่งกำกับให้ AI ใช้สตอรี่บอร์ดเป็นไกด์ลำดับท่าทาง
+          โดยแสดงผลเป็นคลิปเต็มจอ 9:16 ไม่แบ่งช่องตาราง)
         </div>
         <div class="code-box mono" id="storyboardImagePromptBox"></div>
 
@@ -959,7 +1362,9 @@
             <div class="out-title">3.1 🖼️ Prompt สร้างภาพเฟรมแรก (Start Frame) — สำหรับคนใช้ "โหมดเฟรม"</div>
             <button class="btn-copy" onclick="copyTextById('keyframePromptBox', this)">📋 คัดลอก Prompt เฟรมแรก</button>
           </div>
-          <p style="font-size: 13px; color: var(--muted); margin-bottom: 10px;">💡 ใช้เมื่อสลับไปใช้โหมด <b>"เฟรม"</b> ใน Omni (ห้ามเอาภาพสตอรี่บอร์ด 5 ช่องไปใส่ในโหมดเฟรม เพราะโหมดเฟรมจะบังคับให้วินาทีแรกของคลิปแบ่งเป็นตาราง 5 ช่อง)</p>
+          <p style="font-size: 13px; color: var(--muted); margin-bottom: 10px;">💡 ใช้เมื่อสลับไปใช้โหมด <b>"เฟรม"</b>
+            ใน Omni (ห้ามเอาภาพสตอรี่บอร์ด 5 ช่องไปใส่ในโหมดเฟรม เพราะโหมดเฟรมจะบังคับให้วินาทีแรกของคลิปแบ่งเป็นตาราง 5
+            ช่อง)</p>
           <div class="code-box mono" id="keyframePromptBox"></div>
         </div>
 
@@ -1783,10 +2188,17 @@
         }
       }
 
-      // 0. Analysis + Exact OCR Product Name
+      // 0. Analysis + Exact OCR Product Name + Video Filename Box
       document.getElementById('analysisTitle').textContent = `📊 วิเคราะห์สินค้า: ${d.product_title || ''}`;
-      const ocrFullName = (d.exact_product_name_from_image || d.product_title || '').trim();
+      const ocrFullName = (d.exact_product_name_from_image || selectedKalodataProduct?.name || d.product_title || '').trim();
       document.getElementById('ocrProductNameBox').textContent = ocrFullName;
+
+      const activeSku = extractCleanSku(document.getElementById('productSkuInput')?.value || selectedKalodataProduct?.sku || '');
+      const readyFilename = buildSafeVideoFilename(activeSku, ocrFullName);
+      const vfBox = document.getElementById('videoFilenameBox');
+      if (vfBox) {
+        vfBox.textContent = readyFilename;
+      }
 
       const styleBanner = d.selected_style_name ? `🎯 แนวคลิปที่ใช้: ${d.selected_style_name} — ` : '';
       document.getElementById('analysisSummary').textContent = styleBanner + (d.product_summary || '');
@@ -1798,7 +2210,9 @@
         </tbody>
       `;
       document.getElementById('analysisRaw').textContent =
+        `ชื่อไฟล์สำหรับตั้งชื่อคลิป (.mp4) ส่งเข้า Google Drive: ${readyFilename}\n` +
         `ชื่อสินค้าเต็มที่ถอดจากรูปภาพ (OCR): ${ocrFullName}\n` +
+        (activeSku ? `รหัสสินค้า TikTok (SKU 19 หลัก): ${activeSku} (https://shop.tiktok.com/view/product/${activeSku})\n` : '') +
         `วิเคราะห์สินค้า: ${d.product_title || ''}\n${styleBanner}${d.product_summary || ''}\n` +
         specs.map(s => `- ${s.label}: ${s.value}`).join('\n');
 
@@ -1934,8 +2348,11 @@
         `${hs.style_name || `แบบที่ ${i + 1}`}: ${normalizeFiveTags(hs.tags).join(' ')}`
       ).join('\n');
 
+      const vfText = document.getElementById('videoFilenameBox')?.textContent || '';
       const fullText = [
-        `=== วิเคราะห์สินค้า: ${d.product_title || ''} ===`,
+        `=== 0. ชื่อไฟล์สำหรับตั้งชื่อคลิป (.mp4) ส่งเข้า Google Drive ===`,
+        vfText,
+        `\n=== วิเคราะห์สินค้า: ${d.product_title || ''} ===`,
         document.getElementById('analysisRaw').textContent,
         `\n=== 1. บทพูด TikTok 10 วินาที ===`,
         document.getElementById('scriptBox').textContent,
@@ -2075,6 +2492,309 @@
       renderOutput(sample);
       document.getElementById('outputArea').scrollIntoView({ behavior: 'smooth' });
     }
+
+    // ============== Kalodata Top 10 (3 Formulas) + Safe Video Filename Builder ==============
+    let kalodataPool = [];
+    let kalodataBySku = {};
+    let activeKaloFormula = 'blue_ocean';
+    let kaloShuffleSeed = Math.random();
+    let selectedKalodataProduct = null;
+
+    function extractCleanSku(raw) {
+      const s = String(raw || '').trim();
+      const m = s.match(/(\d{15,22})/);
+      return m ? m[1] : '';
+    }
+
+    function sanitizeFilenamePart(name) {
+      // Remove Windows & Google Drive forbidden filename chars: < > : " / \ | ? * and control chars
+      let s = String(name || '')
+        .replace(/[<>:"/\\|?*\x00-\x1F]/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+      if (s.length > 140) {
+        s = s.slice(0, 140).trim();
+      }
+      return s || 'คลิปสินค้า_TikTok';
+    }
+
+    function buildSafeVideoFilename(sku, fullName) {
+      const cleanSku = extractCleanSku(sku);
+      const cleanName = sanitizeFilenamePart(fullName);
+      return cleanSku ? `${cleanSku}__${cleanName}` : cleanName;
+    }
+
+    function updateLiveFilenamePreview() {
+      const rawSkuInput = document.getElementById('productSkuInput')?.value || '';
+      const cleanSku = extractCleanSku(rawSkuInput);
+      const linkBtn = document.getElementById('selectedProductExternalLink');
+      if (linkBtn) {
+        if (cleanSku) {
+          linkBtn.href = `https://shop.tiktok.com/view/product/${cleanSku}?region=TH&locale=th-TH`;
+          linkBtn.style.display = 'inline-flex';
+        } else {
+          linkBtn.style.display = 'none';
+        }
+      }
+
+      const infoVal = document.getElementById('productInfo')?.value || '';
+      const baseName = selectedKalodataProduct?.name || infoVal.split('\n')[0].replace(/^ชื่อสินค้าเต็ม:\s*/i, '').trim();
+      const banner = document.getElementById('liveFilenameBanner');
+      const textEl = document.getElementById('liveFilenameText');
+      if (banner && textEl) {
+        if (cleanSku || baseName) {
+          textEl.textContent = buildSafeVideoFilename(cleanSku, baseName || 'ชื่อสินค้าเต็มจากรูปภาพ');
+          banner.style.display = 'block';
+        } else {
+          banner.style.display = 'none';
+        }
+      }
+
+      // If outputArea is already visible, keep videoFilenameBox synced too
+      const vfBox = document.getElementById('videoFilenameBox');
+      const ocrBox = document.getElementById('ocrProductNameBox');
+      if (vfBox && ocrBox && ocrBox.textContent.trim()) {
+        vfBox.textContent = buildSafeVideoFilename(cleanSku, ocrBox.textContent.trim());
+      }
+    }
+
+    function formatCompactBaht(num) {
+      const n = Number(num || 0);
+      if (n >= 1e6) return `฿${(n / 1e6).toFixed(2)}M`;
+      if (n >= 1e3) return `฿${(n / 1e3).toFixed(1)}K`;
+      return `฿${Math.round(n).toLocaleString('th-TH')}`;
+    }
+
+    function computeFormulaScore(p, formula, jitterFactor = 1) {
+      const vRev = Math.max(0, Number(p.v_rev || 0));
+      const rev = Math.max(1, Number(p.rev || vRev || 1));
+      const creators = Math.max(1, Number(p.creators || 1));
+      const conv = Math.max(1, Number(p.conv || 5));
+      const comm = Math.max(0, Number(p.comm || 0));
+      const avgPrice = Math.max(10, Number(p.avg_price || p.price || 100));
+      const sales = Math.max(1, Number(p.sales || 1));
+      const growth = Number(p.growth || 0);
+      const ai = Math.max(40, Number(p.ai || 60));
+      const videoShare = Math.min(1, vRev / rev);
+
+      if (formula === 'blue_ocean') {
+        // สูตร 1: น่านน้ำสีคราม — ยอดขายจากคลิปสูงมาก แต่จำนวนครีเอเตอร์ที่ทำคลิปยังน้อย + อัตราซื้อดี
+        const revPerCreator = vRev / Math.pow(creators + 6, 1.18);
+        return revPerCreator * (0.7 + conv / 45) * (0.6 + 0.4 * videoShare) * jitterFactor;
+      }
+      if (formula === 'cash_cow') {
+        // สูตร 2: คอมมิชชั่นคุ้ม & ปิดการขายไว — ค่าคอม(บาท/ชิ้น) × อัตราปิดการขาย × ยอดขายจริง
+        const effectiveCommPct = comm > 0 ? comm : (p.hcomm ? 15 : 8);
+        const commBahtPerUnit = avgPrice * (effectiveCommPct / 100);
+        const expectedValuePerClick = commBahtPerUnit * (conv / 100);
+        return expectedValuePerClick * Math.pow(Math.log10(sales + 20), 2.1) * (0.5 + 0.5 * videoShare) * jitterFactor;
+      }
+      // สูตร 3: ดาวรุ่งพุ่งแรง (rising_star) — เติบโตไว + ขายผ่านคลิปวิดีโอเป็นหลัก + AI Score สูง
+      const growthBoost = growth > 0 ? (1 + Math.min(growth, 500) / 80) : Math.max(0.25, 1 + growth / 150);
+      return growthBoost * Math.pow(videoShare, 1.3) * (ai / 100) * Math.pow(Math.log10(vRev + 10), 2.4) * jitterFactor;
+    }
+
+    function toggleKaloBody() {
+      const wrap = document.getElementById('kaloBodyWrap');
+      const btn = document.getElementById('btnToggleKalo');
+      if (!wrap || !btn) return;
+      const isHidden = wrap.style.display === 'none';
+      wrap.style.display = isHidden ? 'block' : 'none';
+      btn.textContent = isHidden ? '🔼 ย่อตารางสินค้า' : '🔽 ขยายตารางสินค้าขายดี Kalodata';
+    }
+
+    function clearKaloFilters() {
+      const catEl = document.getElementById('kaloCatSelect');
+      const priceEl = document.getElementById('kaloPriceSelect');
+      const searchEl = document.getElementById('kaloSearchInput');
+      if (catEl) catEl.value = '';
+      if (priceEl) priceEl.value = 'all';
+      if (searchEl) searchEl.value = '';
+      refreshKalodataTop10(true);
+    }
+
+    function selectKaloFormula(formulaKey, btn) {
+      activeKaloFormula = formulaKey;
+      document.querySelectorAll('.kalo-tab').forEach(b => b.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+      refreshKalodataTop10(false);
+    }
+
+    function refreshKalodataTop10(newRandomSeed = false) {
+      if (!kalodataPool.length) return;
+      if (newRandomSeed) {
+        kaloShuffleSeed = Math.random();
+      }
+      const catFilter = document.getElementById('kaloCatSelect')?.value || '';
+      const priceFilter = document.getElementById('kaloPriceSelect')?.value || 'all';
+      const qFilter = (document.getElementById('kaloSearchInput')?.value || '').trim().toLowerCase();
+
+      let filtered = kalodataPool.filter(p => {
+        if (catFilter && p.cat !== catFilter) return false;
+        const pr = Number(p.price || p.avg_price || 0);
+        if (priceFilter === 'u199' && (pr <= 0 || pr > 199)) return false;
+        if (priceFilter === '200to599' && (pr < 200 || pr > 599)) return false;
+        if (priceFilter === '600plus' && pr < 600) return false;
+        if (qFilter && !String(p.name || '').toLowerCase().includes(qFilter) && !String(p.cat_full || '').toLowerCase().includes(qFilter)) {
+          return false;
+        }
+        return true;
+      });
+
+      const grid = document.getElementById('kaloTopGrid');
+      if (!filtered.length) {
+        grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:26px; color:var(--muted);">ไม่พบสินค้าที่ตรงกับตัวกรองนี้ — ลองกด "↺ ล้างตัวกรอง" หรือเปลี่ยนหมวดหมู่ครับ</div>`;
+        return;
+      }
+
+      // Compute score with deterministic per-load/per-refresh jitter (0.82 .. 1.18) among top candidates
+      // so every time you open the link or click Refresh, fresh top winners surface naturally
+      const scored = filtered.map((p, idx) => {
+        const hash = Math.sin((Number(p.sku.slice(-6)) + idx + 1) * (kaloShuffleSeed * 9973 + 1.2345)) * 10000;
+        const pseudoRand = hash - Math.floor(hash); // 0..1
+        const jitter = 0.80 + pseudoRand * 0.40;
+        return {
+          p,
+          score: computeFormulaScore(p, activeKaloFormula, jitter)
+        };
+      });
+
+      scored.sort((a, b) => b.score - a.score);
+      const top10 = scored.slice(0, 10).map(x => x.p);
+
+      grid.innerHTML = top10.map((p, i) => {
+        const rank = i + 1;
+        const priceDisplay = p.price ? `฿${Number(p.price).toLocaleString('th-TH', { maximumFractionDigits: 0 })}` : `฿${p.price_raw || p.avg_price}`;
+        const commPct = p.comm > 0 ? `${p.comm}%` : (p.hcomm ? '15%+' : 'มาตรฐาน');
+        const commBaht = p.comm > 0 ? ` (~฿${Math.round((p.avg_price || p.price || 100) * p.comm / 100)}/ชิ้น)` : '';
+        const vShare = Math.min(100, Math.round((p.v_rev / Math.max(1, p.rev)) * 100));
+        const growthTxt = p.growth > 0 ? `+${p.growth}% 📈` : `${p.growth}%`;
+        const productUrl = p.link || `https://shop.tiktok.com/view/product/${p.sku}?region=TH&locale=th-TH`;
+
+        return `
+          <div class="kalo-item">
+            <a class="kalo-thumb-wrap" href="${escapeHtml(productUrl)}" target="_blank" rel="noopener"
+              title="คลิกที่รูปเพื่อเปิดหน้าสินค้าจริงบน TikTok Shop (รหัส ${escapeHtml(p.sku)})">
+              <span class="kalo-rank">🏆 Top #${rank}</span>
+              <img src="${escapeHtml(p.image)}" alt="${escapeHtml(p.name)}" loading="lazy" />
+              <span class="kalo-open-hint">🔗 คลิกเปิดสินค้าจริง</span>
+            </a>
+            <div class="kalo-body">
+              <div class="kalo-cat">📂 ${escapeHtml(p.cat || 'สินค้าขายดี')}</div>
+              <div class="kalo-name" title="${escapeHtml(p.name)}">${escapeHtml(p.name)}</div>
+              <div class="kalo-price-row">
+                <span class="kalo-price">${escapeHtml(priceDisplay)}</span>
+                <span class="kalo-comm">ค่าคอม ${escapeHtml(commPct)}${escapeHtml(commBaht)}</span>
+              </div>
+              <div class="kalo-metrics">
+                <div>🎬 ยอดคลิป: <b>${formatCompactBaht(p.v_rev)}</b> (${vShare}%)</div>
+                <div>🧑‍🎤 คนทำคลิป: <b>${Number(p.creators || 0).toLocaleString()} คน</b></div>
+                <div>🛒 อัตราซื้อ: <b>${p.conv || 0}%</b></div>
+                <div>🚀 เติบโต: <b>${escapeHtml(growthTxt)}</b></div>
+              </div>
+              <div class="kalo-actions">
+                <button type="button" class="btn-kalo-use" onclick="useKalodataProduct('${escapeHtml(p.sku)}', this)">
+                  ⚡ เลือกทำคลิป (ดึงรูป + ก๊อปชื่อไฟล์)
+                </button>
+                <button type="button" class="btn-kalo-copy" onclick="copyKalodataFilename('${escapeHtml(p.sku)}', this)">
+                  📋 ก๊อปชื่อไฟล์คลิป (SKU + ชื่อเต็ม)
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function copyKalodataFilename(sku, btn) {
+      const p = kalodataBySku[sku];
+      if (!p) return;
+      const fname = buildSafeVideoFilename(p.sku, p.name);
+      copyToClipboard(fname);
+      flashCopied(btn);
+    }
+
+    async function useKalodataProduct(sku, btn) {
+      const p = kalodataBySku[sku];
+      if (!p) return;
+      selectedKalodataProduct = p;
+
+      const origText = btn ? btn.innerHTML : '';
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '⏳ กำลังดึงรูปสินค้าเข้า Studio...';
+      }
+
+      // 1. กรอกรหัส SKU 19 หลัก + รายละเอียดสินค้า + อัปเดตกล่องชื่อไฟล์คลิป
+      const skuInput = document.getElementById('productSkuInput');
+      if (skuInput) skuInput.value = p.sku;
+
+      const priceDisplay = p.price ? `${Math.round(p.price)} บาท` : `${p.price_raw || Math.round(p.avg_price)} บาท`;
+      const infoEl = document.getElementById('productInfo');
+      if (infoEl) {
+        infoEl.value = `ชื่อสินค้าเต็ม: ${p.name}\nหมวดหมู่: ${p.cat_full || p.cat} | ราคาประมาณ ${priceDisplay}${p.comm ? ` | ค่าคอม ${p.comm}%` : ''}`;
+      }
+      updateLiveFilenamePreview();
+
+      // 2. คัดลอกชื่อไฟล์สำหรับส่งให้คนทำคลิปลง Clipboard ทันที
+      const fname = buildSafeVideoFilename(p.sku, p.name);
+      copyToClipboard(fname);
+
+      // 3. ดึงรูปสินค้าจาก TikTok CDN (รองรับ CORS *) แปลงเป็น Base64 ใส่ช่องอัปโหลดรูปอัตโนมัติ
+      try {
+        const resp = await fetch(p.image, { mode: 'cors' });
+        if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+        const blob = await resp.blob();
+        const dataUrl = await new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result);
+          reader.onerror = reject;
+          reader.readAsDataURL(blob);
+        });
+        const cleanDataUrl = await normalizeImageDataUrl(dataUrl, blob.type || 'image/jpeg');
+        const base64 = cleanDataUrl.split(',')[1];
+        uploadedImages = [{ mimeType: 'image/jpeg', base64, dataUrl: cleanDataUrl }];
+        renderPreviews();
+      } catch (err) {
+        console.warn('Could not auto-fetch product image:', err);
+      }
+
+      if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = '✅ ดึงรูป + ก๊อปชื่อไฟล์แล้ว!';
+        setTimeout(() => { btn.innerHTML = origText; }, 2200);
+      }
+
+      document.getElementById('liveFilenameBanner')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    async function initKalodataAnalyzer() {
+      const badge = document.getElementById('kaloStatusBadge');
+      try {
+        const resp = await fetch(`./kalodata_pool.json?v=${Date.now()}`, { cache: 'no-store' });
+        if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+        const data = await resp.json();
+        kalodataPool = data.products || [];
+        kalodataBySku = {};
+        kalodataPool.forEach(p => { kalodataBySku[p.sku] = p; });
+
+        const catSelect = document.getElementById('kaloCatSelect');
+        if (catSelect && Array.isArray(data.categories)) {
+          catSelect.innerHTML = `<option value="">📦 ทุกหมวดหมู่สินค้า (คัดเกรด ${kalodataPool.length.toLocaleString()} รายการ จาก ${(data.source_total_products || 2989927).toLocaleString()} ชิ้น)</option>` +
+            data.categories.map(c => `<option value="${escapeHtml(c.name)}">${escapeHtml(c.name)} (${c.pool_count} รายการตัวตึง)</option>`).join('');
+        }
+
+        if (badge) {
+          badge.textContent = `📊 Kalodata (${data.kalodata_date_range || '30 วันล่าสุด'}) · คัด ${kalodataPool.length.toLocaleString()} ตัวตึงจาก ${(data.source_total_products || 2989927).toLocaleString()} ชิ้น`;
+        }
+        refreshKalodataTop10(true);
+      } catch (err) {
+        console.warn('Kalodata pool load error:', err);
+        if (badge) badge.textContent = '⚠️ โหลดคลัง Kalodata ไม่สำเร็จ';
+      }
+    }
+
+    initKalodataAnalyzer();
   </script>
 </body>
 
