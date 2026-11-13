@@ -985,11 +985,14 @@
       <div class="kalo-header">
         <div>
           <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-            <span style="font-size:17px; font-weight:800; color:var(--text);">🔥 วิเคราะห์สินค้าขายดี Kalodata (Top 10 × 3 สูตรทำเงิน)</span>
-            <span class="badge-skill" id="kaloStatusBadge" style="background:rgba(16,185,129,0.16); color:var(--green); border-color:rgba(16,185,129,0.4);">กำลังคำนวณสด...</span>
+            <span style="font-size:17px; font-weight:800; color:var(--text);">🔥 วิเคราะห์สินค้าขายดี Kalodata (Top 10 ×
+              3 สูตรทำเงิน)</span>
+            <span class="badge-skill" id="kaloStatusBadge"
+              style="background:rgba(16,185,129,0.16); color:var(--green); border-color:rgba(16,185,129,0.4);">กำลังคำนวณสด...</span>
           </div>
           <p style="font-size:12.8px; color:var(--muted); margin-top:4px;">
-            💡 <b>คลิกที่รูปสินค้า</b> เพื่อเปิดลิงก์สินค้าจริงบน TikTok Shop · หรือกดปุ่ม <b>"⚡ เลือกทำคลิป"</b> เพื่อดึงรูปเข้า Studio + สร้างชื่อไฟล์พร้อมส่งให้คนทำคลิปอัปขึ้น Google Drive
+            💡 <b>คลิกที่รูปสินค้า</b> เพื่อเปิดลิงก์สินค้าจริงบน TikTok Shop · หรือกดปุ่ม <b>"⚡ เลือกทำคลิป"</b>
+            เพื่อดึงรูปเข้า Studio + สร้างชื่อไฟล์พร้อมส่งให้คนทำคลิปอัปขึ้น Google Drive
           </p>
         </div>
         <div style="display:flex; gap:8px; flex-wrap:wrap;">
@@ -1005,45 +1008,56 @@
 
       <div id="kaloBodyWrap">
         <div class="kalo-controls">
-          <select id="kaloCatSelect" onchange="refreshKalodataTop10(false)" style="padding:10px 12px; border-radius:10px; background:var(--card-2); color:var(--text); border:1px solid var(--border); font-family:inherit; font-size:13.5px;">
+          <select id="kaloCatSelect" onchange="refreshKalodataTop10(false)"
+            style="padding:10px 12px; border-radius:10px; background:var(--card-2); color:var(--text); border:1px solid var(--border); font-family:inherit; font-size:13.5px;">
             <option value="">📦 ทุกหมวดหมู่สินค้า (ทั้งหมด)</option>
           </select>
-          <select id="kaloPriceSelect" onchange="refreshKalodataTop10(false)" style="padding:10px 12px; border-radius:10px; background:var(--card-2); color:var(--text); border:1px solid var(--border); font-family:inherit; font-size:13.5px;">
+          <select id="kaloPriceSelect" onchange="refreshKalodataTop10(false)"
+            style="padding:10px 12px; border-radius:10px; background:var(--card-2); color:var(--text); border:1px solid var(--border); font-family:inherit; font-size:13.5px;">
             <option value="all">💰 ทุกระดับราคา</option>
             <option value="u199">🪙 งบซื้อง่าย (ไม่เกิน ฿199)</option>
             <option value="200to599">💵 ราคากลางขายดี (฿200 – ฿599)</option>
             <option value="600plus">💎 ราคาสูง คอมฯ หนัก (฿600 ขึ้นไป)</option>
           </select>
-          <input type="text" id="kaloSearchInput" oninput="refreshKalodataTop10(false)" placeholder="🔍 ค้นหาชื่อสินค้าในคลัง Kalodata เช่น พรม, ท็อปเปอร์, เซรั่ม..." style="padding:10px 12px; border-radius:10px;" />
-          <button type="button" class="btn-copy" onclick="clearKaloFilters()" style="white-space:nowrap;">↺ ล้างตัวกรอง</button>
+          <input type="text" id="kaloSearchInput" oninput="refreshKalodataTop10(false)"
+            placeholder="🔍 ค้นหาชื่อสินค้าในคลัง Kalodata เช่น พรม, ท็อปเปอร์, เซรั่ม..."
+            style="padding:10px 12px; border-radius:10px;" />
+          <button type="button" class="btn-copy" onclick="clearKaloFilters()" style="white-space:nowrap;">↺
+            ล้างตัวกรอง</button>
         </div>
 
         <div class="kalo-tabs">
-          <button type="button" class="kalo-tab active" data-formula="blue_ocean" onclick="selectKaloFormula('blue_ocean', this)">
+          <button type="button" class="kalo-tab active" data-formula="blue_ocean"
+            onclick="selectKaloFormula('blue_ocean', this)">
             <div class="kalo-tab-title">
               <span>🌊 สูตร 1: น่านน้ำสีคราม (Blue Ocean)</span>
               <span class="opt-tag" style="color:var(--accent-2);">คู่แข่งน้อย</span>
             </div>
-            <div class="kalo-tab-desc">ยอดขายจากคลิปสูงมาก แต่จำนวนครีเอเตอร์ที่ทำคลิปยังน้อย โอกาสคลิปปังและแย่งยอดขายง่ายที่สุด</div>
+            <div class="kalo-tab-desc">ยอดขายจากคลิปสูงมาก แต่จำนวนครีเอเตอร์ที่ทำคลิปยังน้อย
+              โอกาสคลิปปังและแย่งยอดขายง่ายที่สุด</div>
           </button>
           <button type="button" class="kalo-tab" data-formula="cash_cow" onclick="selectKaloFormula('cash_cow', this)">
             <div class="kalo-tab-title">
               <span>💰 สูตร 2: คอมมิชชั่นคุ้ม & ปิดไว (Cash Cow)</span>
               <span class="opt-tag" style="color:var(--green);">กำไรต่อชิ้นสูง</span>
             </div>
-            <div class="kalo-tab-desc">คำนวณจาก (ค่าคอมมิชชั่นบาท/ชิ้น × อัตรา Conversion × ยอดขายจริง) เน้นตัวที่คนกดตะกร้าแล้วได้เงินเนื้อๆ</div>
+            <div class="kalo-tab-desc">คำนวณจาก (ค่าคอมมิชชั่นบาท/ชิ้น × อัตรา Conversion × ยอดขายจริง)
+              เน้นตัวที่คนกดตะกร้าแล้วได้เงินเนื้อๆ</div>
           </button>
-          <button type="button" class="kalo-tab" data-formula="rising_star" onclick="selectKaloFormula('rising_star', this)">
+          <button type="button" class="kalo-tab" data-formula="rising_star"
+            onclick="selectKaloFormula('rising_star', this)">
             <div class="kalo-tab-title">
               <span>🚀 สูตร 3: ดาวรุ่งพุ่งแรง (Rising Stars)</span>
               <span class="opt-tag" style="color:var(--gold);">กระแสกำลังมา</span>
             </div>
-            <div class="kalo-tab-desc">อัตราการเติบโต (% Growth) พุ่งแรง + สัดส่วนยอดขายมาจากคลิปวิดีโอเป็นหลัก (ไม่ใช่ไลฟ์สด) + AI Score สูง</div>
+            <div class="kalo-tab-desc">อัตราการเติบโต (% Growth) พุ่งแรง + สัดส่วนยอดขายมาจากคลิปวิดีโอเป็นหลัก
+              (ไม่ใช่ไลฟ์สด) + AI Score สูง</div>
           </button>
         </div>
 
         <div class="kalo-grid" id="kaloTopGrid">
-          <div style="grid-column:1/-1; text-align:center; padding:24px; color:var(--muted);">กำลังโหลดคลังสินค้าขายดี Kalodata...</div>
+          <div style="grid-column:1/-1; text-align:center; padding:24px; color:var(--muted);">กำลังโหลดคลังสินค้าขายดี
+            Kalodata...</div>
         </div>
       </div>
     </div>
@@ -1089,8 +1103,10 @@
             placeholder="เช่น พรมห้องครัวเซ็ต 2 ชิ้น ลายหมากรุกขาวดำ ราคา 79 บาท ลด 78% กันลื่น ซับน้ำ (ถ้าในรูปมีอยู่แล้วไม่ต้องพิมพ์ก็ได้ครับ)"></textarea>
 
           <!-- Instant Video Filename Box for Google Drive Workers -->
-          <div id="liveFilenameBanner" class="filename-ready-box" style="display:none; margin-top:10px; margin-bottom:0;">
-            <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:6px;">
+          <div id="liveFilenameBanner" class="filename-ready-box"
+            style="display:none; margin-top:10px; margin-bottom:0;">
+            <div
+              style="display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:6px;">
               <div style="font-size:13.5px; font-weight:800; color:var(--green);">
                 📁 ชื่อไฟล์สำหรับตั้งชื่อคลิป .mp4 (ส่งให้คนทำคลิปอัปขึ้น Google Drive / บอทโพสต์ออโต้)
               </div>
@@ -1099,7 +1115,9 @@
                 📋 คัดลอกชื่อไฟล์คลิป
               </button>
             </div>
-            <div id="liveFilenameText" class="mono" style="font-size:14px; font-weight:600; color:var(--text); word-break:break-all; background:var(--card); padding:8px 12px; border-radius:8px; border:1px solid var(--border);"></div>
+            <div id="liveFilenameText" class="mono"
+              style="font-size:14px; font-weight:600; color:var(--text); word-break:break-all; background:var(--card); padding:8px 12px; border-radius:8px; border:1px solid var(--border);">
+            </div>
           </div>
         </div>
 
@@ -1198,6 +1216,56 @@
           <input type="text" id="customStyle"
             placeholder="พิมพ์สั่งแนวความต้องการเพิ่มเติมได้ตามใจชอบ เช่น 'ขอคนงานผู้ชายยืนหน้าลังสินค้าในโกดัง พูดเสียงดังฟังชัดเน้นโปรลดหนัก' (หรือเว้นว่างไว้ได้เลย)..." />
         </div>
+
+        <!-- 4. Living Background & Natural Scenario Elements -->
+        <div>
+          <div class="section-label">
+            4. 🌿 องค์ประกอบความมีชีวิตชีวา & สถานการณ์ธรรมชาติ (Living Background & Real-Life Scenario)
+            <span class="opt-tag">เพิ่มความสมจริงเหมือนถ่ายเอง ไม่แข็งทื่อ</span>
+          </div>
+          <div class="chips" id="livelyChips">
+            <div class="chip full-row active" data-val="auto" onclick="selectLivelyChip(this)">
+              ✨ ให้ AI เลือกองค์ประกอบมีชีวิต & สถานการณ์ธรรมชาติให้เข้ากับสินค้าโดยอัตโนมัติ (แนะนำ: โรงงานมีคนงานเดินหลังฉาก / พรมมีแมว-ลูกบอล / ที่นอนตื่นมาบิดขี้เกียจฟินๆ)
+            </div>
+            <div class="chip"
+              data-val="ตื่นนอนตอนเช้า & พักผ่อนจริง (Wake-Up Stretch & Cozy Morning): เปิดด้วยจังหวะตื่นนอนตอนเช้า แสงแดดอุ่นส่องผ่านม่าน บิดขี้เกียจอย่างสดชื่นแล้วสัมผัสความนุ่มฟูของสินค้า พูดชมด้วยอารมณ์ฟินหลับสบาย"
+              onclick="selectLivelyChip(this)">
+              🛌 ตื่นนอนบิดขี้เกียจฟินๆ (เหมาะกับท็อปเปอร์/ที่นอน/หมอน/ชุดนอน)
+            </div>
+            <div class="chip"
+              data-val="สัตว์เลี้ยงแสนรู้ / ลูกบอลของเล่น (Pet & Playful Home Life): มีน้องแมวหรือน้องหมาน่ารักเดินผ่าน วิ่งเล่น หรือมีลูกบอลลูกเล็กกลิ้งผ่านบริเวณสินค้าอย่างเป็นธรรมชาติ ช่วยพิสูจน์ว่าสินค้าเกาะพื้นแน่น นุ่ม และปลอดภัยในบ้านจริง"
+              onclick="selectLivelyChip(this)">
+              🐾 มีน้องหมา/แมวเดินผ่าน หรือลูกบอลกลิ้ง (เหมาะกับพรม/โซฟา/ของใช้ในบ้าน)
+            </div>
+            <div class="chip"
+              data-val="คนงานเดินทำงาน/ยกของในฉากหลัง (Active Factory / Warehouse Workers in Background): ด้านหลังในระยะเบลอสวยๆ มีคนงานกำลังเดินถือลังพัสดุ เข็นรถเข็นพาเลท หรือดึงเทปแพ็กกล่องส่งลูกค้าอย่างคึกคักสมจริง"
+              onclick="selectLivelyChip(this)">
+              👷 มีคนงานเดินยกของ/แพ็กของด้านหลัง (เหมาะกับโกดัง/โรงงาน/คลังสินค้า)
+            </div>
+            <div class="chip"
+              data-val="บรรยากาศครัวและบ้านมีชีวิตชีวา (Lively Kitchen & Daily Routine): มีกิจกรรมในบ้านจริง เช่น น้ำเปิดไหลจากก๊อก ไอน้ำอุ่นๆ จากแก้วกาแฟ หรือคนในบ้านเดินผ่านด้านหลังขณะใช้งานสินค้า"
+              onclick="selectLivelyChip(this)">
+              🍳 ครัว/บ้านมีชีวิตชีวา น้ำไหลจริง-ไอน้ำอุ่นๆ (เหมาะกับของใช้ในครัว/ในบ้าน)
+            </div>
+            <div class="chip"
+              data-val="ลูกค้าเดินเลือกของ/บรรยากาศหน้าร้านคึกคัก (Bustling Shopfront / Showroom Ambience): ฉากหลังระยะชัดตื้นมีลูกค้าเดินดูสินค้าบนเชลฟ์หรือพนักงานจัดของอยู่ด้านหลัง เพิ่มความน่าเชื่อถือว่าขายดีจริง"
+              onclick="selectLivelyChip(this)">
+              🛍️ มีลูกค้าเดินดูของด้านหลังคึกคัก (เหมาะกับหน้าร้าน/ตลาดนัด/โชว์รูม)
+            </div>
+            <div class="chip"
+              data-val="จังหวะชีวิตประจำวันกำลังจะออกจากบ้าน (Get-Ready / On-The-Go Lifestyle): จังหวะแต่งตัวเช็กความเป๊ะหน้ากระจกหรือหยิบใช้ก่อนก้าวออกจากบ้าน ดูเป็นไลฟ์สไตล์คนจริง"
+              onclick="selectLivelyChip(this)">
+              🪞 จังหวะแต่งตัว/หยิบใช้ก่อนออกจากบ้าน (เหมาะกับแฟชั่น/กระเป๋า/บิวตี้)
+            </div>
+            <div class="chip"
+              data-val="none"
+              onclick="selectLivelyChip(this)">
+              🎯 ไม่ใส่องค์ประกอบเสริม (โฟกัสเฉพาะคนรีวิวและสินค้าล้วนๆ)
+            </div>
+          </div>
+          <input type="text" id="customLively"
+            placeholder="พิมพ์สั่งองค์ประกอบธรรมชาติหรือสถานการณ์ที่อยากได้เอง เช่น 'เปิดคลิปนอนหลับแล้วตื่นมาบิดขี้เกียจชมว่าท็อปเปอร์นุ่มมาก' หรือ 'มีแมวส้มเดินผ่านพรม'..." />
+        </div>
       </div>
 
       <button class="btn-generate" id="btnGenerate" onclick="generateAll()">
@@ -1207,11 +1275,15 @@
         style="text-align: center; margin-top: 10px; display: flex; justify-content: center; gap: 8px; flex-wrap: wrap;">
         <button class="btn-copy" onclick="loadDemoSample()"
           style="font-size: 13px; color: var(--accent-2); border-color: rgba(37,244,238,0.35);">
-          👁️ ตัวอย่างแนวที่ 1: Real-Use Demo (ใช้งานจริงในครัว)
+          🐾 ตัวอย่างพรมครัว: มีน้องแมว/ลูกบอลกลิ้งผ่าน
         </button>
         <button class="btn-copy" onclick="loadWarehouseSample()"
           style="font-size: 13px; color: var(--gold); border-color: rgba(255,214,0,0.45);">
-          🏭 ตัวอย่างแนวที่ 13: โกดังปล่อยของ ราคาโรงงาน (ฮาร์ดเซล)
+          🏭 ตัวอย่างโกดัง: มีคนงานเดินยกของแพ็กกล่องด้านหลัง
+        </button>
+        <button class="btn-copy" onclick="loadTopperWakeupSample()"
+          style="font-size: 13px; color: var(--green); border-color: rgba(16,185,129,0.45);">
+          🛌 ตัวอย่างท็อปเปอร์: ตื่นนอนตอนเช้า บิดขี้เกียจฟินๆ
         </button>
       </div>
 
@@ -1437,6 +1509,7 @@
     ];
     let uploadedImages = []; // { mimeType, base64, dataUrl }
     let selectedChipStyle = 'auto';
+    let selectedLivelyStyle = 'auto';
     let lastResultData = null;
 
     // Theme initialization & toggle
@@ -1769,20 +1842,34 @@
       selectedChipStyle = el.getAttribute('data-val');
     }
 
+    function selectLivelyChip(el) {
+      document.querySelectorAll('#livelyChips .chip').forEach(c => c.classList.remove('active'));
+      el.classList.add('active');
+      selectedLivelyStyle = el.getAttribute('data-val');
+    }
+
     // 3. Core Skill System Prompt (/video-studio: video-shotcraft + DirectorSKILL + earshot + /socialmedia + Anti-Ban 2026)
     const SYSTEM_PROMPT = `คุณคือ "TikTok AI Affiliate Creative Director & Commercial Cinematographer (2026 Edition)" ที่ผสานพลังของ 2 ระบบใหญ่เข้าด้วยกัน:
 1) สกิลสายขายและโซเชียล (/socialmedia: hook-generator, reels-scripting, post-formatter, youtube-thumbnail, brand-voice, pinned-comment)
 2) สกิลสายกำกับภาพและโฆษณาสินค้า (/video-studio: video-shotcraft 124 สูตรมุมกล้องโฆษณา + DirectorSKILL product-and-macro & shot-plan + earshot real-sound Foley)
 
 ============================================================
-กฎเหล็กข้อที่ 1: ความเป็นมนุษย์ & แนวฮาร์ดเซลขายตรง (HUMAN COPY FILTER + HARD-SELL STYLES 13-16)
+กฎเหล็กข้อที่ 1: ความเป็นมนุษย์ + องค์ประกอบมีชีวิตชีวาตามธรรมชาติ (HUMAN COPY + LIVING WORLD & NATURAL SCENARIO)
 ============================================================
-- เขียนในฐานะ "คนขายจริง / เจ้าของโกดัง / พนักงานหน้าร้าน / ครีเอเตอร์คนไทยที่หยิบของจริงมาป้ายยา" อ่านออกเสียงแล้วลื่นไหลเป็นธรรมชาติ มีพลังดึงดูดสูง
+- เขียนในฐานะ "คนใช้จริง / เจ้าของโกดัง / พนักงานหน้าร้าน / ครีเอเตอร์คนไทยที่หยิบของจริงมาใช้ในชีวิตประจำวัน" อ่านออกเสียงแล้วลื่นไหลเป็นธรรมชาติ มีอารมณ์ร่วมและพลังดึงดูดสูง
 - ห้ามใช้คำพูดรายงานข้อมูลแบบหุ่นยนต์เด็ดขาด เช่น ห้ามพูดว่า: "จากหน้าร้านระบุว่า", "จากภาพเห็นว่า", "เท่าที่เห็นในภาพ", "ราคาตอนที่แคป", "ข้อมูลที่ร้านแจ้ง", "ตอบโจทย์การใช้งาน", "เพิ่มความสะดวกสบาย", "เหมาะสำหรับผู้ที่", "วันนี้มีสินค้ามาแนะนำ", "ใครกำลังมองหา"
-- ให้เปิดด้วย Hook ที่เห็นภาพหรือความขัดแย้งเฉพาะของสินค้าชิ้นนี้ทันทีตามหลัก hook-generator & reels-scripting (Visual Strike / Product-Specific Tension / Factory Direct Shock)
+- ให้เปิดด้วย Hook ที่เห็นภาพหรือสถานการณ์ชีวิตจริงทันทีตามหลัก hook-generator & reels-scripting
+- **กฎการใส่องค์ประกอบความมีชีวิตชีวาและสถานการณ์ธรรมชาติ (Living Background & Real-Life Micro-Story):**
+  เพื่อให้คลิปดูเป็นธรรมชาติเหมือนถ่ายจากชีวิตจริง ไม่แข็งทื่อแบบคลิปรีวิวหุ่นยนต์ ให้ผูก "สถานการณ์ชีวิตจริง + องค์ประกอบเคลื่อนไหวเสริมในฉาก (Ambient Life / Secondary Motion)" เข้าไปในทั้งบทพูด (ข้อ 1), ตารางกำกับช็อต (ข้อ 2), Gemini Omni Video Prompt (ข้อ 3), และ Prompt ภาพนิ่ง (ข้อ 3.1–3.3) ตามประเภทสินค้าหรือแนวที่เลือก ดังนี้:
+  1) **กรณีที่นอน / ท็อปเปอร์ / หมอน / ผ้าห่ม / ชุดเครื่องนอน:** เปิดด้วยสถานการณ์ตื่นนอนตอนเช้า แสงแดดอุ่นส่องผ่านผ้าม่านโปร่ง คนรีวิวนอนหลับสบายแล้วตื่นขึ้นมาบิดขี้เกียจอย่างสดชื่น กดสัมผัสความนุ่มฟูของท็อปเปอร์/ที่นอนที่ยุบรับสรีระแล้วคืนตัว พูดชมด้วยอารมณ์ฟินว่าเมื่อคืนหลับลึกสบายตัวมาก ไม่ปวดหลังเลย
+  2) **กรณีพรม / แผ่นปูพื้น / โซฟา / ของแต่งบ้าน:** ใส่องค์ประกอบชีวิตในบ้านที่เป็นธรรมชาติ เช่น มีน้องแมวหรือน้องหมาตัวเล็กเดินผ่าน/วิ่งไล่ลูกบอลลูกเล็กกลิ้งผ่านพรม หรือคนในบ้านก้าวเดินเหยียบขณะทำกิจวัตร เพื่อพิสูจน์ทางสายตาแบบเนียนๆ ว่าพรมเกาะพื้นแน่นไม่ลื่นไถล ซับน้ำไว และสัมผัสนุ่มจริง
+  3) **กรณีแนวโกดัง / โรงงาน / คลังสินค้า (แนวที่ 13 และ 16):** ในฉากหลัง (Background Layer ระยะชัดตื้น f/2.8) ต้องมีชีวิตชีวาของโรงงานจริง เช่น มีคนงานใส่เสื้อกั๊กหรือชุดทำงานกำลังเดินยกกล่องพัสดุ เข็นรถเข็นพาเลทสต็อก หรือดึงเทปแพ็กกล่องส่งลูกค้าอยู่ด้านหลังอย่างคึกคัก ขณะที่เจ้าของโกดัง/ผู้พูดด้านหน้ากำลังโชว์สินค้าตัวจริงหน้ากล้อง
+  4) **กรณีพ่อค้าแม่ค้าหน้าร้าน / ตลาดค้าส่ง / โชว์รูมห้าง (แนวที่ 14 และ 15):** ในฉากหลังมีลูกค้าเดินเลือกดูของหรือพนักงานกำลังจัดเรียงสต็อกขึ้นเชลฟ์อยู่ด้านหลังแบบละลายฉากหลังสวยๆ ทำให้เห็นว่าร้านคึกคักขายดีจริง
+  5) **กรณีของใช้ในครัว / ห้องน้ำ / ทำความสะอาด:** มีองค์ประกอบการใช้งานจริงที่มีชีวิต เช่น น้ำไหลจากก๊อกหยดลงมาจริง ไอน้ำอุ่นลอยขึ้นจากแก้วหรือหม้อ หรือกำลังเตรียมมื้อเช้าในครัวจริง
+  6) **ข้อควรระวังในการสั่ง AI:** องค์ประกอบเสริมเหล่านี้ต้องทำหน้าที่เสริมความสมจริงและพิสูจน์การใช้งาน (Background / Supporting Layer) โดย **ห้ามแย่งโฟกัสจากสินค้าหลัก และห้ามบังหรือทำให้รูปทรง/ลวดลายของสินค้าหลักบิดเบี้ยวเด็ดขาด!**
 - **กรณีเลือกแนวที่ 13–16 (สายฮาร์ดเซลเน้นขาย: โกดัง/โรงงานปล่อยของ, พ่อค้าแม่ค้าตลาดค้าส่ง/หน้าร้าน, พนักงานขายในห้าง/โชว์รูม, คนงานแพ็กของหน้าคลัง):**
   1) บทพูด (voiceover_10s): ใช้โทนเสียงกระตือรือร้น จริงใจ เร่งจังหวะขายแบบมืออาชีพ เปิดด้วยความคุ้มค่าหน้างาน เช่น "บุกโกดังตัดสต็อกตรงไม่ผ่านคนกลาง!", "หน้าร้านจัดโปรปล่อยของเอง!", "พนักงานพาส่องโปรหน้าเชลฟ์ลดจุกๆ!" พร้อมย้ำจุดเด่นสินค้า 2–3 ข้อที่จับต้องได้ แล้วตบเข้าโปรโมชันและราคาแบบเซฟตามกฎข้อที่ 2
-  2) ฉากและมุมกล้อง (Storyboard & Video Prompt): ต้องเซ็ตฉากให้ตรงกับแนวที่เลือก เช่น โกดังสินค้าที่มีพาเลทและกล่องลังเรียงรายด้านหลัง (Warehouse racks & shipping cartons), หน้าร้านตลาดค้าส่งที่คึกคัก, โชว์รูมห้างสรรพสินค้าไฟสว่างสวย, หรือโต๊ะแพ็กของหน้าคลังสินค้า โดยให้เห็นเจ้าของโกดัง/พนักงานขาย/คนงานกำลังหยิบจับสาธิตสินค้าชิ้นนั้นให้ดูสดๆ หน้ากล้อง
+  2) ฉากและมุมกล้อง (Storyboard & Video Prompt): ต้องเซ็ตฉากให้ตรงกับแนวที่เลือก พร้อมใส่คนงานเดินทำงาน/ยกของหรือลูกค้าเดินเลือกซื้อของในฉากหลังระยะเบลออย่างเป็นธรรมชาติ
 
 ============================================================
 กฎเหล็กข้อที่ 2: การพูดราคาและส่วนลดแบบเซฟ 100% (SAFE PRICE & DISCOUNT RULE)
@@ -1853,16 +1940,17 @@
     {"label": "ขนาด / ในเซ็ตประกอบด้วย", "value": "..."},
     {"label": "วัสดุ & การจัดแสง (DirectorSKILL)", "value": "เช่น ผ้าโพลีเอสเตอร์ทอแน่น (Matte/Fabric) ➡️ ใช้ Shallow Raking Side Light ส่องเฉียงให้เห็นมิติเส้นใยชัด"},
     {"label": "คุณสมบัติเด่น", "value": "..."},
+    {"label": "องค์ประกอบความมีชีวิตชีวา & สถานการณ์ธรรมชาติ", "value": "เช่น เปิดด้วยซีนตื่นนอนบิดขี้เกียจยามเช้า / มีน้องแมวเดินผ่านและลูกบอลกลิ้งข้างพรม / มีคนงานเดินยกของแพ็กกล่องในฉากหลังโกดัง"},
     {"label": "ราคาในภาพ ➡️ คำพูดราคาแบบเซฟ", "value": "เช่น ในภาพ 79 บาท (ลด 78%) ➡️ ใช้คำว่า 'งบไม่ถึงร้อย / แบงก์ร้อยมีทอน' และ 'ลด 75%'"},
     {"label": "แนวคลิปที่ใช้ (จาก 16 แนว)", "value": "..."}
   ],
-  "voiceover_10s": "บทพูด TikTok 10 วินาที (ประมาณ 25-32 คำไทย พูดเป็นธรรมชาติเหมือนคนจริง เซฟราคาและส่วนลดตามกฎ ปิดท้ายชวนดูที่ตะกร้าเหลืองซ้ายล่าง)...",
+  "voiceover_10s": "บทพูด TikTok 10 วินาที (ประมาณ 25-32 คำไทย พูดเป็นธรรมชาติสอดคล้องกับสถานการณ์ในฉาก เซฟราคาและส่วนลดตามกฎ ปิดท้ายชวนดูที่ตะกร้าเหลืองซ้ายล่าง)...",
   "storyboard": [
     {
       "time": "0–2 วินาที (Hook / Visual Strike)",
       "camera_lens": "เช่น MCU · 35mm · High +20° · Slow Push-in",
       "lighting": "เช่น Shallow Raking Side Light ส่องเฉียงเห็นลายผ้าคมชัด",
-      "visual": "Start: ... ➡️ Action: ... ➡️ End State: ... (ไม่มีข้อความบนจอ)"
+      "visual": "Start: ... ➡️ Action: ... (พร้อมองค์ประกอบมีชีวิตชีวาตามธรรมชาติในฉาก) ➡️ End State: ... (ไม่มีข้อความบนจอ)"
     },
     {
       "time": "2–4 วินาที (Scale & Setup Proof)",
@@ -1889,10 +1977,10 @@
       "visual": "Start: ... ➡️ Action: ... ➡️ End State: หยุดนิ่ง Hold 0.5s เห็นสินค้าเต็มตา"
     }
   ],
-  "kling_master_prompt": "[Format]: Photorealistic vertical 9:16 TikTok product video, 10 seconds. Single continuous shot, no scene cuts.\\n\\n[Product Lock]: The product in the attached photo: exact product description (shape, colors, pattern, proportions, size)...\\n\\n[Blocking: Start -> Action -> End State]: Starts with ... -> performs one clear physical action ... -> ends in a stable final hold for 0.5s with ...\\n\\n[Scene & Material Lighting (DirectorSKILL)]: ... (specify Shallow Raking Light / Travelling Softbox Highlight / Edge Rim Light matching the product surface)...\\n\\n[Spatial & Aspect]: Vertical 9:16 frame, safe margins top 12% and bottom 20% clear...\\n\\n[Camera & Lens (video-shotcraft)]: 35mm / 100mm macro lens, one dominant camera move, zero handheld shake...\\n\\n[Audio & Real-Sound Foley (earshot)]: Authentic physical material foley (...) + Natural Thai voiceover (10s): \\"ใส่บทพูดภาษาไทยตรงกับ voiceover_10s ทุกคำที่นี่\\"\\n\\n[Instance-Level Negatives (DirectorSKILL)]: No text, no on-screen text, no captions, no subtitles, no Thai letters on screen, no logos, no watermarks, no lighting rig reflected, no deformed hands, no extra fingers, no object morphing, no distorted product.",
-  "keyframe_image_prompt": "Photorealistic vertical 9:16 start-frame photo for a TikTok product video. Use the attached product photo(s) as the exact product reference (same shape, colors, pattern, proportions, size)... Scene: ... Person: ... starting pose ... Camera: ... lens ... Lighting: ... (material-specific) ... Keep top 12% and bottom 20% free of key elements. Negatives: no text, no captions, no logos, no watermarks, no extra products, natural hands with five fingers.",
-  "end_frame_image_prompt": "Photorealistic vertical 9:16 end-frame photo, the final held moment of the same video. Same person, same outfit, same location, same lighting and the exact same product as the start frame... Moment: (End State of the last shot) ... Camera: ... Negatives: no text, no captions, no logos, no watermarks, no extra products, natural hands with five fingers.",
-  "storyboard_grid_prompt": "Single storyboard sheet, 5 photorealistic panels: top row 3 panels, bottom row 2 panels, each panel vertical 9:16, thin white gutters. Same product (exactly as the attached photos), same person, same location and lighting in every panel. Panel 1: ... Panel 2: ... Panel 3: ... Panel 4: ... Panel 5: ... No text, no numbers, no captions, no logos anywhere in the image.",
+  "kling_master_prompt": "[Format]: Photorealistic vertical 9:16 TikTok product video, 10 seconds. Single continuous shot, no scene cuts.\\n\\n[Product Lock]: The product in the attached photo: exact product description (shape, colors, pattern, proportions, size)...\\n\\n[Blocking: Start -> Action -> End State]: Starts with ... -> performs natural real-life action ... -> ends in a stable final hold for 0.5s with ...\\n\\n[Living Background & Natural Life Detail]: Authentic ambient life matching the scenario (e.g., warehouse workers carrying cartons and pushing pallet jacks softly out-of-focus in the background / a playful cat or small ball rolling gently beside the mat proving non-slip grip / waking up and stretching naturally in morning sunlight on the plush topper) — kept natural in the background or supporting layer without obstructing or distorting the hero product.\\n\\n[Scene & Material Lighting (DirectorSKILL)]: ... (specify Shallow Raking Light / Travelling Softbox Highlight / Edge Rim Light matching the product surface)...\\n\\n[Spatial & Aspect]: Vertical 9:16 frame, safe margins top 12% and bottom 20% clear...\\n\\n[Camera & Lens (video-shotcraft)]: 35mm / 100mm macro lens, one dominant camera move, zero handheld shake...\\n\\n[Audio & Real-Sound Foley (earshot)]: Authentic physical material foley + subtle natural ambient sound (...) + Natural Thai voiceover (10s): \\"ใส่บทพูดภาษาไทยตรงกับ voiceover_10s ทุกคำที่นี่\\"\\n\\n[Instance-Level Negatives (DirectorSKILL)]: No text, no on-screen text, no captions, no subtitles, no Thai letters on screen, no logos, no watermarks, no lighting rig reflected, no deformed hands, no extra fingers, no object morphing, no distorted product.",
+  "keyframe_image_prompt": "Photorealistic vertical 9:16 start-frame photo for a TikTok product video. Use the attached product photo(s) as the exact product reference (same shape, colors, pattern, proportions, size)... Scene & Living Background: ... (include the natural background life/scenario such as warehouse workers in soft background bokeh, a cute cat/ball near the mat, or morning wake-up stretch on the topper) ... Person & starting pose: ... Camera: ... lens ... Lighting: ... (material-specific) ... Keep top 12% and bottom 20% free of key elements. Negatives: no text, no captions, no logos, no watermarks, no extra products, natural hands with five fingers.",
+  "end_frame_image_prompt": "Photorealistic vertical 9:16 end-frame photo, the final held moment of the same video. Same person, same outfit, same location, same living background ambience, same lighting and the exact same product as the start frame... Moment: (End State of the last shot) ... Camera: ... Negatives: no text, no captions, no logos, no watermarks, no extra products, natural hands with five fingers.",
+  "storyboard_grid_prompt": "Single storyboard sheet, 5 photorealistic panels: top row 3 panels, bottom row 2 panels, each panel vertical 9:16, thin white gutters. Same product (exactly as the attached photos), same person, same location, same living background elements and lighting in every panel. Panel 1: ... Panel 2: ... Panel 3: ... Panel 4: ... Panel 5: ... No text, no numbers, no captions, no logos anywhere in the image.",
   "cover_headlines": [
     "ข้อความปกแบบที่ 1 (3-7 คำ ชวนสงสัย/หยุดนิ้ว เซฟราคา)",
     "ข้อความปกแบบที่ 2",
@@ -1953,6 +2041,7 @@
 
       const infoText = document.getElementById('productInfo').value.trim();
       const customStyle = document.getElementById('customStyle').value.trim();
+      const customLively = (document.getElementById('customLively')?.value || '').trim();
 
       if (uploadedImages.length === 0 && !infoText) {
         alert('กรุณาอัปโหลดรูปสินค้าอย่างน้อย 1 รูป หรือพิมพ์รายละเอียดสินค้าก่อนครับ');
@@ -1972,6 +2061,17 @@
           ? 'แนวความต้องการ: ให้วิเคราะห์สินค้าแล้วเลือก 1 แนวจาก 16 แนวหลักที่หยุดนิ้วและเหมาะกับสินค้านี้มากที่สุดโดยอัตโนมัติ'
           : `แนวความต้องการ: ${selectedChipStyle}`);
 
+      let livelyInstruction = '';
+      if (customLively) {
+        livelyInstruction = `องค์ประกอบความมีชีวิตชีวาและสถานการณ์ธรรมชาติที่ผู้ใช้สั่งเน้นเป็นพิเศษ: "${customLively}" (ให้ผูกสถานการณ์และองค์ประกอบนี้เข้ากับบทพูด ตารางกำกับช็อต 10 วินาที Gemini Omni Video Prompt และ Prompt ภาพนิ่ง 3.1-3.3 โดยห้ามแย่งโฟกัสหรือบังรูปทรงสินค้าหลัก)`;
+      } else if (selectedLivelyStyle === 'none') {
+        livelyInstruction = 'องค์ประกอบเสริมในฉาก: ไม่ต้องใส่สัตว์เลี้ยงหรือคนเดินผ่านฉากหลัง ให้โฟกัสที่ผู้รีวิวและตัวสินค้าหลักล้วนๆ';
+      } else if (selectedLivelyStyle === 'auto') {
+        livelyInstruction = 'องค์ประกอบความมีชีวิตชีวาและสถานการณ์ธรรมชาติ (Auto Living World): ให้เลือกองค์ประกอบเคลื่อนไหวเสริมและสถานการณ์ชีวิตจริงที่เหมาะกับสินค้าและแนวคลิปนี้มากที่สุดโดยอัตโนมัติ (เช่น ถ้าเป็นโกดัง/โรงงาน ต้องมีคนงานเดินยกของ/เข็นพาเลท/แพ็กกล่องอยู่ในฉากหลังระยะชัดตื้น; ถ้าเป็นพรม/ของแต่งบ้าน มีน้องแมวหรือน้องหมาเดินผ่านหรือลูกบอลกลิ้งข้างพรมพิสูจน์ว่าพรมเกาะพื้นแน่น; ถ้าเป็นที่นอน/ท็อปเปอร์/หมอน เปิดด้วยซีนตื่นนอนตอนเช้าแสงแดดอุ่นส่องผ่านม่าน บิดขี้เกียจฟินๆ แล้วพูดชมว่าหลับสบายมาก) และใส่ลงในทั้งบทพูด ตารางกำกับช็อต และบล็อก [Living Background & Natural Life Detail] ใน Video Prompt';
+      } else {
+        livelyInstruction = `องค์ประกอบความมีชีวิตชีวาและสถานการณ์ธรรมชาติที่เลือก: ${selectedLivelyStyle} (ให้ผูกเข้ากับบทพูด ตารางกำกับช็อต และบล็อก [Living Background & Natural Life Detail] ใน Video Prompt และ Prompt ภาพนิ่ง 3.1-3.3)`;
+      }
+
       const userPromptParts = [];
       uploadedImages.forEach(img => {
         userPromptParts.push({
@@ -1983,7 +2083,7 @@
       });
 
       userPromptParts.push({
-        text: `กรุณาวิเคราะห์ข้อมูลจากภาพสินค้าที่แนบมานี้ ${infoText ? `(ข้อมูลเพิ่มเติมจากผู้ใช้: ${infoText})` : ''}\n${styleInstruction}\nจำกฎเหล็ก: 0) ต้องถอดข้อความชื่อสินค้าทั้งหมดที่ปรากฏในรูปภาพแบบคำต่อคำครบทุกตัวอักษรใส่ใน exact_product_name_from_image 1) ห้ามพูดคำว่า "ราคาหลักสิบ" เด็ดขาด ให้ปัดเป็นเพดานราคาปลอดภัย เช่น 79 บาท -> "งบไม่ถึงร้อย / แบงก์ร้อยมีทอน", 2XX บาท -> "สามร้อยมีทอน" 2) ถ้าพูด % ส่วนลด ต้องปัดลงให้ต่ำกว่าในภาพและลงท้ายด้วย 0 หรือ 5 เท่านั้น (เช่น 78% -> 75%, 72% -> 70%) 3) ห้ามมีข้อความขึ้นในคลิปและใน Storyboard 4) ต้องนำบทพูดภาษาไทยใส่ลงใน Video Prompt สำหรับ Gemini Omni (ฟิลด์ kling_master_prompt) ด้วย และห้ามใช้ไวยากรณ์ Kling อย่าง <<<image_1>>> หรือ ++ 5) ชุดแฮชแท็กต้องมี 5 แบบ แบบละ 5 แฮชแท็กเป๊ะๆ`
+        text: `กรุณาวิเคราะห์ข้อมูลจากภาพสินค้าที่แนบมานี้ ${infoText ? `(ข้อมูลเพิ่มเติมจากผู้ใช้: ${infoText})` : ''}\n${styleInstruction}\n${livelyInstruction}\nจำกฎเหล็ก: 0) ต้องถอดข้อความชื่อสินค้าทั้งหมดที่ปรากฏในรูปภาพแบบคำต่อคำครบทุกตัวอักษรใส่ใน exact_product_name_from_image 1) ห้ามพูดคำว่า "ราคาหลักสิบ" เด็ดขาด ให้ปัดเป็นเพดานราคาปลอดภัย เช่น 79 บาท -> "งบไม่ถึงร้อย / แบงก์ร้อยมีทอน", 2XX บาท -> "สามร้อยมีทอน" 2) ถ้าพูด % ส่วนลด ต้องปัดลงให้ต่ำกว่าในภาพและลงท้ายด้วย 0 หรือ 5 เท่านั้น (เช่น 78% -> 75%, 72% -> 70%) 3) ห้ามมีข้อความขึ้นในคลิปและใน Storyboard 4) ต้องนำบทพูดภาษาไทยใส่ลงใน Video Prompt สำหรับ Gemini Omni (ฟิลด์ kling_master_prompt) พร้อมใส่บล็อก [Living Background & Natural Life Detail] และห้ามใช้ไวยากรณ์ Kling อย่าง <<<image_1>>> หรือ ++ 5) ชุดแฮชแท็กต้องมี 5 แบบ แบบละ 5 แฮชแท็กเป๊ะๆ`
       });
 
       const modelsToTry = getModelQueue();
@@ -2398,18 +2498,19 @@
           { "label": "ขนาด / ในเซ็ตประกอบด้วย", "value": "ผืนยาว 120 × 40 ซม. และผืนสั้น 60 × 40 ซม." },
           { "label": "วัสดุ", "value": "ผ้าโพลีเอสเตอร์ทอแน่น สัมผัสนุ่มสบายเท้า" },
           { "label": "คุณสมบัติเด่น", "value": "ฐานกันลื่นยึดเกาะพื้นกระเบื้อง ซับน้ำไว ซักทำความสะอาดง่าย" },
+          { "label": "องค์ประกอบความมีชีวิตชีวา & สถานการณ์ธรรมชาติ", "value": "มีน้องแมวส้มตัวเล็กเดินผ่านและกลิ้งลูกบอลลูกเล็กข้างพรมครัว ขณะคนก้าวเหยียบหน้าซิงก์ พิสูจน์ว่าพรมเกาะพื้นแน่นไม่ลื่นไถล" },
           { "label": "ราคาในภาพ ➡️ คำพูดราคาแบบเซฟ", "value": "ในภาพ 79 บาท (ลด 78%) ➡️ เซฟเป็น 'งบไม่ถึงร้อย / แบงก์ร้อยมีทอน' และ 'ลดหนัก 75%' (ห้ามพูดคำว่าหลักสิบ)" },
           { "label": "แนวคลิปที่ใช้ (จาก 12 แนว)", "value": "แนวที่ 1: Real-Use Demo (ใช้งานจริงให้เห็นผลชัด)" }
         ],
-        "voiceover_10s": "ยืนล้างจานน้ำกระเด็นพื้นลื่น ลองเปลี่ยนมาปูพรมหมากรุกเซ็ตสองชิ้นคู่นี้ดูค่ะ ได้ทั้งผืนยาวผืนสั้น ซับน้ำไว ฐานหนึบไม่ลื่นไถล ตอนนี้จัดโปรลดหนัก 75% งบไม่ถึงร้อยได้ครบเซ็ต กดดูที่ตะกร้าเหลืองซ้ายล่างได้เลยนะ!",
+        "voiceover_10s": "ยืนล้างจานน้ำกระเด็นพื้นลื่น ลองเปลี่ยนมาปูพรมหมากรุกเซ็ตสองชิ้นคู่นี้ดูค่ะ ได้ทั้งผืนยาวผืนสั้น ซับน้ำไว ฐานหนึบขนาดแมววิ่งเล่นยังไม่ลื่นไถล ตอนนี้ลดหนัก 75% งบไม่ถึงร้อยได้ครบเซ็ต กดตะกร้าเหลืองซ้ายล่างได้เลยนะ!",
         "storyboard": [
-          { "time": "0–2 วินาที (Hook / Visual Strike)", "camera_lens": "MS · 35mm · High +20° · Slow Push-in", "lighting": "Shallow Raking Side Light ส่องเฉียงเน้นตารางหมากรุก", "visual": "Start: พื้นกระเบื้องหน้าซิงก์ ➡️ Action: เท้าเปล่าก้าวเหยียบลงบนพรมลายหมากรุกผืนยาวอย่างมั่นคง ➡️ End State: พรมยึดเกาะพื้นแน่นไม่ขยับ Hold 0.5s" },
-          { "time": "2–4 วินาที (Scale & Setup Proof)", "camera_lens": "WS · 35mm · Low Angle · Lateral Tracking Glide", "lighting": "Natural Window Daylight + Soft Warm Fill", "visual": "Start: มุมเคาน์เตอร์ครัว ➡️ Action: กล้องแพนตามแนวยาวโชว์พรมทั้ง 2 ชิ้น (ผืนยาว 120×40 + ผืนสั้น 60×40 ซม.) ➡️ End State: เห็นพรมสองผืนวางเข้าชุดกัน" },
+          { "time": "0–2 วินาที (Hook / Visual Strike)", "camera_lens": "MS · 35mm · High +20° · Slow Push-in", "lighting": "Shallow Raking Side Light ส่องเฉียงเน้นตารางหมากรุก", "visual": "Start: พื้นกระเบื้องหน้าซิงก์ ➡️ Action: เท้าเปล่าก้าวเหยียบลงบนพรมลายหมากรุกผืนยาว พร้อมลูกบอลเล็กกลิ้งผ่านและน้องแมวเดินผ่านขอบพรมอย่างเป็นธรรมชาติ ➡️ End State: พรมยึดเกาะพื้นแน่นไม่ขยับ Hold 0.5s" },
+          { "time": "2–4 วินาที (Scale & Setup Proof)", "camera_lens": "WS · 35mm · Low Angle · Lateral Tracking Glide", "lighting": "Natural Window Daylight + Soft Warm Fill", "visual": "Start: มุมเคาน์เตอร์ครัว ➡️ Action: กล้องแพนตามแนวยาวโชว์พรมทั้ง 2 ชิ้น (ผืนยาว 120×40 + ผืนสั้น 60×40 ซม.) โดยมีน้องแมวนั่งมองอยู่ด้านข้างแบบละลายฉากหลัง ➡️ End State: เห็นพรมสองผืนวางเข้าชุดกัน" },
           { "time": "4–6 วินาที (Texture Macro Proof)", "camera_lens": "ECU Macro · 100mm f/4 · Locked Camera", "lighting": "Hard Raking Side Light เน้นเส้นใยผ้าโพลีเอสเตอร์", "visual": "Start: กล้องนิ่งโฟกัสผิวพรม ➡️ Action: มือลูบและกดเนื้อผ้าโพลีเอสเตอร์เบาๆ โชว์ความนุ่มและซับน้ำ ➡️ End State: ผ้าคืนตัวทรงสวย ลายตารางคมชัด" },
           { "time": "6–8 วินาที (Grip & Backing Test)", "camera_lens": "CU · 50mm · Low 25cm off floor · Locked Camera", "lighting": "Controlled Key + Floor Bounce", "visual": "Start: มือจับมุมพรม ➡️ Action: เปิดมุมพรมด้านหลังขึ้นโชว์ปุ่มยางกันลื่นแล้ววางทาบลงพื้น ➡️ End State: มือดันทดสอบความหนึบ พรมนิ่งสนิท" },
-          { "time": "8–10 วินาที (Hero Packshot Hold)", "camera_lens": "WS · 35mm · Eye-level +15° · Gentle Pull-back", "lighting": "Balanced Commercial Daylight", "visual": "Start: มุมกลางครัว ➡️ Action: กล้องถอยออกช้าๆ เห็นห้องครัวมินิมอลสะอาดตา ➡️ End State: พรมทั้ง 2 ผืนวางเด่นชัด Hold 0.5s" }
+          { "time": "8–10 วินาที (Hero Packshot Hold)", "camera_lens": "WS · 35mm · Eye-level +15° · Gentle Pull-back", "lighting": "Balanced Commercial Daylight", "visual": "Start: มุมกลางครัว ➡️ Action: กล้องถอยออกช้าๆ เห็นห้องครัวมินิมอลอบอุ่นมีชีวิตชีวา ➡️ End State: พรมทั้ง 2 ผืนวางเด่นชัด Hold 0.5s" }
         ],
-        "kling_master_prompt": "[Subject & Invariant Lock]: <<<image_1>>>, ++black and white checkerboard kitchen mat 2-piece set++, consisting of one long rectangular runner mat (120x40 cm, 3:1 proportion) and one matching shorter rectangular mat (60x40 cm, 3:2 proportion), crisp woven polyester fabric texture with sharp black-and-white checker grid.\n\n[Blocking: Start -> Action -> End State]: Starts with the two mats laid neatly in front of the kitchen counter and sink -> bare feet step onto the long runner mat while a single adult hand presses the woven surface and lifts one corner slightly to prove non-slip grip -> ends in a stable 0.5s hold with both mats flat and unwarped on the floor.\n\n[Scene & Material Lighting (DirectorSKILL)]: Clean minimalist home kitchen, warm oak cabinets, bright white floor tiles; Shallow Raking Side Light from a camera-left window casting subtle micro-shadows across the woven polyester fibers so texture reads clearly without glare.\n\n[Spatial & Aspect]: Vertical 9:16 composition, safe margins top 12% and bottom 20% clear; foreground shows tactile mat surface, midground shows the 2-piece set alignment.\n\n[Camera & Lens (video-shotcraft)]: 35mm spherical lens, one smooth high-angle push-in transitioning into a stable hold, zero handheld shake, focus plane locked on the front checkerboard weave.\n\n[Audio & Real-Sound Foley (earshot)]: Soft tactile fabric brush foley and firm rubber-grip floor contact sound (no game-like synth SFX) + Natural Thai female creator voice speaking warmly (10s): \"ยืนล้างจานน้ำกระเด็นพื้นลื่น ลองเปลี่ยนมาปูพรมหมากรุกเซ็ตสองชิ้นคู่นี้ดูค่ะ ได้ทั้งผืนยาวผืนสั้น ซับน้ำไว ฐานหนึบไม่ลื่นไถล ตอนนี้จัดโปรลดหนัก 75% งบไม่ถึงร้อยได้ครบเซ็ต กดดูที่ตะกร้าเหลืองซ้ายล่างได้เลยนะ!\"\n\n[Instance-Level Negatives (DirectorSKILL)]: No text, no on-screen text, no captions, no subtitles, no Thai characters on screen, no logos, no watermarks, no lighting rig reflected, no distorted checkerboard lines, no warped grid pattern, no deformed hands, no extra fingers, no duplicate extra mats.",
+        "kling_master_prompt": "[Subject & Invariant Lock]: <<<image_1>>>, ++black and white checkerboard kitchen mat 2-piece set++, consisting of one long rectangular runner mat (120x40 cm, 3:1 proportion) and one matching shorter rectangular mat (60x40 cm, 3:2 proportion), crisp woven polyester fabric texture with sharp black-and-white checker grid.\n\n[Blocking: Start -> Action -> End State]: Starts with the two mats laid neatly in front of the kitchen counter and sink -> bare feet step onto the long runner mat while a single adult hand presses the woven surface and lifts one corner slightly to prove non-slip grip -> ends in a stable 0.5s hold with both mats flat and unwarped on the floor.\n\n[Living Background & Natural Life Detail]: A cute ginger house cat playfully trots past the edge of the kitchen mat chasing a small rolling toy ball in the background, naturally proving that the non-slip mat stays completely flat and anchored on the tile floor without sliding, while keeping the full checkerboard pattern clearly visible.\n\n[Scene & Material Lighting (DirectorSKILL)]: Clean minimalist home kitchen, warm oak cabinets, bright white floor tiles; Shallow Raking Side Light from a camera-left window casting subtle micro-shadows across the woven polyester fibers so texture reads clearly without glare.\n\n[Spatial & Aspect]: Vertical 9:16 composition, safe margins top 12% and bottom 20% clear; foreground shows tactile mat surface, midground shows the 2-piece set alignment.\n\n[Camera & Lens (video-shotcraft)]: 35mm spherical lens, one smooth high-angle push-in transitioning into a stable hold, zero handheld shake, focus plane locked on the front checkerboard weave.\n\n[Audio & Real-Sound Foley (earshot)]: Soft tactile fabric brush foley, subtle rolling ball and firm rubber-grip floor contact sound (no game-like synth SFX) + Natural Thai female creator voice speaking warmly (10s): \"ยืนล้างจานน้ำกระเด็นพื้นลื่น ลองเปลี่ยนมาปูพรมหมากรุกเซ็ตสองชิ้นคู่นี้ดูค่ะ ได้ทั้งผืนยาวผืนสั้น ซับน้ำไว ฐานหนึบขนาดแมววิ่งเล่นยังไม่ลื่นไถล ตอนนี้ลดหนัก 75% งบไม่ถึงร้อยได้ครบเซ็ต กดตะกร้าเหลืองซ้ายล่างได้เลยนะ!\"\n\n[Instance-Level Negatives (DirectorSKILL)]: No text, no on-screen text, no captions, no subtitles, no Thai characters on screen, no logos, no watermarks, no lighting rig reflected, no distorted checkerboard lines, no warped grid pattern, no deformed hands, no extra fingers, no duplicate extra mats.",
         "keyframe_image_prompt": "Photorealistic vertical 9:16 start-frame photo for a TikTok product video. Use the attached product photo(s) as the exact product reference: a black-and-white checkerboard kitchen mat set, one long runner (120x40 cm, 3:1 proportion) and one short mat (60x40 cm, 3:2 proportion), identical checker size, colors and borderless edges. Scene: clean minimalist home kitchen, warm oak cabinets, white floor tiles; the long runner lies flat in front of the sink, the short mat in front of the counter. Moment: a bare adult foot is about to step onto the long runner, captured just before contact. Camera: MS, 35mm lens, high angle +20 degrees, product in sharp focus. Lighting: shallow raking side daylight from a camera-left window, subtle micro-shadows revealing the woven polyester texture, no glare. Composition: keep the top 12% and bottom 20% free of key elements. Negatives: no text, no captions, no logos, no watermarks, no extra mats, no warped checker grid, natural feet and hands.",
         "end_frame_image_prompt": "Photorealistic vertical 9:16 end-frame photo, the final held moment of the same video. Same minimalist kitchen with warm oak cabinets and white floor tiles, same camera-left window daylight, and the exact same black-and-white checkerboard mat set as the start frame. Moment: wide eye-level hero shot, the long runner perfectly flat in front of the sink and the short mat in front of the counter, both centered and fully visible, the kitchen calm and tidy. Camera: WS, 35mm lens, eye level +15 degrees, locked. Composition: keep the top 12% and bottom 20% free of key elements. Negatives: no text, no captions, no logos, no watermarks, no extra mats, no warped checker grid.",
         "storyboard_grid_prompt": "Single storyboard sheet with 5 photorealistic panels: top row 3 panels, bottom row 2 panels, each panel vertical 9:16, separated by thin white gutters. Use the attached product photo(s) as the exact product reference: black-and-white checkerboard kitchen mat set (120x40 cm runner + 60x40 cm mat). Same minimalist oak-and-white-tile kitchen and the same camera-left window daylight in every panel.\nPanel 1: high-angle medium shot, a bare foot stepping firmly onto the long runner in front of the sink, the mat staying flat.\nPanel 2: low-angle wide shot along the counter showing both mats laid out together as a matching set.\nPanel 3: extreme macro, an adult hand pressing the woven polyester checker surface, hard raking side light revealing fibers.\nPanel 4: close-up near the floor, a hand lifting one corner to reveal the non-slip rubber dots on the back.\nPanel 5: wide eye-level hero shot of the clean kitchen with both mats perfectly flat and centered.\nNo text, no numbers, no captions, no logos, no watermarks anywhere in the image.",
@@ -2454,18 +2555,19 @@
           { "label": "ขนาด / ในเซ็ตประกอบด้วย", "value": "ผืนยาว 120 × 40 ซม. และผืนสั้น 60 × 40 ซม." },
           { "label": "วัสดุ", "value": "ผ้าโพลีเอสเตอร์ทอแน่น ซับน้ำไว ด้านหลังบุปุ่มยางกันลื่น" },
           { "label": "คุณสมบัติเด่น", "value": "ยึดเกาะพื้นแน่น ซับน้ำไว ซักเครื่องได้ งานตัดสต็อกตรงจากโกดัง" },
+          { "label": "องค์ประกอบความมีชีวิตชีวา & สถานการณ์ธรรมชาติ", "value": "ฉากหลังในโกดังมีคนงานใส่เสื้อกั๊กกำลังเดินยกกล่องพัสดุและเข็นรถเข็นพาเลทสต็อกอย่างคึกคักในระยะเบลอ (Shallow Depth of Field)" },
           { "label": "ราคาในภาพ ➡️ คำพูดราคาแบบเซฟ", "value": "ในภาพ 79 บาท (ลด 78%) ➡️ เซฟเป็น 'งบไม่ถึงร้อย / แบงก์ร้อยมีทอน' และ 'ลดหนัก 75%' (ห้ามพูดคำว่าหลักสิบ)" },
           { "label": "แนวคลิปที่ใช้ (จาก 16 แนว)", "value": "แนวที่ 13: โกดัง/โรงงานปล่อยของเอง (ฮาร์ดเซล ราคาหน้าโรงงาน)" }
         ],
         "voiceover_10s": "บุกโกดังมาปล่อยของเอง! พรมห้องครัวลายหมากรุกยกเซ็ตสองผืน ได้ทั้งผืนยาวผืนสั้น งานทอแน่นซับน้ำไว ฐานกันลื่นหนึบๆ วันนี้จัดโปรหน้าโรงงานลดหนัก 75% แบงก์ร้อยมีทอนได้ครบสองชิ้น จิ้มตะกร้าเหลืองซ้ายล่างได้เลยครับ!",
         "storyboard": [
-          { "time": "0–2 วินาที (Hook / Factory Direct Shock)", "camera_lens": "MS · 35mm · Eye-level · Fast Push-in", "lighting": "Bright Industrial LED + Side Raking Key", "visual": "Start: เจ้าของโกดังยืนหน้าพาเลทสต็อกพรม ➡️ Action: สะบัดคลี่พรมหมากรุกขาวดำผืนยาว 120×40 คู่ผืนสั้น 60×40 ซม. โชว์หน้ากล้อง ➡️ End State: ถือพรมตึงเห็นลายชัด Hold 0.5s" },
+          { "time": "0–2 วินาที (Hook / Factory Direct Shock)", "camera_lens": "MS · 35mm · Eye-level · Fast Push-in", "lighting": "Bright Industrial LED + Side Raking Key", "visual": "Start: เจ้าของโกดังยืนหน้าพาเลทสต็อกพรม โดยมีคนงานเดินยกกล่องพัสดุผ่านด้านหลัง ➡️ Action: สะบัดคลี่พรมหมากรุกขาวดำผืนยาว 120×40 คู่ผืนสั้น 60×40 ซม. โชว์หน้ากล้อง ➡️ End State: ถือพรมตึงเห็นลายชัด Hold 0.5s" },
           { "time": "2–4 วินาที (Texture Macro Proof)", "camera_lens": "ECU Macro · 85mm · Locked Camera", "lighting": "Hard Raking Side Light เน้นเส้นใยทอแน่น", "visual": "Start: โฟกัสเนื้อพรมใกล้ๆ ➡️ Action: มือดึงและกดเนื้อผ้าโพลีเอสเตอร์โชว์ความหนาแน่นและซับน้ำ ➡️ End State: เนื้อผ้าคืนตัวแน่นไม่ย้วย" },
-          { "time": "4–6 วินาที (Grip & Backing Proof)", "camera_lens": "MS · 35mm · High +25° Tilted Down · Locked", "lighting": "Warehouse Overhead + Floor Bounce", "visual": "Start: พลิกโชว์ปุ่มยางกันลื่นด้านหลัง ➡️ Action: โยนพรมวางลงบนพื้นปูนขัดมันในโกดังแล้วใช้เท้าดันทดสอบความหนึบ ➡️ End State: พรมเกาะพื้นแน่นไม่ขยับ" },
+          { "time": "4–6 วินาที (Grip & Backing Proof)", "camera_lens": "MS · 35mm · High +25° Tilted Down · Locked", "lighting": "Warehouse Overhead + Floor Bounce", "visual": "Start: พลิกโชว์ปุ่มยางกันลื่นด้านหลัง ➡️ Action: โยนพรมวางลงบนพื้นปูนขัดมันในโกดังแล้วใช้เท้าดันทดสอบความหนึบ ขณะด้านหลังมีคนงานเข็นรถเข็นพาเลทผ่าน ➡️ End State: พรมเกาะพื้นแน่นไม่ขยับ" },
           { "time": "6–8 วินาที (2-Piece Set Value)", "camera_lens": "MCU · 50mm · Eye-level · Slow Dolly-in", "lighting": "Clean Side Key 45°", "visual": "Start: โต๊ะแพ็กของหน้าลังพัสดุ ➡️ Action: หยิบพรมทั้ง 2 ผืน (ยาว+สั้น) มารวมคู่กันโชว์ว่าได้ครบเซ็ต ➡️ End State: ชู 2 ชิ้นคู่กันชัดเจน" },
-          { "time": "8–10 วินาที (Warehouse Hero Hold)", "camera_lens": "MS · 35mm · Eye-level · Locked Hold 0.5s", "lighting": "Bright Balanced Warehouse Daylight", "visual": "Start: หน้าชั้นวางสต็อกพรมเรียงแน่น ➡️ Action: เจ้าของโกดังถือเซ็ตพรมคู่โชว์เต็มเฟรม ➡️ End State: หยุดนิ่ง Hold 0.5s เห็นสินค้าชัดเจน" }
+          { "time": "8–10 วินาที (Warehouse Hero Hold)", "camera_lens": "MS · 35mm · Eye-level · Locked Hold 0.5s", "lighting": "Bright Balanced Warehouse Daylight", "visual": "Start: หน้าชั้นวางสต็อกพรมเรียงแน่น ➡️ Action: เจ้าของโกดังถือเซ็ตพรมคู่โชว์เต็มเฟรม ด้านหลังคนงานกำลังดึงเทปแพ็กกล่องส่งลูกค้า ➡️ End State: หยุดนิ่ง Hold 0.5s เห็นสินค้าชัดเจน" }
         ],
-        "kling_master_prompt": "[Subject & Invariant Lock]: <<<image_1>>>, ++black and white checkerboard kitchen mat 2-piece set++, consisting of one long rectangular runner mat (120x40 cm proportion) and one matching shorter rectangular mat (60x40 cm proportion), held and demonstrated by an energetic Thai warehouse owner wearing a neat dark polo work shirt.\n\n[Blocking: Start -> Action -> End State]: Starts standing in front of stacked warehouse inventory pallets holding the 2-piece mat set -> briskly unrolls the mats, flips the corner to reveal the non-slip rubber backing dots, and places the mat firmly onto the warehouse floor to prove grip stability -> ends holding both mats proudly in a clean 0.5s final hold.\n\n[Scene & Material Lighting (DirectorSKILL)]: Authentic modern wholesale distribution warehouse in Thailand, stacked brown shipping cartons and neat product racks in the background; bright industrial LED daylight combined with a 45-degree Shallow Raking Side Light across the woven polyester fabric so the checkerboard weave and backing dots read with high tactile relief.\n\n[Spatial & Aspect]: Vertical 9:16 frame, safe margins top 12% and bottom 20% clear; foreground highlights the crisp black-and-white checkerboard mats, midground shows the warehouse packing station, background features deep industrial shelves.\n\n[Camera & Lens (video-shotcraft)]: 35mm spherical lens, punchy medium close-up push-in followed by a stable locked frame, zero chaotic camera shake.\n\n[Audio & Real-Sound Foley (earshot)]: Crisp fabric unroll snap, tactile hand-press foley on woven polyester, and firm rubber-grip contact on concrete floor + Energetic Thai male warehouse owner voice (10s): \"บุกโกดังมาปล่อยของเอง! พรมห้องครัวลายหมากรุกยกเซ็ตสองผืน ได้ทั้งผืนยาวผืนสั้น งานทอแน่นซับน้ำไว ฐานกันลื่นหนึบๆ วันนี้จัดโปรหน้าโรงงานลดหนัก 75% แบงก์ร้อยมีทอนได้ครบสองชิ้น จิ้มตะกร้าเหลืองซ้ายล่างได้เลยครับ!\"\n\n[Instance-Level Negatives (DirectorSKILL)]: No text, no on-screen text, no captions, no subtitles, no Thai characters on screen, no logos, no watermarks, no lighting rig reflected, no distorted checkerboard lines, no warped grid pattern, no deformed hands, no extra fingers, no object morphing.",
+        "kling_master_prompt": "[Subject & Invariant Lock]: <<<image_1>>>, ++black and white checkerboard kitchen mat 2-piece set++, consisting of one long rectangular runner mat (120x40 cm proportion) and one matching shorter rectangular mat (60x40 cm proportion), held and demonstrated by an energetic Thai warehouse owner wearing a neat dark polo work shirt.\n\n[Blocking: Start -> Action -> End State]: Starts standing in front of stacked warehouse inventory pallets holding the 2-piece mat set -> briskly unrolls the mats, flips the corner to reveal the non-slip rubber backing dots, and places the mat firmly onto the warehouse floor to prove grip stability -> ends holding both mats proudly in a clean 0.5s final hold.\n\n[Living Background & Natural Life Detail]: In the softly blurred warehouse background (shallow depth of field at f/2.8), real warehouse staff in safety vests are actively walking past carrying brown shipping cartons, pushing a hand pallet jack along the aisle, and sealing boxes with packing tape at a packing table — creating an authentic, bustling factory-direct atmosphere without obstructing the foreground product.\n\n[Scene & Material Lighting (DirectorSKILL)]: Authentic modern wholesale distribution warehouse in Thailand, stacked brown shipping cartons and neat product racks in the background; bright industrial LED daylight combined with a 45-degree Shallow Raking Side Light across the woven polyester fabric so the checkerboard weave and backing dots read with high tactile relief.\n\n[Spatial & Aspect]: Vertical 9:16 frame, safe margins top 12% and bottom 20% clear; foreground highlights the crisp black-and-white checkerboard mats, midground shows the warehouse packing station, background features deep industrial shelves with active workers.\n\n[Camera & Lens (video-shotcraft)]: 35mm spherical lens, punchy medium close-up push-in followed by a stable locked frame, zero chaotic camera shake.\n\n[Audio & Real-Sound Foley (earshot)]: Crisp fabric unroll snap, tactile hand-press foley on woven polyester, firm rubber-grip contact on concrete floor, and subtle distant packing tape warehouse ambience + Energetic Thai male warehouse owner voice (10s): \"บุกโกดังมาปล่อยของเอง! พรมห้องครัวลายหมากรุกยกเซ็ตสองผืน ได้ทั้งผืนยาวผืนสั้น งานทอแน่นซับน้ำไว ฐานกันลื่นหนึบๆ วันนี้จัดโปรหน้าโรงงานลดหนัก 75% แบงก์ร้อยมีทอนได้ครบสองชิ้น จิ้มตะกร้าเหลืองซ้ายล่างได้เลยครับ!\"\n\n[Instance-Level Negatives (DirectorSKILL)]: No text, no on-screen text, no captions, no subtitles, no Thai characters on screen, no logos, no watermarks, no lighting rig reflected, no distorted checkerboard lines, no warped grid pattern, no deformed hands, no extra fingers, no object morphing.",
         "keyframe_image_prompt": "Photorealistic vertical 9:16 start-frame photo for a TikTok product video. Use the attached product photo(s) as the exact product reference: a black-and-white checkerboard kitchen mat set, one long runner (120x40 cm proportion) and one short mat (60x40 cm proportion), identical checker size, colors and borderless edges. Scene: modern Thai wholesale warehouse, stacked brown shipping cartons and product racks behind. Person: energetic Thai man in his 30s, neat dark polo work shirt, standing at waist-up framing, holding the long runner partly unrolled with both hands so the checker pattern faces the camera, the short mat tucked under one arm. Camera: MS, 35mm lens, eye level, product in sharp focus. Lighting: bright industrial LED overhead plus a 45-degree shallow raking side light across the woven fabric. Composition: keep the top 12% and bottom 20% free of key elements. Negatives: no text, no captions, no logos, no watermarks, no price signs, no extra mats, no warped checker grid, natural hands with five fingers.",
         "end_frame_image_prompt": "Photorealistic vertical 9:16 end-frame photo, the final held moment of the same video. Same Thai man in the same dark polo work shirt, same wholesale warehouse with stacked brown cartons and stock racks, same bright industrial lighting, and the exact same black-and-white checkerboard mat set as the start frame. Moment: waist-up hero pose, he holds the long runner and the short mat side by side toward the camera, both fully visible and flat, a confident smile, everything still. Camera: MS, 35mm lens, eye level, locked. Composition: keep the top 12% and bottom 20% free of key elements. Negatives: no text, no captions, no logos, no watermarks, no price signs, no extra mats, no warped checker grid, natural hands with five fingers.",
         "storyboard_grid_prompt": "Single storyboard sheet with 5 photorealistic panels: top row 3 panels, bottom row 2 panels, each panel vertical 9:16, separated by thin white gutters. Use the attached product photo(s) as the exact product reference: black-and-white checkerboard kitchen mat set (120x40 cm runner + 60x40 cm mat). Same Thai wholesale warehouse, same man in a dark polo shirt and the same bright industrial lighting in every panel.\nPanel 1: medium shot, the man snapping both mats open in front of stacked carton pallets, holding them taut toward the camera.\nPanel 2: extreme macro, hands stretching the dense woven checker fabric under hard raking side light.\nPanel 3: high-angle shot, the mat lying on polished concrete with its non-slip backing dots visible as his foot pushes it and it stays in place.\nPanel 4: medium close-up at a packing table, the man holding the long and short mats side by side as a set.\nPanel 5: medium shot hero hold, the man presenting the complete 2-piece set in front of full stock racks.\nNo text, no numbers, no captions, no logos, no price signs, no watermarks anywhere in the image.",
@@ -2490,6 +2592,63 @@
           "พรมครัวหมากรุก 2 ชิ้น แบงก์ร้อยมีทอน",
           "ตัดสต็อกคลัง! พรมครัวกันลื่นซับน้ำ",
           "กดดูสี/ขนาด พรมครัวเซ็ตคู่ 2 ชิ้น"
+        ]
+      };
+      lastResultData = sample;
+      renderOutput(sample);
+      document.getElementById('outputArea').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function loadTopperWakeupSample() {
+      const sample = {
+        "exact_product_name_from_image": "ท็อปเปอร์ที่นอนใยขนห่านเทียม หนาพิเศษ 4 นิ้ว นุ่มฟูเด้ง รองรับสรีระ แก้ปวดหลัง มียางรัดมุม 4 ด้าน (ขนาด 3.5 / 5 / 6 ฟุต)",
+        "selected_style_name": "1. Real-Use Demo + Wake-Up Stretch Scenario — เปิดด้วยซีนตื่นนอนตอนเช้า บิดขี้เกียจฟินๆ บนท็อปเปอร์หนานุ่มแล้วกดโชว์ความฟูเด้ง",
+        "product_title": "ท็อปเปอร์ใยขนห่านเทียม หนา 4 นิ้ว นุ่มฟูเด้ง รัดมุมแน่น",
+        "product_summary": "ท็อปเปอร์ปูทับที่นอนหนา 4 นิ้ว เนื้อผ้าไมโครไฟเบอร์นุ่มลื่น ใยขนห่านเทียมฟูเด้ง ผูกสถานการณ์ตื่นนอนตอนเช้าบิดขี้เกียจอย่างสดชื่น เซฟคำเคลมราคาเป็น 'สามร้อยมีทอน / งบไม่ถึงสามร้อย' และเซฟส่วนลดเป็น 'ลด 70%'",
+        "specs": [
+          { "label": "ชื่อสินค้าเต็มที่ถอดจากภาพ (OCR)", "value": "ท็อปเปอร์ที่นอนใยขนห่านเทียม หนาพิเศษ 4 นิ้ว นุ่มฟูเด้ง รองรับสรีระ แก้ปวดหลัง มียางรัดมุม 4 ด้าน (ขนาด 3.5 / 5 / 6 ฟุต)" },
+          { "label": "สินค้า", "value": "ท็อปเปอร์ปูทับที่นอน ใยขนห่านเทียม หนาพิเศษ 4 นิ้ว" },
+          { "label": "สีและลายที่เลือก", "value": "สีเทาเข้มมินิมอล เย็บควิลท์ตารางหนานุ่ม (Deep Grey Quilted)" },
+          { "label": "ขนาด / ในเซ็ตประกอบด้วย", "value": "หนา 4 นิ้ว มียางยืดรัดมุมเตียงครบ 4 ด้าน (มีขนาด 3.5 / 5 / 6 ฟุต)" },
+          { "label": "วัสดุ & การจัดแสง (DirectorSKILL)", "value": "ผ้าไมโครไฟเบอร์เย็บตารางนูนฟู ➡️ ใช้ Warm Morning Window Raking Light ส่องเฉียงผ่านผ้าม่านให้เห็นลอนความหนา 4 นิ้วชัดเจน" },
+          { "label": "คุณสมบัติเด่น", "value": "สัมผัสนุ่มฟูเด้งคืนตัวไว เปลี่ยนที่นอนแข็งเป็นเตียงโรงแรม มียางรัดมุมไม่เลื่อนหลุด" },
+          { "label": "องค์ประกอบความมีชีวิตชีวา & สถานการณ์ธรรมชาติ", "value": "เปิดด้วยจังหวะตื่นนอนตอนเช้า แสงแดดอุ่นส่องผ่านม่านโปร่งพริ้วเบาๆ คนรีวิวลุกขึ้นบิดขี้เกียจอย่างสบายตัวแล้วกดโชว์ความนุ่มฟูของท็อปเปอร์" },
+          { "label": "ราคาในภาพ ➡️ คำพูดราคาแบบเซฟ", "value": "ในภาพ 259 บาท (ลด 73%) ➡️ เซฟเป็น 'สามร้อยมีทอน / งบไม่ถึงสามร้อย' และ 'ลดหนัก 70%'" },
+          { "label": "แนวคลิปที่ใช้ (จาก 16 แนว)", "value": "แนวที่ 1: Real-Use Demo + สถานการณ์ตื่นนอนยามเช้า" }
+        ],
+        "voiceover_10s": "ตื่นเช้ามาแบบไม่ปวดหลังเลยค่ะทุกคน! ตั้งแต่วางท็อปเปอร์หนาพิเศษสี่นิ้วตัวนี้ทับที่นอนเดิม นุ่มฟูเด้งหลับสบายเหมือนนอนโรงแรม มียางรัดมุมแน่น วันนี้จัดโปรลดหนัก 70% สามร้อยมีทอน จิ้มตะกร้าเหลืองซ้ายล่างได้เลยน้า!",
+        "storyboard": [
+          { "time": "0–2 วินาที (Hook / Morning Wake-Up Stretch)", "camera_lens": "MS · 35mm · Eye-level · Gentle Push-in", "lighting": "Warm Morning Sunlight Raking Through Sheer Curtains", "visual": "Start: หญิงสาวเพิ่งตื่นนอนบนท็อปเปอร์สีเทาหนานุ่ม แสงแดดเช้าส่องผ่านม่านโปร่งพริ้วเบาๆ ➡️ Action: ลุกขึ้นนั่งบิดขี้เกียจยืดแขนด้วยสีหน้าสดชื่นหลับเต็มอิ่ม ➡️ End State: ยิ้มสดใสพร้อมวางมือลงบนลอนท็อปเปอร์ Hold 0.5s" },
+          { "time": "2–4 วินาที (Plush Rebound Macro Proof)", "camera_lens": "CU · 50mm · Side Angle · Locked Camera", "lighting": "Shallow Raking Side Light เน้นความหนา 4 นิ้ว", "visual": "Start: โฟกัสข้างลอนท็อปเปอร์หนา 4 นิ้ว ➡️ Action: ใช้ฝ่ามือกดลงไปบนตารางควิลท์ลึกๆ แล้วปล่อยให้เห็นเนื้อใยฟูเด้งคืนตัวทันที ➡️ End State: ลอนท็อปเปอร์ฟูเต็มทรง" },
+          { "time": "4–6 วินาที (Corner Strap Grip Proof)", "camera_lens": "MCU · 35mm · High +25° · Locked Camera", "lighting": "Soft Bedroom Daylight", "visual": "Start: มุมเตียงนอน ➡️ Action: มือดึงสายยางยืดรัดมุมที่คล้องกับที่นอนเดิมแน่นหนา โชว์ว่าพลิกตัวแค่ไหนก็ไม่เลื่อนหลุด ➡️ End State: มุมท็อปเปอร์ตึงเรียบสนิท" },
+          { "time": "6–8 วินาที (Full Bed Comfort Feel)", "camera_lens": "MS · 35mm · Low Angle · Slow Lateral Glide", "lighting": "Warm Golden Morning Key + Soft Fill", "visual": "Start: ข้างเตียงนอน ➡️ Action: ทิ้งตัวนั่งและลูบเนื้อผ้าไมโครไฟเบอร์ที่นุ่มลื่นสบายผิว ➡️ End State: นั่งสบายบนท็อปเปอร์หนานุ่ม" },
+          { "time": "8–10 วินาที (Hero Bedroom Hold)", "camera_lens": "WS · 35mm · Eye-level +15° · Locked Hold 0.5s", "lighting": "Balanced Cozy Morning Daylight", "visual": "Start: ภาพรวมเตียงนอนมินิมอลแสงเช้าอบอุ่น ➡️ Action: ผายมือโชว์ท็อปเปอร์ปูเต็มเตียงเรียบตึงหนานุ่ม ➡️ End State: หยุดนิ่ง Hold 0.5s เห็นสินค้าเต็มตา" }
+        ],
+        "kling_master_prompt": "[Format]: Photorealistic vertical 9:16 TikTok product video, 10 seconds. Single continuous shot, no scene cuts.\n\n[Product Lock]: The product in the attached photo: thick 4-inch deep-grey quilted plush mattress topper with deep box-stitch squares and elastic corner straps, laid neatly over a bedroom mattress.\n\n[Blocking: Start -> Action -> End State]: Starts with a young Thai woman waking up refreshed on the thick grey quilted mattress topper in the morning, sitting up and doing a natural wake-up stretch with a relaxed smile -> she presses both hands firmly into the 4-inch quilted cushion to show its deep plush compression and instant springy rebound, then briefly checks the secure elastic corner strap -> ends in a calm 0.5s hold showing the full plush topper neatly fitted on the bed.\n\n[Living Background & Natural Life Detail]: Cozy lived-in bedroom in the morning; sheer white window curtains gently sway in a soft morning breeze in the background while warm golden morning sunbeams filter across the room, creating an authentic wake-up atmosphere without distracting from the grey quilted topper.\n\n[Scene & Material Lighting (DirectorSKILL)]: Cozy minimalist Thai bedroom; Warm Morning Shallow Raking Sunlight from the side window grazing across the 4-inch box-quilted microfiber surface so the deep plush loft and stitching contours read clearly.\n\n[Spatial & Aspect]: Vertical 9:16 composition, safe margins top 12% and bottom 20% clear; foreground emphasizes the thick 4-inch quilted topper edge, midground shows the creator on the bed, background shows softly blurred morning curtains.\n\n[Camera & Lens (video-shotcraft)]: 35mm spherical lens, smooth gentle push-in from medium shot to close-up tactile press, zero camera shake.\n\n[Audio & Real-Sound Foley (earshot)]: Soft fabric rustle, airy cushion compression rebound foley, and gentle morning room ambience + Natural Thai female creator voice speaking warmly and happily (10s): \"ตื่นเช้ามาแบบไม่ปวดหลังเลยค่ะทุกคน! ตั้งแต่วางท็อปเปอร์หนาพิเศษสี่นิ้วตัวนี้ทับที่นอนเดิม นุ่มฟูเด้งหลับสบายเหมือนนอนโรงแรม มียางรัดมุมแน่น วันนี้จัดโปรลดหนัก 70% สามร้อยมีทอน จิ้มตะกร้าเหลืองซ้ายล่างได้เลยน้า!\"\n\n[Instance-Level Negatives (DirectorSKILL)]: No text, no on-screen text, no captions, no subtitles, no Thai characters on screen, no logos, no watermarks, no deformed hands, no extra fingers, no distorted quilt grid, no object morphing.",
+        "keyframe_image_prompt": "Photorealistic vertical 9:16 start-frame photo for a TikTok product video. Use the attached product photo(s) as the exact product reference: a thick 4-inch deep-grey box-quilted plush mattress topper laid neatly on a bed. Scene & Living Background: cozy minimalist bedroom in the morning, sheer white window curtains softly glowing with warm golden morning sunlight in the background. Person: young Thai woman in neat pastel pajama set sitting up on the grey quilted topper just after waking up, doing a natural refreshed morning stretch with a happy relaxed smile, one hand resting on the plush quilted surface. Camera: MS, 35mm lens, eye level, topper texture in sharp focus. Lighting: warm morning shallow raking sunlight from the side window highlighting the 4-inch plush loft. Composition: keep the top 12% and bottom 20% free of key elements. Negatives: no text, no captions, no logos, no watermarks, natural hands with five fingers.",
+        "end_frame_image_prompt": "Photorealistic vertical 9:16 end-frame photo, the final held moment of the same video. Same young Thai woman in pastel pajamas, same cozy bedroom with morning sunlight through sheer curtains, and the exact same thick 4-inch deep-grey box-quilted mattress topper as the start frame. Moment: wide eye-level hero shot, she sits neatly beside the bed pressing one hand gently on the plush 4-inch corner to showcase its thickness and neat fit, smiling warmly. Camera: WS, 35mm lens, eye level +15 degrees, locked. Composition: keep the top 12% and bottom 20% free of key elements. Negatives: no text, no captions, no logos, no watermarks, natural hands with five fingers.",
+        "storyboard_grid_prompt": "Single storyboard sheet with 5 photorealistic panels: top row 3 panels, bottom row 2 panels, each panel vertical 9:16, separated by thin white gutters. Use the attached product photo(s) as the exact product reference: thick 4-inch deep-grey box-quilted mattress topper. Same cozy bedroom with warm morning window light through sheer curtains and the same young Thai woman in pastel pajamas in every panel.\nPanel 1: medium shot, the woman sitting up on the grey quilted topper in morning sunlight, doing a refreshed wake-up stretch.\nPanel 2: close-up side angle, her hands pressing deep into the 4-inch quilted topper cushion showing plush loft and rebound.\nPanel 3: medium close-up at the bed corner, her hand showing the elastic corner strap securely gripping the mattress.\nPanel 4: medium shot, she smooths her hand across the soft microfiber quilted surface.\nPanel 5: wide hero shot of the neat bed with the thick grey topper fully visible in warm morning light.\nNo text, no numbers, no captions, no logos, no watermarks anywhere in the image.",
+        "cover_headlines": [
+          "ตื่นมาไม่ปวดหลัง! ท็อปเปอร์หนา 4 นิ้ว",
+          "เปลี่ยนเตียงแข็งเป็นโรงแรม สามร้อยมีทอน!",
+          "นุ่มฟูเด้งหลับลึก! โปรลดหนัก 70%",
+          "ท็อปเปอร์ใยขนห่านเทียม รัดมุมแน่น 4 ด้าน",
+          "งบไม่ถึงสามร้อย ได้ท็อปเปอร์หนานุ่มเต็มเตียง"
+        ],
+        "caption_body": "ใครนอนตื่นมาแล้วชอบปวดหลังหรือที่นอนเดิมแข็งเกินไป ลองปูท็อปเปอร์ใยขนห่านเทียมหนาพิเศษ 4 นิ้วตัวนี้ทับดูเลยค่ะ ตื่นเช้ามาบิดขี้เกียจแบบสบายตัวมาก\n\nตัวใยอัดแน่นนุ่มฟูเด้ง รองรับสรีระได้ดี เนื้อผ้าระบายอากาศไม่ร้อน มีสายยางยืดรัดมุมให้ครบ 4 ด้าน พลิกตัวแค่ไหนก็ไม่เลื่อนหลุด\n\nตอนนี้จัดโปรลดหนัก 70% สามร้อยมีทอนก็ได้ความนุ่มฟูเหมือนนอนโรงแรมแล้ว กดเลือกขนาดที่ตะกร้าเหลืองซ้ายล่างได้เลยนะคะ",
+        "hashtag_sets": [
+          { "style_name": "แบบที่ 1: สายตรงสินค้า & พิกัดใช้งาน", "tags": ["#ท็อปเปอร์", "#ท็อปเปอร์ใยขนห่านเทียม", "#ที่นอนท็อปเปอร์", "#ท็อปเปอร์หนา4นิ้ว", "#แก้ปวดหลัง"] },
+          { "style_name": "แบบที่ 2: สายป้ายยา & รีวิวของใช้จริง", "tags": ["#ป้ายยาของใช้ในบ้าน", "#รีวิวห้องนอน", "#ของดีห้องนอน", "#หลับสบาย", "#ใช้ดีบอกต่อ"] },
+          { "style_name": "แบบที่ 3: สายแต่งห้องนอนมินิมอล / หอพัก", "tags": ["#แต่งห้องนอน", "#ห้องนอนมินิมอล", "#ของใช้เด็กหอ", "#แต่งห้องงบประหยัด", "#เตียงดูดวิญญาณ"] },
+          { "style_name": "แบบที่ 4: สายคุ้มค่า / โปรแรงราคาโดน", "tags": ["#สามร้อยมีทอน", "#งบไม่ถึงสามร้อย", "#โปรแรงTikTokShop", "#ของคุ้มราคาประหยัด", "#ลดหนัก70"] },
+          { "style_name": "แบบที่ 5: สายไวรัลดันฟีด TikTok Shop", "tags": ["#TikTokShopครีเอเตอร์", "#พิกัดตะกร้าเหลือง", "#ป้ายยาTikTokShop", "#รีวิวTikTokShop", "#TikTokแต่งบ้าน"] }
+        ],
+        "basket_titles": [
+          "ท็อปเปอร์หนา 4 นิ้ว สามร้อยมีทอน",
+          "ลด 70% ท็อปเปอร์นุ่มฟูแก้ปวดหลัง",
+          "ท็อปเปอร์ขนห่านเทียม รัดมุมแน่น",
+          "เปลี่ยนเตียงแข็งให้นุ่ม งบไม่ถึงสามร้อย",
+          "กดเลือกขนาด 3.5 / 5 / 6 ฟุตที่นี่"
         ]
       };
       lastResultData = sample;
