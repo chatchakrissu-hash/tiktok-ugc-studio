@@ -26,6 +26,7 @@ from pathlib import Path
 from typing import Any
 
 import openpyxl
+import pandas as pd
 from openpyxl.styles import Alignment, Border, Font, PatternFill, Side
 from openpyxl.utils import get_column_letter
 from PIL import Image
@@ -528,19 +529,55 @@ def _cell_to_str(val: Any) -> str:
 
 
 def _detect_column_map(headers: list[str]) -> tuple[dict[str, int], int]:
-    """Identify header columns for sku, link, name, gmv, orders, comm, price and return score."""
+    """Identify header columns for sku, link, name, gmv, orders, refunds, status, comm, price, shop."""
     col_map: dict[str, int] = {}
     score = 0
     norm_headers = [re.sub(r"\s+", " ", str(h or "").strip().lower()) for h in headers]
 
     rules: list[tuple[str, tuple[str, ...], tuple[str, ...]]] = [
-        ("sku", ("product id", "product_id", "item id", "item_id", "รหัสสินค้า", "ไอดีสินค้า", "id สินค้า", "sku", "id"), ("video", "วิดีโอ", "creator", "order")),
+        (
+            "sku",
+            ("รหัสสินค้า", "product id", "product_id", "ไอดีสินค้า", "id สินค้า", "item id", "item_id", "รหัสไอเทม", "sku"),
+            ("id ของ sku", "sku id", "seller sku", "รหัสร้านค้า", "shop id", "รหัสเนื้อหา", "content id", "video", "วิดีโอ", "creator", "หมายเลขคำสั่งซื้อ", "order id"),
+        ),
         ("link", ("product link", "product url", "ลิงก์สินค้า", "url สินค้า", "link", "url"), ("video",)),
-        ("name", ("product name", "product_name", "product title", "item name", "ชื่อสินค้า", "ข้อมูลสินค้า", "ชื่อตะกร้า", "product", "สินค้า", "title"), ("id", "รหัส", "ลิงก์", "link")),
-        ("gmv", ("affiliate gmv", "video gmv", "gross merchandise", "gmv", "ยอดขายรวม", "มูลค่าสินค้า", "ยอดขายจากวิดีโอ", "ยอดขาย", "รายได้", "revenue", "sales amount"), ("อัตรา", "rate", "%", "เปรียบเทียบ")),
-        ("orders", ("items sold", "units sold", "affiliate orders", "จำนวนสินค้าที่ขายได้", "จำนวนที่ขายได้", "คำสั่งซื้อ", "ยอดสั่งซื้อ", "ออเดอร์", "จำนวนชิ้น", "orders", "quantity", "sold"), ("rate", "อัตรา", "%")),
-        ("comm", ("estimated commission", "est. commission", "commission", "ค่าคอมมิชชั่นโดยประมาณ", "ค่าคอมมิชชั่น", "คอมมิชชั่น", "ค่าคอม"), ("rate", "อัตรา", "%")),
+        (
+            "name",
+            ("ชื่อสินค้า", "product name", "product_name", "product title", "item name", "ข้อมูลสินค้า", "ชื่อตะกร้า", "product", "สินค้า", "title"),
+            ("id", "รหัส", "ลิงก์", "link", "ขายได้", "คืนเงิน", "ร้านค้า", "shop", "ประเภท", "สถานะ"),
+        ),
+        (
+            "gmv",
+            ("affiliate gmv", "video gmv", "gross merchandise", "gmv", "ยอดขายรวม", "มูลค่าสินค้า", "ยอดขายจากวิดีโอ", "ยอดขาย", "ฐานค่าคอมมิชชั่นตามจริง", "ฐานค่าคอมมิชชั่นโดยประมาณ", "revenue", "sales amount"),
+            ("อัตรา", "rate", "%", "เปรียบเทียบ"),
+        ),
+        (
+            "orders",
+            ("สินค้าที่ขายได้", "จำนวนสินค้าที่ขายได้", "จำนวนที่ขายได้", "items sold", "units sold", "affiliate orders", "ยอดสั่งซื้อ", "ออเดอร์", "จำนวนชิ้น", "orders", "quantity", "sold"),
+            ("หมายเลข", "ประเภท", "สถานะ", "วันที่", "คืนเงิน", "refund", "rate", "อัตรา", "%", "id", "รหัส"),
+        ),
+        (
+            "refunds",
+            ("สินค้าที่มีการคืนเงิน", "จำนวนคืนเงิน", "refunded items", "refunded units", "refunds"),
+            ("rate", "อัตรา", "%"),
+        ),
+        (
+            "status",
+            ("สถานะการชำระคำสั่งซื้อ", "สถานะคำสั่งซื้อ", "order status", "settlement status"),
+            (),
+        ),
+        (
+            "comm",
+            ("ยอดรายได้รวมสุดท้าย", "ค่าคอมมิชชั่นโดยประมาณ", "estimated commission", "est. commission", "ค่าคอมมิชชั่นมาตรฐาน", "commission", "ค่าคอมมิชชั่น", "คอมมิชชั่น", "ค่าคอม"),
+            ("ประเภท", "ฐาน", "base", "rate", "อัตรา", "%", "วันที่", "โฆษณาร้านค้าโดยประมาณ", "มาตรฐานโดยประมาณ"),
+        ),
+        (
+            "est_comm",
+            ("ค่าคอมมิชชั่นมาตรฐานโดยประมาณ", "ค่าคอมมิชชั่นโฆษณาร้านค้าโดยประมาณ", "estimated standard commission"),
+            ("อัตรา", "rate", "%"),
+        ),
         ("price", ("avg price", "price", "ราคาเฉลี่ย", "ราคา"), ("gmv", "รวม", "total")),
+        ("shop", ("ชื่อร้านค้า", "ร้านค้า", "shop name", "seller name"), ("รหัส", "id", "ประเภท", "โฆษณา", "ค่าคอม")),
     ]
 
     used_indices: set[int] = set()
@@ -572,12 +609,26 @@ def _detect_column_map(headers: list[str]) -> tuple[dict[str, int], int]:
 
 
 def _read_rows_from_file(filename: str, raw_bytes: bytes) -> list[list[str]]:
-    """Read raw rows as strings from .xlsx, .xlsm, .csv, or .tsv without float SKU truncation."""
+    """Read raw rows as strings from .xlsx, .xlsm, .csv, or .tsv without float SKU truncation or A1 dimension bugs."""
     ext = Path(filename).suffix.lower()
     if ext in {".xlsx", ".xlsm"}:
-        wb = openpyxl.load_workbook(io.BytesIO(raw_bytes), read_only=True, data_only=True)
-        # Pick the sheet with the most rows
-        best_rows: list[list[str]] = []
+        # TikTok Affiliate exports often set <dimension ref="A1"/>, causing openpyxl read_only=True
+        # to stop at cell A1! pandas.read_excel(..., dtype=str) reads all rows fast and preserves 19-digit IDs.
+        try:
+            sheets = pd.read_excel(io.BytesIO(raw_bytes), sheet_name=None, header=None, dtype=str, keep_default_na=False)
+            best_rows: list[list[str]] = []
+            for df in sheets.values():
+                rows = [[str(c).strip() for c in row] for row in df.itertuples(index=False, name=None)]
+                non_empty = [r for r in rows if any(c for c in r)]
+                if len(non_empty) > len(best_rows):
+                    best_rows = non_empty
+            if best_rows:
+                return best_rows
+        except Exception:
+            pass
+
+        wb = openpyxl.load_workbook(io.BytesIO(raw_bytes), read_only=False, data_only=True)
+        best_rows = []
         for ws in wb.worksheets:
             rows = [[_cell_to_str(c) for c in row] for row in ws.iter_rows(values_only=True)]
             non_empty = [r for r in rows if any(c.strip() for c in r)]
@@ -644,6 +695,10 @@ def parse_sales_files(files_payload: list[dict[str, str]]) -> dict[str, Any]:
                 i = best_map.get(key, -1)
                 return row[i].strip() if 0 <= i < len(row) else ""
 
+            status_val = get_col("status").lower()
+            if status_val and any(bad in status_val for bad in ("ยกเลิก", "ไม่มีสิทธิ์", "cancelled", "canceled", "ineligible")):
+                continue
+
             raw_sku_cell = get_col("sku")
             raw_link_cell = get_col("link")
             name = normalize_thai_text(get_col("name"))
@@ -656,13 +711,18 @@ def parse_sales_files(files_payload: list[dict[str, str]]) -> dict[str, Any]:
             if not name and not sku:
                 continue
 
-            # Strip leading code tags if imported from an old PDF/schedule sheet
             gmv = parse_number(get_col("gmv"))
-            orders = int(round(parse_number(get_col("orders"))))
-            comm = parse_number(get_col("comm"))
+            sold = int(round(parse_number(get_col("orders")))) if "orders" in best_map else (1 if gmv > 0 else 0)
+            refunded = int(round(parse_number(get_col("refunds")))) if "refunds" in best_map else 0
+            net_orders = max(0, sold - refunded)
+            fully_refunded = sold > 0 and net_orders == 0
+            gmv_eff = 0.0 if fully_refunded else gmv
+            comm_raw = parse_number(get_col("comm")) or parse_number(get_col("est_comm"))
+            comm_eff = 0.0 if fully_refunded else comm_raw
             price = parse_number(get_col("price"))
-            if price <= 0 and gmv > 0 and orders > 0:
-                price = round(gmv / orders, 2)
+            shop_name = normalize_thai_text(get_col("shop"))
+            if price <= 0 and gmv_eff > 0 and net_orders > 0:
+                price = round(gmv_eff / net_orders, 2)
 
             agg_key = sku if sku else norm_token_key(name)
             if not agg_key:
@@ -672,21 +732,26 @@ def parse_sales_files(files_payload: list[dict[str, str]]) -> dict[str, Any]:
                 aggregated[agg_key] = {
                     "sku": sku,
                     "name": name or f"สินค้า TikTok ({sku})",
+                    "shop": shop_name,
                     "link": raw_link_cell if raw_link_cell.startswith("http") else (
                         f"https://shop.tiktok.com/view/product/{sku}?region=TH&locale=th-TH" if sku else ""
                     ),
-                    "gmv": round(gmv, 2),
-                    "orders": orders,
-                    "comm": round(comm, 2),
+                    "gmv": round(gmv_eff, 2),
+                    "orders": net_orders,
+                    "refunded": refunded,
+                    "comm": round(comm_eff, 2),
                     "price": round(price, 2),
                 }
             else:
                 cur = aggregated[agg_key]
-                cur["gmv"] = round(cur["gmv"] + gmv, 2)
-                cur["orders"] += orders
-                cur["comm"] = round(cur["comm"] + comm, 2)
+                cur["gmv"] = round(cur["gmv"] + gmv_eff, 2)
+                cur["orders"] += net_orders
+                cur["refunded"] = cur.get("refunded", 0) + refunded
+                cur["comm"] = round(cur["comm"] + comm_eff, 2)
                 if len(name) > len(cur["name"]):
                     cur["name"] = name
+                if shop_name and not cur.get("shop"):
+                    cur["shop"] = shop_name
                 if price > 0 and cur["price"] <= 0:
                     cur["price"] = round(price, 2)
 
@@ -809,8 +874,8 @@ def analyze_sales_payload(payload: dict[str, Any]) -> dict[str, Any]:
     """Parse sales file(s) or pasted lines, resolve SKUs/images, and classify Winner/Dropped/New Stars."""
     files = payload.get("files") or []
     text_lines = str(payload.get("text_lines") or "").strip()
-    min_orders = int(payload.get("min_orders_winner") or 1)
-    min_gmv = float(payload.get("min_gmv_winner") or 0.0)
+    min_orders = int(payload.get("min_orders_winner") if payload.get("min_orders_winner") is not None else 5)
+    min_gmv = float(payload.get("min_gmv_winner") if payload.get("min_gmv_winner") is not None else 500.0)
     new_stars_count = int(payload.get("new_stars_count") if payload.get("new_stars_count") is not None else 6)
 
     warnings: list[str] = []
@@ -836,8 +901,8 @@ def analyze_sales_payload(payload: dict[str, Any]) -> dict[str, Any]:
                 "name": name,
                 "link": unwrapped.get("resolved_url", ""),
                 "image": unwrapped.get("og_image", ""),
-                "gmv": 100.0,
-                "orders": 1,
+                "gmv": 500.0,
+                "orders": max(1, min_orders),
                 "comm": 0.0,
                 "price": 0.0,
             })
@@ -849,7 +914,7 @@ def analyze_sales_payload(payload: dict[str, Any]) -> dict[str, Any]:
             "warnings": warnings,
         }
 
-    # Classify Winners vs Dropped FIRST so we don't waste remote DB queries on dropped 0-sale rows
+    # Classify Winners vs Dropped FIRST so we don't waste remote DB queries on dropped/tail rows
     cat_map = load_channel_catalog()
     has_any_sales = any((float(x.get("gmv") or 0) > 0 or int(x.get("orders") or 0) > 0) for x in raw_items)
 
@@ -861,26 +926,43 @@ def analyze_sales_payload(payload: dict[str, Any]) -> dict[str, Any]:
     for item in local_resolved:
         gmv = float(item.get("gmv") or 0)
         orders = int(item.get("orders") or 0)
-        keep = True if not has_any_sales else (orders >= min_orders and gmv >= min_gmv)
         if not has_any_sales:
+            keep = True
             item["reason"] = "รายการสินค้าจากช่อง (ไม่มีคอลัมน์ยอดขาย — จัดเข้ากลุ่มทำคลิป)"
+        elif min_orders <= 1 and min_gmv <= 0:
+            keep = orders >= 1 or gmv > 0
+        else:
+            keep = (orders > 0 or gmv > 0) and (
+                (min_orders > 0 and orders >= min_orders) or (min_gmv > 0 and gmv >= min_gmv)
+            )
         if keep:
             item["tier"] = "winner"
             item["starred"] = True
-            item.setdefault("reason", f"ขายดีประจำช่อง ({orders:,} ออเดอร์ · ฿{gmv:,.0f})")
+            item.setdefault("reason", f"ขายดีประจำช่อง ({orders:,} ชิ้น · ฿{gmv:,.0f})")
             winners.append(item)
         else:
             item["tier"] = "dropped"
             item["starred"] = False
-            item["reason"] = f"ยอดขาย ฿{gmv:,.0f} / {orders} ออเดอร์ — ปัดตกเพื่อเทโควตาให้ตัวทำเงินและสินค้าใหม่"
+            item["reason"] = f"ขายได้ {orders:,} ชิ้น (฿{gmv:,.0f}) — ต่ำกว่าเกณฑ์ ({min_orders} ชิ้น / ฿{min_gmv:,.0f}) จึงปัดตกไปเทโควตาให้ตัวทำเงิน"
             dropped.append(item)
+
+    # Safeguard: if threshold was set higher than every product in a small store, keep top 10 by GMV
+    if not winners and dropped and has_any_sales:
+        dropped.sort(key=lambda x: (float(x.get("gmv") or 0), int(x.get("orders") or 0)), reverse=True)
+        promoted = dropped[: min(10, len(dropped))]
+        dropped = dropped[len(promoted) :]
+        for item in promoted:
+            item["tier"] = "winner"
+            item["starred"] = True
+            item["reason"] = f"ตัวท็อปสุดที่มีในไฟล์ ({item.get('orders', 0):,} ชิ้น · ฿{item.get('gmv', 0):,.0f})"
+            winners.append(item)
 
     winners.sort(key=lambda x: (float(x.get("gmv") or 0), int(x.get("orders") or 0)), reverse=True)
     dropped.sort(key=lambda x: (float(x.get("gmv") or 0), int(x.get("orders") or 0)), reverse=True)
 
     # Remote Kalodata DB lookup ONLY for winners missing SKU or top winners missing thumbnail
     need_remote_indices: list[int] = []
-    img_remote_budget = 10
+    img_remote_budget = 15
     for idx, item in enumerate(winners):
         if not item.get("sku"):
             need_remote_indices.append(idx)

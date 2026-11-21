@@ -664,9 +664,18 @@
             <input type="number" id="newStarMainQuota" value="5" min="1" max="10" />
           </div>
           <div>
-            <label class="field-label">🏆 ขั้นต่ำถือว่าขายได้ (ออเดอร์ >=)</label>
-            <input type="number" id="minOrdersWinner" value="1" min="0" max="1000" />
+            <label class="field-label">🏆 เกณฑ์ไปต่อ: ขายได้สุทธิ >= (ชิ้น)</label>
+            <input type="number" id="minOrdersWinner" value="5" min="0" max="1000" />
           </div>
+          <div>
+            <label class="field-label">💰 หรือมียอด GMV >= (บาท)</label>
+            <input type="number" id="minGmvWinner" value="500" min="0" step="50" />
+          </div>
+        </div>
+        <div id="reanalyzeBar" style="display:none; margin-top:10px; justify-content:flex-end;">
+          <button type="button" class="btn btn-sm btn-gold" onclick="reanalyzeLastUploadedFiles()">
+            🔄 คัดเกรดใหม่ตามเกณฑ์ด้านบน (ไม่ต้องเลือกไฟล์ใหม่)
+          </button>
         </div>
       </div>
 
@@ -1005,6 +1014,8 @@
       });
     }
 
+    let lastUploadedFilesPayload = [];
+
     async function handleSalesFiles(fileList) {
       const arr = Array.from(fileList || []);
       if (!arr.length) return;
@@ -1015,16 +1026,34 @@
           const dataUrl = await fileToBase64(f);
           filesPayload.push({ filename: f.name, content_base64: dataUrl });
         }
-        const res = await apiPost('/api/analyze-sales', {
-          files: filesPayload,
-          min_orders_winner: Number(document.getElementById('minOrdersWinner').value || 1),
-          new_stars_count: Number(document.getElementById('newStarsCount').value || 6)
-        });
-        applyAnalysisResult(res);
-        showToast(`✅ วิเคราะห์สำเร็จ! ขายดี ${res.winners.length} ตัว · ใหม่น่าลอง ${res.new_stars.length} ตัว · ปัดตก ${res.dropped.length} ตัว`, 5000);
+        lastUploadedFilesPayload = filesPayload;
+        const bar = document.getElementById('reanalyzeBar');
+        if (bar) bar.style.display = 'flex';
+        await runSalesAnalysisFromPayload(filesPayload);
       } catch (err) {
         showToast(`❌ ${err.message}`, 7000);
       }
+    }
+
+    async function reanalyzeLastUploadedFiles() {
+      if (!lastUploadedFilesPayload.length) return;
+      showToast('🔄 กำลังคำนวณคัดเกรดใหม่ตามเกณฑ์ที่ปรับ...', 0);
+      try {
+        await runSalesAnalysisFromPayload(lastUploadedFilesPayload);
+      } catch (err) {
+        showToast(`❌ ${err.message}`, 7000);
+      }
+    }
+
+    async function runSalesAnalysisFromPayload(filesPayload) {
+      const res = await apiPost('/api/analyze-sales', {
+        files: filesPayload,
+        min_orders_winner: Number(document.getElementById('minOrdersWinner').value || 0),
+        min_gmv_winner: Number(document.getElementById('minGmvWinner').value || 0),
+        new_stars_count: Number(document.getElementById('newStarsCount').value || 6)
+      });
+      applyAnalysisResult(res);
+      showToast(`✅ วิเคราะห์สำเร็จ! ขายดี ${res.winners.length} ตัว · ใหม่น่าลอง ${res.new_stars.length} ตัว · ปัดตก ${res.dropped.length} ตัว`, 5000);
     }
 
     async function analyzeQuickPaste() {
@@ -1132,8 +1161,9 @@
                 </div>
               </td>
               <td>
-                <b>฿${Number(p.gmv || 0).toLocaleString()}</b><br>
-                <span style="color:var(--muted); font-size:12px;">${Number(p.orders || 0).toLocaleString()} ออเดอร์</span>
+                <b>฿${Number(p.gmv || 0).toLocaleString()}</b>
+                ${p.comm ? `<span style="color:var(--green); font-size:12px; font-weight:700;"> (คอม ฿${Number(p.comm).toLocaleString(undefined, { maximumFractionDigits: 0 })})</span>` : ''}<br>
+                <span style="color:var(--muted); font-size:12px;">${Number(p.orders || 0).toLocaleString()} ชิ้น${p.shop ? ` · ${escapeHtml(p.shop)}` : ''}</span>
               </td>
               <td>
                 <input type="number" min="1" max="31" placeholder="ออโต้"
