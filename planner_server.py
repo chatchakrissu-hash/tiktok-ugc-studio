@@ -578,6 +578,8 @@ def _detect_column_map(headers: list[str]) -> tuple[dict[str, int], int]:
         ),
         ("price", ("avg price", "price", "ราคาเฉลี่ย", "ราคา"), ("gmv", "รวม", "total")),
         ("shop", ("ชื่อร้านค้า", "ร้านค้า", "shop name", "seller name"), ("รหัส", "id", "ประเภท", "โฆษณา", "ค่าคอม")),
+        ("content_id", ("รหัสเนื้อหา", "content id", "content_id", "video id", "รหัสวิดีโอ"), ()),
+        ("order_id", ("หมายเลขคำสั่งซื้อ", "order id", "order_id", "รหัสคำสั่งซื้อ"), ()),
     ]
 
     used_indices: set[int] = set()
@@ -721,6 +723,8 @@ def parse_sales_files(files_payload: list[dict[str, str]]) -> dict[str, Any]:
             comm_eff = 0.0 if fully_refunded else comm_raw
             price = parse_number(get_col("price"))
             shop_name = normalize_thai_text(get_col("shop"))
+            content_id = get_col("content_id")
+            order_id = get_col("order_id")
             if price <= 0 and gmv_eff > 0 and net_orders > 0:
                 price = round(gmv_eff / net_orders, 2)
 
@@ -741,6 +745,8 @@ def parse_sales_files(files_payload: list[dict[str, str]]) -> dict[str, Any]:
                     "refunded": refunded,
                     "comm": round(comm_eff, 2),
                     "price": round(price, 2),
+                    "_content_ids": {content_id} if content_id else set(),
+                    "_order_ids": {order_id} if order_id else set(),
                 }
             else:
                 cur = aggregated[agg_key]
@@ -748,6 +754,10 @@ def parse_sales_files(files_payload: list[dict[str, str]]) -> dict[str, Any]:
                 cur["orders"] += net_orders
                 cur["refunded"] = cur.get("refunded", 0) + refunded
                 cur["comm"] = round(cur["comm"] + comm_eff, 2)
+                if content_id:
+                    cur["_content_ids"].add(content_id)
+                if order_id:
+                    cur["_order_ids"].add(order_id)
                 if len(name) > len(cur["name"]):
                     cur["name"] = name
                 if shop_name and not cur.get("shop"):
@@ -760,123 +770,493 @@ def parse_sales_files(files_payload: list[dict[str, str]]) -> dict[str, Any]:
                 f"ไฟล์ {fname} มีรหัสสินค้า {corrupted_count} รายการที่ถูก Excel ปัดเศษ (เช่น E+18) — ระบบกำลังค้นรหัส 19 หลักจริงจากชื่อสินค้าให้แทนครับ"
             )
 
+    products_out: list[dict[str, Any]] = []
+    for prod in aggregated.values():
+        cids = prod.pop("_content_ids", set())
+        oids = prod.pop("_order_ids", set())
+        orders = int(prod.get("orders") or 0)
+        gmv = float(prod.get("gmv") or 0)
+        comm = float(prod.get("comm") or 0)
+        videos_count = len(cids) if cids else (1 if (orders > 0 or gmv > 0) else 0)
+        distinct_orders = len(oids) if oids else orders
+        prod["videos_count"] = videos_count
+        prod["distinct_orders"] = distinct_orders
+        prod["comm_pct_eff"] = round((comm / gmv) * 100.0, 1) if gmv > 0 else 0.0
+        prod["comm_per_video"] = round(comm / max(1, videos_count), 2) if (orders > 0 or gmv > 0) else 0.0
+        prod["comm_per_order"] = round(comm / max(1, distinct_orders), 2) if (orders > 0 or gmv > 0) else 0.0
+        products_out.append(prod)
+
     return {
-        "products": list(aggregated.values()),
+        "products": products_out,
         "parsed_files": parsed_files,
         "warnings": warnings,
     }
+
+
+HOME_CORE_CATS = {
+    "อุปกรณ์เครื่องใช้ภายในบ้าน",
+    "สิ่งทอและเครื่องตกแต่งที่ใช้วัสดุผิวนุ่ม",
+    "เครื่องครัว",
+    "เครื่องใช้ในบ้าน",
+    "เฟอร์นิเจอร์",
+    "การปรับปรุงบ้าน",
+    "อุปกรณ์สัตว์เลี้ยง",
+}
+CROSS_IMPULSE_CATS = {
+    "ความงามและของใช้ส่วนตัว",
+    "อาหารและเครื่องดื่ม",
+    "สุขภาพ",
+    "เครื่องมือและเครื่องโลหะ",
+    "ยานยนต์และจักรยานยนต์",
+}
+
+
+def _discover_gemini_api_key(explicit_key: str = "") -> str:
+    """Resolve Gemini API key dynamically from request, environment, or local desktop pipeline config."""
+    k = str(explicit_key or "").strip()
+    if k:
+        return k
+    env_k = os.environ.get("GEMINI_API_KEY", "").strip()
+    if env_k:
+        return env_k
+    desktop_bot = Path.home() / "Desktop" / "tiktok_auto_pipeline.py"
+    if desktop_bot.is_file():
+        try:
+            txt = desktop_bot.read_text(encoding="utf-8", errors="ignore")
+            m = re.search(r"GEMINI_API_KEY\s*=\s*['\"]([^'\"]+)['\"]", txt)
+            if m:
+                return m.group(1).strip()
+        except Exception:
+            pass
+    return ""
+
+
+def _build_new_star_candidate_pool(
+    winners: list[dict[str, Any]],
+    dropped: list[dict[str, Any]],
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    """Filter Kalodata pool into high-commission impulse video candidates (core vs cross-category)."""
+    pool = ensure_pool_loaded()
+    if not pool:
+        return [], []
+
+    used_skus = {p.get("sku") for p in winners + dropped if p.get("sku")}
+    used_names = [norm_token_key(p.get("name", "")) for p in winners + dropped if p.get("name")]
+
+    winner_cats = {str(w.get("cat") or "").strip() for w in winners if w.get("cat")}
+    core_cats = HOME_CORE_CATS | winner_cats
+
+    core_scored: list[tuple[float, dict[str, Any]]] = []
+    cross_scored: list[tuple[float, dict[str, Any]]] = []
+
+    for p in pool:
+        sku = str(p.get("sku") or "")
+        if not sku or sku in used_skus:
+            continue
+        comm = float(p.get("comm") or 0)
+        price = float(p.get("price") or p.get("avg_price") or 0)
+        v_rev = max(0.0, float(p.get("v_rev") or 0))
+        rev = max(1.0, float(p.get("rev") or v_rev or 1))
+        v_share = v_rev / rev
+
+        # Strict quality gate: eliminate 0%/tiny-comm traps & unsuited big-ticket electronics
+        if comm < 5.0 or price < 25.0 or price > 1290.0 or v_rev < 20000.0 or v_share < 0.40:
+            continue
+
+        nk = norm_token_key(p.get("name", ""))
+        if any(nk == un or (len(nk) >= 12 and (nk in un or un in nk)) for un in used_names):
+            continue
+
+        cat = str(p.get("cat") or "").strip()
+        if cat not in core_cats and cat not in CROSS_IMPULSE_CATS:
+            continue
+
+        creators = max(1.0, float(p.get("creators") or 1))
+        conv = max(1.0, float(p.get("conv") or 5))
+        growth = float(p.get("growth") or 0)
+        ai_score = max(40.0, float(p.get("ai") or 65))
+
+        comm_baht = price * (comm / 100.0)
+        blue_ocean = (v_rev / math.pow(creators + 6.0, 1.15)) * (0.65 + conv / 45.0)
+        growth_boost = 1.0 + min(max(growth, 0.0), 400.0) / 120.0
+        comm_boost = 0.8 + min(comm_baht, 120.0) / 50.0
+        score = blue_ocean * growth_boost * comm_boost * (0.5 + 0.5 * min(1.0, v_share)) * (ai_score / 100.0)
+
+        entry = {
+            "sku": sku,
+            "name": p["name"],
+            "image": p.get("image", ""),
+            "cat": cat,
+            "price": price,
+            "comm": comm,
+            "comm_baht": round(comm_baht, 1),
+            "v_rev": v_rev,
+            "creators": int(p.get("creators") or 0),
+            "conv": conv,
+            "growth": growth,
+            "link": p.get("link") or f"https://shop.tiktok.com/view/product/{sku}?region=TH&locale=th-TH",
+            "tier": "new_star",
+            "starred": True,
+            "segment": "core" if cat in core_cats else "cross",
+            "reason": (
+                f"🌟 ตรงหมวดบ้าน/ของใช้ (คอม {comm:.0f}% ~฿{comm_baht:,.0f}/ชิ้น)"
+                if cat in core_cats
+                else f"🚀 ข้ามหมวดคนซื้อกลุ่มเดียวกัน (คอม {comm:.0f}% ~฿{comm_baht:,.0f}/ชิ้น)"
+            ),
+        }
+        if cat in core_cats:
+            core_scored.append((score, entry))
+        else:
+            cross_scored.append((score, entry))
+
+    core_scored.sort(key=lambda x: x[0], reverse=True)
+    cross_scored.sort(key=lambda x: x[0], reverse=True)
+    return [x[1] for x in core_scored], [x[1] for x in cross_scored]
 
 
 def select_new_stars_from_pool(
     winners: list[dict[str, Any]],
     dropped: list[dict[str, Any]],
     desired_count: int = 6,
+    strategy: str = "balanced",
 ) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
-    """Pick top trending Blue Ocean & Rising Star products matching the channel's categories."""
-    pool = ensure_pool_loaded()
-    if desired_count <= 0 or not pool:
+    """Pick diversified, high-commission Blue Ocean products matching core_only / balanced / expand strategy."""
+    if desired_count <= 0:
+        return [], []
+    core_list, cross_list = _build_new_star_candidate_pool(winners, dropped)
+    if not core_list and not cross_list:
         return [], []
 
-    used_skus = {p.get("sku") for p in winners + dropped if p.get("sku")}
-    used_names = [norm_token_key(p.get("name", "")) for p in winners + dropped if p.get("name")]
-
-    # Score preferred categories from channel winners weighted by GMV
-    cat_weights: dict[str, float] = {}
-    for w in winners:
-        c = str(w.get("cat") or "").strip()
-        if c:
-            cat_weights[c] = cat_weights.get(c, 0.0) + max(1.0, float(w.get("gmv") or 1.0))
-
-    if not cat_weights:
-        # Infer Home / Living affinities when category strings are sparse
-        all_names = " ".join(w.get("name", "") for w in winners)
-        if re.search(r"พรม|ท็อปเปอร์|ผ้าปู|ที่นอน|ห้องครัว|สเปรย์|ราว|กล่อง|บ้าน", all_names):
-            for c in ("ของใช้ภายในบ้าน", "Home Supplies", "ห้องนอน", "ห้องครัว", "สัตว์เลี้ยง"):
-                cat_weights[c] = 1.0
-
-    scored: list[tuple[float, dict[str, Any]]] = []
-    for p in pool:
-        sku = str(p.get("sku") or "")
-        if not sku or sku in used_skus:
-            continue
-        nk = norm_token_key(p.get("name", ""))
-        if any(nk == un or (len(nk) >= 12 and (nk in un or un in nk)) for un in used_names):
-            continue
-
-        v_rev = max(0.0, float(p.get("v_rev") or 0))
-        rev = max(1.0, float(p.get("rev") or v_rev or 1))
-        creators = max(1.0, float(p.get("creators") or 1))
-        conv = max(1.0, float(p.get("conv") or 5))
-        comm = float(p.get("comm") or (15 if p.get("hcomm") else 8))
-        growth = float(p.get("growth") or 0)
-        ai_score = max(40.0, float(p.get("ai") or 65))
-        v_share = min(1.0, v_rev / rev)
-
-        # Blended Blue Ocean + Video Growth score
-        blue_ocean = (v_rev / math.pow(creators + 6.0, 1.15)) * (0.7 + conv / 45.0)
-        growth_boost = 1.0 + min(max(growth, 0.0), 400.0) / 120.0
-        comm_boost = 1.0 + min(comm, 30.0) / 40.0
-        cat_match = 1.65 if p.get("cat") in cat_weights else 1.0
-        score = blue_ocean * growth_boost * comm_boost * (0.5 + 0.5 * v_share) * (ai_score / 100.0) * cat_match
-        scored.append((score, p))
-
-    scored.sort(key=lambda x: x[0], reverse=True)
-
-    # Diversify slightly by first two meaningful words so we don't return 6 near-identical SKUs
-    picked: list[dict[str, Any]] = []
-    backups: list[dict[str, Any]] = []
-    seen_prefixes: dict[str, int] = {}
-
-    for _, p in scored:
-        prefix = " ".join(clean_product_query(p.get("name", "")).lower().split()[:2])
-        if len(picked) < desired_count:
-            if seen_prefixes.get(prefix, 0) < 2:
-                seen_prefixes[prefix] = seen_prefixes.get(prefix, 0) + 1
-                picked.append({
-                    "sku": p["sku"],
-                    "name": p["name"],
-                    "image": p.get("image", ""),
-                    "cat": p.get("cat", ""),
-                    "price": float(p.get("price") or p.get("avg_price") or 0),
-                    "comm": float(p.get("comm") or 0),
-                    "v_rev": float(p.get("v_rev") or 0),
-                    "creators": int(p.get("creators") or 0),
-                    "conv": float(p.get("conv") or 0),
-                    "growth": float(p.get("growth") or 0),
-                    "link": p.get("link") or f"https://shop.tiktok.com/view/product/{p['sku']}?region=TH&locale=th-TH",
-                    "tier": "new_star",
-                    "starred": True,
-                    "reason": "สินค้าดาวรุ่ง Kalodata (ยอดคลิปพุ่ง คู่แข่งน้อย)",
-                })
+    def pick_diverse(source_list: list[dict[str, Any]], count: int, used_prefixes: dict[str, int], cat_counts: dict[str, int], picked_skus: set[str]) -> list[dict[str, Any]]:
+        out: list[dict[str, Any]] = []
+        for item in source_list:
+            if len(out) >= count:
+                break
+            if item["sku"] in picked_skus:
                 continue
-        if len(backups) < 40:
-            backups.append({
-                "sku": p["sku"],
-                "name": p["name"],
-                "image": p.get("image", ""),
-                "cat": p.get("cat", ""),
-                "price": float(p.get("price") or p.get("avg_price") or 0),
-                "comm": float(p.get("comm") or 0),
-                "v_rev": float(p.get("v_rev") or 0),
-                "creators": int(p.get("creators") or 0),
-                "conv": float(p.get("conv") or 0),
-                "growth": float(p.get("growth") or 0),
-                "link": p.get("link") or f"https://shop.tiktok.com/view/product/{p['sku']}?region=TH&locale=th-TH",
-                "tier": "new_star",
-                "starred": True,
-                "reason": "สินค้าดาวรุ่ง Kalodata สำรอง",
-            })
+            prefix = " ".join(clean_product_query(item["name"]).lower().split()[:2])
+            if used_prefixes.get(prefix, 0) >= 1:
+                continue
+            if cat_counts.get(item["cat"], 0) >= 2:
+                continue
+            used_prefixes[prefix] = used_prefixes.get(prefix, 0) + 1
+            cat_counts[item["cat"]] = cat_counts.get(item["cat"], 0) + 1
+            picked_skus.add(item["sku"])
+            out.append(item)
+        return out
+
+    used_prefixes: dict[str, int] = {}
+    cat_counts: dict[str, int] = {}
+    picked_skus: set[str] = set()
+
+    if strategy == "core_only":
+        n_core, n_cross = desired_count, 0
+    elif strategy == "expand":
+        n_cross = max(1, round(desired_count * 0.65))
+        n_core = max(0, desired_count - n_cross)
+    else:  # balanced: ~65% core home-living + ~35% cross-category same-buyer impulse
+        n_cross = max(1, desired_count // 3) if desired_count >= 3 else 0
+        n_core = max(0, desired_count - n_cross)
+
+    picked = pick_diverse(core_list, n_core, used_prefixes, cat_counts, picked_skus)
+    picked.extend(pick_diverse(cross_list, n_cross, used_prefixes, cat_counts, picked_skus))
+    if len(picked) < desired_count:
+        picked.extend(pick_diverse(core_list + cross_list, desired_count - len(picked), used_prefixes, cat_counts, picked_skus))
+
+    # Build backup list for swaps and AI selection (keep diversity across core and cross)
+    backups: list[dict[str, Any]] = []
+    max_backup = 40
+    i_c, i_x = 0, 0
+    while len(backups) < max_backup and (i_c < len(core_list) or i_x < len(cross_list)):
+        if i_c < len(core_list):
+            if core_list[i_c]["sku"] not in picked_skus:
+                backups.append(core_list[i_c])
+            i_c += 1
+        if len(backups) < max_backup and i_c < len(core_list):
+            if core_list[i_c]["sku"] not in picked_skus:
+                backups.append(core_list[i_c])
+            i_c += 1
+        if len(backups) < max_backup and i_x < len(cross_list):
+            if cross_list[i_x]["sku"] not in picked_skus:
+                backups.append(cross_list[i_x])
+            i_x += 1
 
     return picked, backups
 
 
+def grade_channel_products_smart(items: list[dict[str, Any]]) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    """Classify channel products dynamically using real commission share (Pareto 85/93.5%), traps, and Hidden Gems."""
+    has_any_sales = any((float(x.get("gmv") or 0) > 0 or int(x.get("orders") or 0) > 0) for x in items)
+    if not has_any_sales:
+        winners: list[dict[str, Any]] = []
+        for it in items:
+            it["tier"] = "winner"
+            it["grade"] = "A"
+            it["starred"] = True
+            it["reason"] = "รายการสินค้าจากช่อง (ไม่มีคอลัมน์ยอดขาย — จัดเข้ากลุ่มทำคลิป)"
+            winners.append(it)
+        return winners, []
+
+    total_comm = sum(float(x.get("comm") or 0) for x in items)
+    use_comm = total_comm > 0.0
+
+    def perf_val(x: dict[str, Any]) -> float:
+        return float(x.get("comm") or 0) if use_comm else float(x.get("gmv") or 0)
+
+    positive = [x for x in items if (int(x.get("orders") or 0) > 0 or float(x.get("gmv") or 0) > 0)]
+    zero_items = [x for x in items if x not in positive]
+
+    positive.sort(key=lambda x: (perf_val(x), float(x.get("gmv") or 0), int(x.get("orders") or 0)), reverse=True)
+    total_metric = max(1.0, sum(perf_val(x) for x in positive))
+
+    winners = []
+    dropped = []
+
+    for it in zero_items:
+        it["tier"] = "dropped"
+        it["grade"] = "ZERO"
+        it["starred"] = False
+        it["reason"] = "❌ ยอดขาย ฿0 / 0 ชิ้น — ปัดตกอัตโนมัติ"
+        dropped.append(it)
+
+    cum_metric = 0.0
+    for rank_idx, it in enumerate(positive):
+        gmv = float(it.get("gmv") or 0)
+        comm = float(it.get("comm") or 0)
+        orders = int(it.get("orders") or 0)
+        vids = int(it.get("videos_count") or 1)
+        cpv = float(it.get("comm_per_video") or 0)
+        cpo = float(it.get("comm_per_order") or 0)
+        cpct = float(it.get("comm_pct_eff") or 0)
+
+        m_val = perf_val(it)
+        cum_before = cum_metric / total_metric
+        cum_metric += m_val
+
+        # Volume trap check: many small orders but pathetic real commission
+        is_volume_trap = use_comm and orders >= 6 and cpo < 2.2 and (comm / total_metric) < 0.004
+
+        if (cum_before < 0.85 or rank_idx < 3) and not (use_comm and comm <= 0 and gmv < 1000):
+            it["tier"] = "winner"
+            it["grade"] = "S"
+            it["starred"] = True
+            it["reason"] = (
+                f"👑 เกรด S ตัวแบกช่อง (คอม ฿{comm:,.0f} · {cpct}% · เฉลี่ย ฿{cpv:,.0f}/คลิป)"
+                if use_comm
+                else f"👑 เกรด S ตัวแบกช่อง (GMV ฿{gmv:,.0f} · {orders} ชิ้น)"
+            )
+            winners.append(it)
+        elif is_volume_trap:
+            it["tier"] = "dropped"
+            it["grade"] = "TRAP"
+            it["starred"] = False
+            it["reason"] = f"⚠️ ปัดตก (เหนื่อยฟรีคอมเตี้ย): ขายตั้ง {orders} ชิ้น แต่ได้คอมแค่ ฿{comm:,.1f} (เฉลี่ย ฿{cpo:.1f}/ชิ้น)"
+            dropped.append(it)
+        elif vids <= 2 and (
+            (use_comm and (cpv >= 28.0 or cpo >= 22.0 or (cpct >= 8.0 and comm >= 20.0)))
+            or (not use_comm and gmv >= total_metric * 0.015)
+        ):
+            it["tier"] = "winner"
+            it["grade"] = "A_GEM"
+            it["starred"] = True
+            it["reason"] = (
+                f"💎 ช้างเผือกน่าปั้น: ทำแค่ {vids} คลิป แต่ได้คอม ฿{comm:,.0f} (เฉลี่ย ฿{cpv:,.0f}/คลิป · {cpct}%) น่าอัดคลิปเพิ่ม!"
+                if use_comm
+                else f"💎 ช้างเผือกน่าปั้น: ทำแค่ {vids} คลิป ได้ยอด ฿{gmv:,.0f}"
+            )
+            winners.append(it)
+        elif cum_before < 0.935:
+            it["tier"] = "winner"
+            it["grade"] = "A"
+            it["starred"] = True
+            it["reason"] = (
+                f"⭐ เกรด A ทำเงินสม่ำเสมอ (คอม ฿{comm:,.0f} · {cpct}% · {vids} คลิป)"
+                if use_comm
+                else f"⭐ เกรด A ทำเงินสม่ำเสมอ (GMV ฿{gmv:,.0f} · {orders} ชิ้น)"
+            )
+            winners.append(it)
+        else:
+            it["tier"] = "dropped"
+            it["grade"] = "C"
+            it["starred"] = False
+            it["reason"] = (
+                f"🗑️ หางแถว (~6% ท้ายตาราง): ทั้งเดือนได้คอม ฿{comm:,.1f} ({orders} ชิ้น · {vids} คลิป) เก็บสล็อตไปปั้นตัวท็อปคุ้มกว่า"
+                if use_comm
+                else f"🗑️ หางแถวท้ายตาราง: GMV ฿{gmv:,.0f} ({orders} ชิ้น)"
+            )
+            dropped.append(it)
+
+    if not winners and dropped:
+        promoted = dropped[: min(10, len(dropped))]
+        dropped = dropped[len(promoted) :]
+        for it in promoted:
+            it["tier"] = "winner"
+            it["grade"] = "A"
+            it["starred"] = True
+            winners.append(it)
+
+    return winners, dropped
+
+
+def run_ai_portfolio_advisor(
+    winners: list[dict[str, Any]],
+    dropped: list[dict[str, Any]],
+    picked_stars: list[dict[str, Any]],
+    backup_stars: list[dict[str, Any]],
+    strategy: str = "balanced",
+    desired_count: int = 6,
+    explicit_key: str = "",
+) -> dict[str, Any]:
+    """Use Gemini AI (blunt, data-first) to review borderline items and curate best New Star products."""
+    api_key = _discover_gemini_api_key(explicit_key)
+    if not api_key:
+        return {"ai_used": False, "ai_model": "", "ai_critique": [], "winners": winners, "dropped": dropped, "new_stars": picked_stars}
+
+    try:
+        from google import genai
+        from google.genai import types
+    except Exception:
+        return {"ai_used": False, "ai_model": "", "ai_critique": [], "winners": winners, "dropped": dropped, "new_stars": picked_stars}
+
+    all_channel = winners + dropped
+    compact_channel = [
+        {
+            "sku": p["sku"],
+            "tier_auto": p["tier"],
+            "grade": p.get("grade", ""),
+            "gmv": round(float(p.get("gmv") or 0), 0),
+            "comm": round(float(p.get("comm") or 0), 1),
+            "comm_pct": float(p.get("comm_pct_eff") or 0),
+            "orders": int(p.get("orders") or 0),
+            "videos": int(p.get("videos_count") or 0),
+            "comm_per_vid": float(p.get("comm_per_video") or 0),
+            "name": str(p.get("name") or "")[:55],
+        }
+        for p in all_channel[:45]
+        if p.get("sku")
+    ]
+
+    candidate_pool = (picked_stars + backup_stars)[:28]
+    compact_cands = [
+        {
+            "sku": c["sku"],
+            "segment": c.get("segment", "core"),
+            "cat": c.get("cat", ""),
+            "price": round(float(c.get("price") or 0), 0),
+            "comm_pct": float(c.get("comm") or 0),
+            "comm_baht": float(c.get("comm_baht") or 0),
+            "v_rev": round(float(c.get("v_rev") or 0), 0),
+            "creators": int(c.get("creators") or 0),
+            "conv": float(c.get("conv") or 0),
+            "growth": float(c.get("growth") or 0),
+            "name": str(c.get("name") or "")[:60],
+        }
+        for c in candidate_pool
+    ]
+
+    strat_desc = {
+        "balanced": f"สมดุล: เลือกทั้งหมด {desired_count} ตัว โดยเน้นหมวดบ้าน/ของใช้ใกล้เคียงประมาณ {max(1, desired_count - max(1, desired_count // 3))} ตัว และอีก {max(1, desired_count // 3) if desired_count >= 3 else 0} ตัวเป็นสินค้าข้ามหมวดที่คนดูกลุ่มเดียวกันซื้อง่าย คอมสูง",
+        "core_only": f"เน้นหมวดเดิม: เลือก {desired_count} ตัวจาก segment='core' เป็นหลัก",
+        "expand": f"ขยายหมวด: เลือก {desired_count} ตัว โดยผสม segment='cross' ที่คอมคุ้มคู่แข่งน้อยเป็นหลัก",
+    }.get(strategy, f"เลือก {desired_count} ตัวที่ดีที่สุด")
+
+    prompt = (
+        "คุณคือที่ปรึกษากลยุทธ์ TikTok Shop Affiliate สายข้อมูลจริง (ห้ามอวย ห้ามพูดเอาใจ ให้วิเคราะห์ตรงไปตรงมาตามตัวเลขเท่านั้น):\n"
+        f"1. ข้อมูลสินค้าของช่องตอนนี้ ({len(compact_channel)} รายการ): {json.dumps(compact_channel, ensure_ascii=False)}\n"
+        f"2. รายชื่อสินค้าใหม่ตัวเต็งจาก Kalodata ({len(compact_cands)} รายการ): {json.dumps(compact_cands, ensure_ascii=False)}\n"
+        f"3. กลยุทธ์สินค้าใหม่ที่ต้องการ: {strat_desc}\n\n"
+        "คำสั่ง (ตอบเป็น JSON เท่านั้น ห้ามมีข้อความอื่น):\n"
+        "- `ai_critique`: อาร์เรย์ข้อความสั้นๆ 3 ข้อ วิจารณ์พอร์ตช่องตรงๆ เช่น ตัวไหน GMV สูงแต่ค่าคอม%ต่ำมากเป็นความเสี่ยง, ตัวไหนเป็นช้างเผือกต่อคลิป, และทำไมถึงเลือกสินค้าใหม่ชุดนี้\n"
+        "- `promote_skus`: เสนอไม่เกิน 3 ตัวที่ระบบคัดเป็น dropped แต่อาจคุ้มค่าแก่การดันต่อ พร้อมเหตุผลสั้นๆ: [{\"sku\":\"...\",\"reason\":\"...\"}]\n"
+        "- `drop_skus`: เสนอไม่เกิน 3 ตัวที่อยู่ใน winners แต่คอมต่อชิ้น/ประสิทธิภาพแย่กว่าตัวอื่นจริง: [{\"sku\":\"...\",\"reason\":\"...\"}]\n"
+        f"- `selected_new_stars`: คัด SKU จากรายการข้อ 2 มาให้ครบ {desired_count} ตัวไม่ซ้ำกัน ตามกลยุทธ์ที่สั่ง พร้อมเหตุผลตรงๆ: [{{\"sku\":\"...\",\"reason\":\"...\"}}]"
+    )
+
+    client = genai.Client(api_key=api_key)
+    for model_name in ("gemini-2.5-flash", "gemini-3-flash-preview", "gemini-2.5-flash-lite"):
+        try:
+            resp = client.models.generate_content(
+                model=model_name,
+                contents=prompt,
+                config=types.GenerateContentConfig(
+                    temperature=0.25,
+                    response_mime_type="application/json",
+                ),
+            )
+            parsed = json.loads(resp.text or "{}")
+            critique = [str(x).strip() for x in (parsed.get("ai_critique") or []) if str(x).strip()][:4]
+
+            # Apply bounded promote/drop overrides cleanly
+            winners_by_sku = {p["sku"]: p for p in winners if p.get("sku")}
+            dropped_by_sku = {p["sku"]: p for p in dropped if p.get("sku")}
+
+            for promo in (parsed.get("promote_skus") or [])[:3]:
+                psku = str(promo.get("sku") or "").strip()
+                if psku in dropped_by_sku:
+                    obj = dropped_by_sku.pop(psku)
+                    obj["tier"] = "winner"
+                    obj["grade"] = "A_GEM"
+                    obj["starred"] = True
+                    obj["reason"] = f"🤖 AI ดึงกลับ: {promo.get('reason') or 'น่าลองดันต่อ'}"
+                    winners.append(obj)
+                    dropped = [d for d in dropped if d.get("sku") != psku]
+
+            for dr in (parsed.get("drop_skus") or [])[:3]:
+                dsku = str(dr.get("sku") or "").strip()
+                if dsku in winners_by_sku and len(winners) > 5:
+                    obj = winners_by_sku.pop(dsku)
+                    # Do not allow AI to drop top-3 earners
+                    if obj.get("grade") == "S" and obj in winners[:5]:
+                        continue
+                    obj["tier"] = "dropped"
+                    obj["grade"] = "AI_DROP"
+                    obj["starred"] = False
+                    obj["reason"] = f"🤖 AI ปัดตก: {dr.get('reason') or 'ประสิทธิภาพไม่คุ้มโควตา'}"
+                    dropped.insert(0, obj)
+                    winners = [w for w in winners if w.get("sku") != dsku]
+
+            # Map selected_new_stars cleanly from vetted candidate_pool
+            cand_map = {c["sku"]: c for c in candidate_pool}
+            ai_stars: list[dict[str, Any]] = []
+            seen_s: set[str] = set()
+            for sel in parsed.get("selected_new_stars") or []:
+                ssku = str(sel.get("sku") or "").strip()
+                if ssku in cand_map and ssku not in seen_s and len(ai_stars) < desired_count:
+                    item = dict(cand_map[ssku])
+                    if sel.get("reason"):
+                        item["reason"] = f"🤖 AI คัด: {sel['reason']}"
+                    ai_stars.append(item)
+                    seen_s.add(ssku)
+
+            for fallback_item in picked_stars + backup_stars:
+                if len(ai_stars) >= desired_count:
+                    break
+                if fallback_item["sku"] not in seen_s:
+                    ai_stars.append(fallback_item)
+                    seen_s.add(fallback_item["sku"])
+
+            return {
+                "ai_used": True,
+                "ai_model": model_name,
+                "ai_critique": critique,
+                "winners": winners,
+                "dropped": dropped,
+                "new_stars": ai_stars,
+            }
+        except Exception:
+            continue
+
+    return {"ai_used": False, "ai_model": "", "ai_critique": [], "winners": winners, "dropped": dropped, "new_stars": picked_stars}
+
+
 def analyze_sales_payload(payload: dict[str, Any]) -> dict[str, Any]:
-    """Parse sales file(s) or pasted lines, resolve SKUs/images, and classify Winner/Dropped/New Stars."""
+    """Parse sales file(s) or pasted lines, grade via Real Commission + AI Advisor, and pick New Stars."""
     files = payload.get("files") or []
     text_lines = str(payload.get("text_lines") or "").strip()
-    min_orders = int(payload.get("min_orders_winner") if payload.get("min_orders_winner") is not None else 5)
-    min_gmv = float(payload.get("min_gmv_winner") if payload.get("min_gmv_winner") is not None else 500.0)
     new_stars_count = int(payload.get("new_stars_count") if payload.get("new_stars_count") is not None else 6)
+    new_star_strategy = str(payload.get("new_star_strategy") or "balanced").strip()
+    use_ai = bool(payload.get("use_ai") if payload.get("use_ai") is not None else True)
+    explicit_key = str(payload.get("gemini_api_key") or "").strip()
 
     warnings: list[str] = []
     parsed_files: list[str] = []
@@ -902,9 +1282,14 @@ def analyze_sales_payload(payload: dict[str, Any]) -> dict[str, Any]:
                 "link": unwrapped.get("resolved_url", ""),
                 "image": unwrapped.get("og_image", ""),
                 "gmv": 500.0,
-                "orders": max(1, min_orders),
-                "comm": 0.0,
-                "price": 0.0,
+                "orders": 5,
+                "comm": 50.0,
+                "videos_count": 1,
+                "distinct_orders": 5,
+                "comm_pct_eff": 10.0,
+                "comm_per_video": 50.0,
+                "comm_per_order": 10.0,
+                "price": 100.0,
             })
 
     if not raw_items:
@@ -914,51 +1299,12 @@ def analyze_sales_payload(payload: dict[str, Any]) -> dict[str, Any]:
             "warnings": warnings,
         }
 
-    # Classify Winners vs Dropped FIRST so we don't waste remote DB queries on dropped/tail rows
+    # Fast local-only SKU/thumbnail pass for all items (<0.1s) before grading
     cat_map = load_channel_catalog()
-    has_any_sales = any((float(x.get("gmv") or 0) > 0 or int(x.get("orders") or 0) > 0) for x in raw_items)
-
-    # Fast local-only pass for all items (<0.1s)
     local_resolved = [resolve_product_metadata(item, cat_map, use_remote_api=False) for item in raw_items]
 
-    winners: list[dict[str, Any]] = []
-    dropped: list[dict[str, Any]] = []
-    for item in local_resolved:
-        gmv = float(item.get("gmv") or 0)
-        orders = int(item.get("orders") or 0)
-        if not has_any_sales:
-            keep = True
-            item["reason"] = "รายการสินค้าจากช่อง (ไม่มีคอลัมน์ยอดขาย — จัดเข้ากลุ่มทำคลิป)"
-        elif min_orders <= 1 and min_gmv <= 0:
-            keep = orders >= 1 or gmv > 0
-        else:
-            keep = (orders > 0 or gmv > 0) and (
-                (min_orders > 0 and orders >= min_orders) or (min_gmv > 0 and gmv >= min_gmv)
-            )
-        if keep:
-            item["tier"] = "winner"
-            item["starred"] = True
-            item.setdefault("reason", f"ขายดีประจำช่อง ({orders:,} ชิ้น · ฿{gmv:,.0f})")
-            winners.append(item)
-        else:
-            item["tier"] = "dropped"
-            item["starred"] = False
-            item["reason"] = f"ขายได้ {orders:,} ชิ้น (฿{gmv:,.0f}) — ต่ำกว่าเกณฑ์ ({min_orders} ชิ้น / ฿{min_gmv:,.0f}) จึงปัดตกไปเทโควตาให้ตัวทำเงิน"
-            dropped.append(item)
-
-    # Safeguard: if threshold was set higher than every product in a small store, keep top 10 by GMV
-    if not winners and dropped and has_any_sales:
-        dropped.sort(key=lambda x: (float(x.get("gmv") or 0), int(x.get("orders") or 0)), reverse=True)
-        promoted = dropped[: min(10, len(dropped))]
-        dropped = dropped[len(promoted) :]
-        for item in promoted:
-            item["tier"] = "winner"
-            item["starred"] = True
-            item["reason"] = f"ตัวท็อปสุดที่มีในไฟล์ ({item.get('orders', 0):,} ชิ้น · ฿{item.get('gmv', 0):,.0f})"
-            winners.append(item)
-
-    winners.sort(key=lambda x: (float(x.get("gmv") or 0), int(x.get("orders") or 0)), reverse=True)
-    dropped.sort(key=lambda x: (float(x.get("gmv") or 0), int(x.get("orders") or 0)), reverse=True)
+    # Dynamic portfolio grading (Real Commission 85/93.5% Pareto + Volume Traps + Hidden Gems)
+    winners, dropped = grade_channel_products_smart(local_resolved)
 
     # Remote Kalodata DB lookup ONLY for winners missing SKU or top winners missing thumbnail
     need_remote_indices: list[int] = []
@@ -985,10 +1331,35 @@ def analyze_sales_payload(payload: dict[str, Any]) -> dict[str, Any]:
 
     save_channel_catalog_entries(winners)
 
-    new_stars, backup_new_stars = select_new_stars_from_pool(winners, dropped, desired_count=new_stars_count)
-    save_channel_catalog_entries(new_stars)
+    picked_stars, backup_stars = select_new_stars_from_pool(
+        winners, dropped, desired_count=new_stars_count, strategy=new_star_strategy
+    )
 
+    ai_result = {
+        "ai_used": False,
+        "ai_model": "",
+        "ai_critique": [],
+        "winners": winners,
+        "dropped": dropped,
+        "new_stars": picked_stars,
+    }
+    if use_ai:
+        ai_result = run_ai_portfolio_advisor(
+            winners, dropped, picked_stars, backup_stars,
+            strategy=new_star_strategy, desired_count=new_stars_count, explicit_key=explicit_key
+        )
+        winners = ai_result["winners"]
+        dropped = ai_result["dropped"]
+        picked_stars = ai_result["new_stars"]
+        used_star_skus = {s["sku"] for s in picked_stars}
+        backup_stars = [b for b in backup_stars if b["sku"] not in used_star_skus]
+
+    save_channel_catalog_entries(picked_stars)
     missing_sku_items = [x for x in winners if not extract_clean_sku(x.get("sku"))]
+
+    total_gmv = round(sum(float(x.get("gmv") or 0) for x in winners + dropped), 2)
+    total_comm = round(sum(float(x.get("comm") or 0) for x in winners + dropped), 2)
+    gems_count = sum(1 for x in winners if x.get("grade") == "A_GEM")
 
     return {
         "ok": True,
@@ -996,9 +1367,19 @@ def analyze_sales_payload(payload: dict[str, Any]) -> dict[str, Any]:
         "warnings": warnings,
         "winners": winners,
         "dropped": dropped,
-        "new_stars": new_stars,
-        "backup_new_stars": backup_new_stars,
+        "new_stars": picked_stars,
+        "backup_new_stars": backup_stars,
         "missing_sku_count": len(missing_sku_items),
+        "ai_used": ai_result["ai_used"],
+        "ai_model": ai_result["ai_model"],
+        "ai_critique": ai_result["ai_critique"],
+        "portfolio_stats": {
+            "total_gmv": total_gmv,
+            "total_comm": total_comm,
+            "gems_count": gems_count,
+            "winners_count": len(winners),
+            "dropped_count": len(dropped),
+        },
     }
 
 
@@ -1135,7 +1516,10 @@ def generate_monthly_schedule(payload: dict[str, Any]) -> dict[str, Any]:
     free_in = [dict(x) for x in (payload.get("free_samples") or []) if x.get("name") or x.get("sku")]
     dropped_in = [dict(x) for x in (payload.get("dropped_products") or payload.get("dropped") or [])]
 
-    winners_in.sort(key=lambda x: (float(x.get("gmv") or 0), int(x.get("orders") or 0)), reverse=True)
+    winners_in.sort(
+        key=lambda x: (float(x.get("comm") or 0), float(x.get("gmv") or 0), int(x.get("orders") or 0)),
+        reverse=True,
+    )
 
     # Deduplicate by SKU (or normalized name when SKU missing) keeping highest tier priority
     active_list: list[dict[str, Any]] = []
@@ -1233,38 +1617,36 @@ def generate_monthly_schedule(payload: dict[str, Any]) -> dict[str, Any]:
             remaining -= add
 
     if remaining > 0 and winner_prods:
-        # Ensure top winners first get at least 2 main slots if possible (so OMNI 5 has rich eligible choices!)
+        # Ensure top winners and Hidden Gems (A_GEM) get at least 2-3 main slots when capacity allows
         if total_main_slots >= len(active_list) + 2:
             for prod in winner_prods:
                 k = prod_key(prod)
-                if quotas[k] < 2 and remaining > 0:
-                    quotas[k] += 1
-                    remaining -= 1
+                min_floor = 3 if (prod.get("grade") == "A_GEM" and num_days >= 10) else 2
+                if quotas[k] < min_floor and remaining > 0:
+                    add = min(remaining, min_floor - quotas[k])
+                    quotas[k] += add
+                    remaining -= add
 
         max_per_prod = num_days if len(active_list) >= main_per_day else num_days * 2
         weights = [
-            math.sqrt(max(float(p.get("gmv") or 0), float(p.get("orders") or 0) * 150.0, 80.0))
+            math.sqrt(max(float(p.get("comm") or 0) * 25.0, float(p.get("gmv") or 0), float(p.get("orders") or 0) * 150.0, 80.0))
             for p in winner_prods
         ]
         while remaining > 0:
-            progressed = False
-            w_sum = sum(w for p, w in zip(winner_prods, weights) if quotas[prod_key(p)] < max_per_prod)
-            if w_sum <= 0:
+            eligible = [
+                (idx, p, w)
+                for idx, (p, w) in enumerate(zip(winner_prods, weights))
+                if quotas[prod_key(p)] < max_per_prod
+            ]
+            if not eligible:
                 max_per_prod += 1
                 continue
-            for p, w in zip(winner_prods, weights):
-                if remaining <= 0:
-                    break
-                k = prod_key(p)
-                if quotas[k] >= max_per_prod:
-                    continue
-                quotas[k] += 1
-                remaining -= 1
-                progressed = True
-                if remaining <= 0:
-                    break
-            if not progressed:
-                break
+            _, best_p, _ = min(
+                eligible,
+                key=lambda item: (quotas[prod_key(item[1])] / max(1e-6, item[2]), item[0]),
+            )
+            quotas[prod_key(best_p)] += 1
+            remaining -= 1
 
     # Step B: Spread main slots evenly across days (minimizing collisions on same day)
     day_main_buckets: list[list[dict[str, Any]]] = [[] for _ in range(num_days)]

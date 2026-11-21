@@ -664,23 +664,33 @@
             <input type="number" id="newStarMainQuota" value="5" min="1" max="10" />
           </div>
           <div>
-            <label class="field-label">🏆 เกณฑ์ไปต่อ: ขายได้สุทธิ >= (ชิ้น)</label>
-            <input type="number" id="minOrdersWinner" value="5" min="0" max="1000" />
+            <label class="field-label">🧠 ระบบคัดเกรดสินค้าช่อง (เลิกใช้เลขตายตัว)</label>
+            <select id="gradingMode">
+              <option value="ai_smart" selected>🤖 AI + วัดค่าคอมจริง & ช้างเผือกต่อคลิป (แนะนำ)</option>
+              <option value="math_smart">📊 สูตรวัดค่าคอมจริง 93% + ช้างเผือก (ด่วน ไม่รอ AI)</option>
+            </select>
           </div>
           <div>
-            <label class="field-label">💰 หรือมียอด GMV >= (บาท)</label>
-            <input type="number" id="minGmvWinner" value="500" min="0" step="50" />
+            <label class="field-label">🚀 กลยุทธ์คัดสินค้าใหม่น่าลองจากคลังระบบ</label>
+            <select id="newStarStrategy">
+              <option value="balanced" selected>⚖️ สมดุล (หมวดบ้านเดิม ~65% + ข้ามหมวดซื้อง่าย ~35%)</option>
+              <option value="core_only">🏠 หมวดบ้าน / ที่นอน / ครัว ล้วน 100%</option>
+              <option value="expand">🌍 ขยายฐานหมวดใหม่คอมฯ สูงซื้อง่าย</option>
+            </select>
           </div>
         </div>
         <div id="reanalyzeBar" style="display:none; margin-top:10px; justify-content:flex-end;">
           <button type="button" class="btn btn-sm btn-gold" onclick="reanalyzeLastUploadedFiles()">
-            🔄 คัดเกรดใหม่ตามเกณฑ์ด้านบน (ไม่ต้องเลือกไฟล์ใหม่)
+            🔄 คัดเกรดและให้ AI เลือกสินค้าใหม่รอบใหม่ (ไม่ต้องอัปโหลดไฟล์ซ้ำ)
           </button>
         </div>
       </div>
 
       <!-- Parse Warnings -->
       <div id="parseWarningsBox" class="alert-box" style="display:none; border-color:var(--accent-2); background:rgba(37,244,238,0.08);"></div>
+
+      <!-- AI Blunt Portfolio Critique Box -->
+      <div id="aiCritiqueBox" class="alert-box" style="display:none; border-color:var(--gold); background:rgba(255,214,0,0.08);"></div>
 
       <!-- Missing SKU Alert Box -->
       <div id="missingSkuPanel" class="alert-box" style="display:none;">
@@ -1048,12 +1058,13 @@
     async function runSalesAnalysisFromPayload(filesPayload) {
       const res = await apiPost('/api/analyze-sales', {
         files: filesPayload,
-        min_orders_winner: Number(document.getElementById('minOrdersWinner').value || 0),
-        min_gmv_winner: Number(document.getElementById('minGmvWinner').value || 0),
-        new_stars_count: Number(document.getElementById('newStarsCount').value || 6)
+        use_ai: (document.getElementById('gradingMode')?.value || 'ai_smart') === 'ai_smart',
+        new_star_strategy: document.getElementById('newStarStrategy')?.value || 'balanced',
+        new_stars_count: Number(document.getElementById('newStarsCount').value || 6),
+        gemini_api_key: localStorage.getItem('AGY_TIKTOK_STUDIO_GEMINI_KEY') || ''
       });
       applyAnalysisResult(res);
-      showToast(`✅ วิเคราะห์สำเร็จ! ขายดี ${res.winners.length} ตัว · ใหม่น่าลอง ${res.new_stars.length} ตัว · ปัดตก ${res.dropped.length} ตัว`, 5000);
+      showToast(`✅ วิเคราะห์สำเร็จ! เก็บ ${res.winners.length} ตัว (รวมช้างเผือก) · ใหม่น่าลอง ${res.new_stars.length} ตัว · ปัดตก ${res.dropped.length} ตัว`, 5500);
     }
 
     async function analyzeQuickPaste() {
@@ -1063,8 +1074,10 @@
       try {
         const res = await apiPost('/api/analyze-sales', {
           text_lines: lines,
-          min_orders_winner: 1,
-          new_stars_count: Number(document.getElementById('newStarsCount').value || 6)
+          use_ai: (document.getElementById('gradingMode')?.value || 'ai_smart') === 'ai_smart',
+          new_star_strategy: document.getElementById('newStarStrategy')?.value || 'balanced',
+          new_stars_count: Number(document.getElementById('newStarsCount').value || 6),
+          gemini_api_key: localStorage.getItem('AGY_TIKTOK_STUDIO_GEMINI_KEY') || ''
         });
         applyAnalysisResult(res);
         showToast(`✅ ดึงข้อมูลเสร็จสิ้น (${res.winners.length} รายการ + ใหม่ ${res.new_stars.length} รายการ)`, 4500);
@@ -1079,7 +1092,11 @@
         new_stars: res.new_stars || [],
         backup_new_stars: res.backup_new_stars || [],
         dropped: res.dropped || [],
-        warnings: res.warnings || []
+        warnings: res.warnings || [],
+        ai_used: Boolean(res.ai_used),
+        ai_model: res.ai_model || '',
+        ai_critique: res.ai_critique || [],
+        portfolio_stats: res.portfolio_stats || {}
       };
       const warnBox = document.getElementById('parseWarningsBox');
       if (analysisState.warnings.length) {
@@ -1088,6 +1105,20 @@
       } else {
         warnBox.style.display = 'none';
       }
+
+      const aiBox = document.getElementById('aiCritiqueBox');
+      if (aiBox) {
+        const st = analysisState.portfolio_stats || {};
+        const headerStats = `📊 <b>สรุปพอร์ตจริงทั้งเดือน:</b> GMV รวม <b>฿${Number(st.total_gmv || 0).toLocaleString()}</b> · ค่าคอมจริงรวม <b style="color:var(--green);">฿${Number(st.total_comm || 0).toLocaleString()}</b> · เก็บทำต่อ <b>${st.winners_count || 0}</b> ตัว (💎 ช้างเผือก <b>${st.gems_count || 0}</b> ตัว) · ปัดตก <b>${st.dropped_count || 0}</b> ตัว`;
+        if (analysisState.ai_used && analysisState.ai_critique.length) {
+          aiBox.style.display = 'block';
+          aiBox.innerHTML = `${headerStats}<div style="margin-top:8px; font-weight:800; color:var(--gold);">🤖 ความเห็นตรงไปตรงมาจาก AI Strategist (${escapeHtml(analysisState.ai_model)}):</div><ul style="padding-left:20px; margin-top:4px; font-size:13.2px; line-height:1.6;">${analysisState.ai_critique.map(c => `<li>${escapeHtml(c)}</li>`).join('')}</ul>`;
+        } else {
+          aiBox.style.display = 'block';
+          aiBox.innerHTML = headerStats;
+        }
+      }
+
       document.getElementById('analysisGroupsWrap').style.display = 'block';
       renderAnalysisTables();
     }
@@ -1135,13 +1166,18 @@
       }
 
       // 2. Winners Table
+      const gradeBadgeHtml = g => {
+        if (g === 'S') return `<span class="badge badge-winner">👑 เกรด S ตัวแบก</span>`;
+        if (g === 'A_GEM') return `<span class="badge badge-free">💎 ช้างเผือกน่าปั้น</span>`;
+        return `<span class="badge badge-star">⭐ เกรด A ทำเงิน</span>`;
+      };
       document.getElementById('winnersCountLabel').textContent = analysisState.winners.length;
       document.getElementById('winnersTable').innerHTML = `
         <thead>
           <tr>
             <th>รูป</th>
-            <th>สินค้า & รหัส 19 หลัก</th>
-            <th>ยอดขาย / ออเดอร์</th>
+            <th>สินค้า & รหัส 19 หลัก / เกรด</th>
+            <th>ค่าคอมจริง & ประสิทธิภาพต่อคลิป</th>
             <th style="width:130px;">กำหนดคิวหลักเอง (ว่าง=ออโต้)</th>
             <th>จัดการ</th>
           </tr>
@@ -1151,19 +1187,20 @@
             <tr>
               <td>${renderThumbHtml(p)}</td>
               <td>
-                <div style="font-weight:700;">⭐ ${escapeHtml(p.name)}</div>
-                <div style="font-size:12px; margin-top:2px;">
+                <div style="font-weight:700;">${gradeBadgeHtml(p.grade)} ${escapeHtml(p.name)}</div>
+                <div style="font-size:12px; margin-top:3px;">
                   ${p.sku
                     ? `<a href="${escapeHtml(p.link || `https://shop.tiktok.com/view/product/${p.sku}`)}" target="_blank" rel="noopener" class="mono" style="color:var(--accent-2); text-decoration:none;">🛒 ${escapeHtml(p.sku)}</a>`
                     : `<span style="color:var(--warn); font-weight:700;">⚠️ ยังไม่มีเลข 19 หลัก (กรอกด้านบน)</span>`
                   }
                   ${p.cat ? `<span class="badge" style="margin-left:6px;">${escapeHtml(p.cat)}</span>` : ''}
                 </div>
+                ${p.reason ? `<div style="font-size:11.6px; color:var(--muted); margin-top:2px;">${escapeHtml(p.reason)}</div>` : ''}
               </td>
               <td>
-                <b>฿${Number(p.gmv || 0).toLocaleString()}</b>
-                ${p.comm ? `<span style="color:var(--green); font-size:12px; font-weight:700;"> (คอม ฿${Number(p.comm).toLocaleString(undefined, { maximumFractionDigits: 0 })})</span>` : ''}<br>
-                <span style="color:var(--muted); font-size:12px;">${Number(p.orders || 0).toLocaleString()} ชิ้น${p.shop ? ` · ${escapeHtml(p.shop)}` : ''}</span>
+                <b style="color:var(--green);">คอม ฿${Number(p.comm || 0).toLocaleString(undefined, { maximumFractionDigits: 1 })}</b>
+                <span style="font-size:12px; color:var(--muted);">(${p.comm_pct_eff || 0}% · เฉลี่ย ฿${Number(p.comm_per_video || 0).toLocaleString()}/คลิป)</span><br>
+                <span style="color:var(--muted); font-size:12px;">GMV ฿${Number(p.gmv || 0).toLocaleString()} · ${Number(p.orders || 0).toLocaleString()} ชิ้น · ${p.videos_count || 1} คลิป</span>
               </td>
               <td>
                 <input type="number" min="1" max="31" placeholder="ออโต้"
@@ -1184,7 +1221,7 @@
         <thead>
           <tr>
             <th>รูป</th>
-            <th>สินค้าใหม่ดาวรุ่ง (ติดดาว)</th>
+            <th>สินค้าใหม่ดาวรุ่ง (AI + Kalodata คัดเฉพาะมีค่าคอม)</th>
             <th>ผลงานตลาด Kalodata</th>
             <th style="width:120px;">คิวหลัก</th>
             <th>จัดการ</th>
@@ -1200,9 +1237,10 @@
                   <a href="${escapeHtml(p.link || `https://shop.tiktok.com/view/product/${p.sku}`)}" target="_blank" rel="noopener" class="mono" style="color:var(--accent-2); text-decoration:none;">🛒 ${escapeHtml(p.sku)}</a>
                   ${p.cat ? `<span class="badge" style="margin-left:6px;">${escapeHtml(p.cat)}</span>` : ''}
                 </div>
+                ${p.reason ? `<div style="font-size:11.6px; color:var(--green); margin-top:2px;">${escapeHtml(p.reason)}</div>` : ''}
               </td>
               <td style="font-size:12.5px;">
-                ราคา <b>฿${Math.round(p.price || 0).toLocaleString()}</b> · คอมฯ <b style="color:var(--green);">${p.comm || 0}%</b><br>
+                ราคา <b>฿${Math.round(p.price || 0).toLocaleString()}</b> · คอมฯ <b style="color:var(--green);">${p.comm || 0}% (~฿${Math.round((p.price || 0) * (p.comm || 0) / 100)}/ชิ้น)</b><br>
                 ยอดคลิป <b>฿${Math.round(p.v_rev || 0).toLocaleString()}</b> · คนทำ ${p.creators || 0} · โต ${p.growth || 0}%
               </td>
               <td>
@@ -1232,7 +1270,10 @@
                 <div>${escapeHtml(p.name)}</div>
                 <div class="mono" style="font-size:11.5px; color:var(--muted);">${escapeHtml(p.sku || 'ไม่มี SKU')}</div>
               </td>
-              <td>฿${Number(p.gmv || 0).toLocaleString()} / ${p.orders || 0} ออเดอร์</td>
+              <td>
+                <b>คอม ฿${Number(p.comm || 0).toLocaleString(undefined, { maximumFractionDigits: 1 })}</b> (${p.comm_pct_eff || 0}%)<br>
+                <span style="font-size:12px; color:var(--muted);">GMV ฿${Number(p.gmv || 0).toLocaleString()} · ${p.orders || 0} ชิ้น · ${p.videos_count || 0} คลิป</span>
+              </td>
               <td style="font-size:12.5px; color:var(--muted);">${escapeHtml(p.reason || 'ยอดไม่เดิน')}</td>
               <td>
                 <button type="button" class="btn btn-sm btn-green" onclick="moveItemGroup('dropped', 'winners', ${idx})">↩️ ดึงกลับมาทำต่อ</button>
