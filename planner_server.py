@@ -580,6 +580,7 @@ def _detect_column_map(headers: list[str]) -> tuple[dict[str, int], int]:
         ("shop", ("ชื่อร้านค้า", "ร้านค้า", "shop name", "seller name"), ("รหัส", "id", "ประเภท", "โฆษณา", "ค่าคอม")),
         ("content_id", ("รหัสเนื้อหา", "content id", "content_id", "video id", "รหัสวิดีโอ"), ()),
         ("order_id", ("หมายเลขคำสั่งซื้อ", "order id", "order_id", "รหัสคำสั่งซื้อ"), ()),
+        ("order_date", ("วันที่สั่งซื้อ", "เวลาที่สั่งซื้อ", "created time", "order date", "order time"), ("ชำระเงิน", "paid", "settlement")),
     ]
 
     used_indices: set[int] = set()
@@ -658,11 +659,39 @@ def _read_rows_from_file(filename: str, raw_bytes: bytes) -> list[list[str]]:
     raise ValueError(f"ยังไม่รองรับนามสกุลไฟล์ {ext} (รองรับ .xlsx และ .csv ครับ)")
 
 
+def _parse_date_iso(raw_val: Any) -> str:
+    """Parse DD/MM/YYYY or YYYY-MM-DD (including Thai Buddhist year) into ISO YYYY-MM-DD."""
+    s = str(raw_val or "").strip()
+    if not s:
+        return ""
+    m_ymd = re.search(r"(\d{4})-(\d{2})-(\d{2})", s)
+    if m_ymd:
+        y, mo, d = int(m_ymd.group(1)), int(m_ymd.group(2)), int(m_ymd.group(3))
+        if y > 2400:
+            y -= 543
+        try:
+            return dt.date(y, mo, d).isoformat()
+        except ValueError:
+            return ""
+    m_dmy = re.search(r"(\d{1,2})/(\d{1,2})/(\d{4})", s)
+    if m_dmy:
+        d, mo, y = int(m_dmy.group(1)), int(m_dmy.group(2)), int(m_dmy.group(3))
+        if y > 2400:
+            y -= 543
+        try:
+            return dt.date(y, mo, d).isoformat()
+        except ValueError:
+            return ""
+    return ""
+
+
 def parse_sales_files(files_payload: list[dict[str, str]]) -> dict[str, Any]:
     """Parse uploaded TikTok monthly Excel/CSV files and aggregate unique products cleanly."""
     aggregated: dict[str, dict[str, Any]] = {}
     warnings: list[str] = []
     parsed_files: list[str] = []
+    min_order_date = ""
+    max_order_date = ""
 
     for fobj in files_payload:
         fname = str(fobj.get("filename") or "sales.xlsx")
@@ -700,6 +729,13 @@ def parse_sales_files(files_payload: list[dict[str, str]]) -> dict[str, Any]:
             status_val = get_col("status").lower()
             if status_val and any(bad in status_val for bad in ("ยกเลิก", "ไม่มีสิทธิ์", "cancelled", "canceled", "ineligible")):
                 continue
+
+            o_date = _parse_date_iso(get_col("order_date"))
+            if o_date:
+                if not min_order_date or o_date < min_order_date:
+                    min_order_date = o_date
+                if not max_order_date or o_date > max_order_date:
+                    max_order_date = o_date
 
             raw_sku_cell = get_col("sku")
             raw_link_cell = get_col("link")
@@ -784,13 +820,137 @@ def parse_sales_files(files_payload: list[dict[str, str]]) -> dict[str, Any]:
         prod["comm_pct_eff"] = round((comm / gmv) * 100.0, 1) if gmv > 0 else 0.0
         prod["comm_per_video"] = round(comm / max(1, videos_count), 2) if (orders > 0 or gmv > 0) else 0.0
         prod["comm_per_order"] = round(comm / max(1, distinct_orders), 2) if (orders > 0 or gmv > 0) else 0.0
+        prod["posted_clips"] = 0
+        prod["bot_logged_clips"] = 0
+        prod["hit_rate_pct"] = 0.0
+        prod["real_comm_per_posted"] = 0.0
         products_out.append(prod)
 
     return {
         "products": products_out,
         "parsed_files": parsed_files,
         "warnings": warnings,
+        "min_order_date": min_order_date,
+        "max_order_date": max_order_date,
     }
+
+
+def enrich_with_bot_posted_stats(
+    items: list[dict[str, Any]],
+    min_date: str = "",
+    max_date: str = "",
+) -> list[dict[str, Any]]:
+    """Cross-reference Desktop bot posted history & logs strictly within the Excel's known date window."""
+    if not min_date and not max_date:
+        return items
+    hist_file = Path.home() / "Desktop" / "posted_clip_history.json"
+    log_file = Path.home() / "Desktop" / "ประวัติการทำงานออโต้_TikTok.log"
+
+    sku_post_counts: dict[str, int] = {}
+    sku_meta: dict[str, dict[str, str]] = {}
+    name_entries: list[str] = []
+    all_log_dates: list[str] = []
+
+    if hist_file.is_file():
+        try:
+            data = json.loads(hist_file.read_text(encoding="utf-8"))
+            if isinstance(data, list):
+                for row in data:
+                    d_str = str(row.get("date") or "")[:10]
+                    if d_str:
+                        all_log_dates.append(d_str)
+                    if min_date and d_str and d_str < min_date:
+                        continue
+                    if max_date and d_str and d_str > max_date:
+                        continue
+                    sku = extract_clean_sku(row.get("sku") or row.get("filename"))
+                    nm = normalize_thai_text(row.get("name") or "")
+                    if sku:
+                        sku_post_counts[sku] = sku_post_counts.get(sku, 0) + 1
+                        if nm and sku not in sku_meta:
+                            sku_meta[sku] = {"name": nm}
+                    elif nm:
+                        name_entries.append(nm)
+        except Exception:
+            pass
+
+    if log_file.is_file():
+        try:
+            for line in log_file.read_text(encoding="utf-8", errors="ignore").splitlines():
+                m = re.match(r"^\[(\d{4}-\d{2}-\d{2})\s+[^\]]+\]\s+(?:โพสต์|ตั้งเวลา[^:]*|บันทึกร่าง)[^:]*สำเร็จ[^:]*:\s*(.+)$", line)
+                if not m:
+                    continue
+                d_str, body = m.group(1), m.group(2).split("|", 1)[0].strip()
+                all_log_dates.append(d_str)
+                if min_date and d_str < min_date:
+                    continue
+                if max_date and d_str > max_date:
+                    continue
+                sku = extract_clean_sku(body)
+                if sku:
+                    # Prefer structured posted_clip_history.json for SKU counts if present on same date, else count log line
+                    if not hist_file.is_file():
+                        sku_post_counts[sku] = sku_post_counts.get(sku, 0) + 1
+                else:
+                    clean_b = re.sub(r"\.mp4$", "", body, flags=re.I)
+                    clean_b = re.sub(r"^ตอบ(?:คอมเมนต์|comment)\s*", "", clean_b, flags=re.I).strip()
+                    if clean_b:
+                        name_entries.append(clean_b)
+        except Exception:
+            pass
+
+    first_log_date = min(all_log_dates) if all_log_dates else ""
+    item_skus_present: set[str] = set()
+
+    for it in items:
+        sku = str(it.get("sku") or "")
+        if sku:
+            item_skus_present.add(sku)
+        vids = int(it.get("videos_count") or 0)
+        comm = float(it.get("comm") or 0)
+
+        logged = sku_post_counts.get(sku, 0) if sku else 0
+        if logged == 0 and name_entries and it.get("name"):
+            it_name = str(it["name"])
+            logged = sum(1 for ne in name_entries if name_similarity(it_name, ne) >= 0.72)
+
+        it["bot_logged_clips"] = logged
+        if logged > 0 and (logged > vids or (first_log_date and min_date and min_date >= first_log_date)):
+            eff_posted = max(logged, vids, 1)
+            it["posted_clips"] = eff_posted
+            it["hit_rate_pct"] = round(min(100.0, (vids / eff_posted) * 100.0), 0)
+            it["real_comm_per_posted"] = round(comm / eff_posted, 2)
+        else:
+            it["posted_clips"] = 0
+            it["hit_rate_pct"] = 0.0
+            it["real_comm_per_posted"] = 0.0
+
+    # Inject SKUs that have >= 3 structured bot posts in window and 0 orders in Excel
+    for sku, cnt in sku_post_counts.items():
+        if cnt >= 3 and sku not in item_skus_present:
+            meta = sku_meta.get(sku, {})
+            items.append({
+                "sku": sku,
+                "name": meta.get("name") or f"สินค้าที่บอทโพสต์แล้วขายไม่ได้ ({sku})",
+                "shop": "",
+                "link": f"https://shop.tiktok.com/view/product/{sku}?region=TH&locale=th-TH",
+                "gmv": 0.0,
+                "orders": 0,
+                "refunded": 0,
+                "comm": 0.0,
+                "price": 0.0,
+                "videos_count": 0,
+                "distinct_orders": 0,
+                "comm_pct_eff": 0.0,
+                "comm_per_video": 0.0,
+                "comm_per_order": 0.0,
+                "posted_clips": cnt,
+                "bot_logged_clips": cnt,
+                "hit_rate_pct": 0.0,
+                "real_comm_per_posted": 0.0,
+            })
+
+    return items
 
 
 HOME_CORE_CATS = {
@@ -1013,10 +1173,15 @@ def grade_channel_products_smart(items: list[dict[str, Any]]) -> tuple[list[dict
     dropped = []
 
     for it in zero_items:
+        p_clips = int(it.get("posted_clips") or 0)
         it["tier"] = "dropped"
         it["grade"] = "ZERO"
         it["starred"] = False
-        it["reason"] = "❌ ยอดขาย ฿0 / 0 ชิ้น — ปัดตกอัตโนมัติ"
+        it["reason"] = (
+            f"❌ โพสต์จริง {p_clips} คลิป แต่ขายได้ 0 ชิ้น — ปัดตกอัตโนมัติ"
+            if p_clips > 0
+            else "❌ ยอดขาย ฿0 / 0 ชิ้น — ปัดตกอัตโนมัติ"
+        )
         dropped.append(it)
 
     cum_metric = 0.0
@@ -1024,7 +1189,11 @@ def grade_channel_products_smart(items: list[dict[str, Any]]) -> tuple[list[dict
         gmv = float(it.get("gmv") or 0)
         comm = float(it.get("comm") or 0)
         orders = int(it.get("orders") or 0)
+        d_orders = int(it.get("distinct_orders") or orders)
         vids = int(it.get("videos_count") or 1)
+        posted_c = int(it.get("posted_clips") or 0)
+        hit_pct = float(it.get("hit_rate_pct") or 0)
+        rcpp = float(it.get("real_comm_per_posted") or 0)
         cpv = float(it.get("comm_per_video") or 0)
         cpo = float(it.get("comm_per_order") or 0)
         cpct = float(it.get("comm_pct_eff") or 0)
@@ -1033,57 +1202,84 @@ def grade_channel_products_smart(items: list[dict[str, Any]]) -> tuple[list[dict
         cum_before = cum_metric / total_metric
         cum_metric += m_val
 
-        # Volume trap check: many small orders but pathetic real commission
+        # Volume trap or Low Hit-Rate waste check
         is_volume_trap = use_comm and orders >= 6 and cpo < 2.2 and (comm / total_metric) < 0.004
+        is_low_hit_waste = posted_c >= 3 and hit_pct < 20.0 and rcpp < 8.0 and cum_before >= 0.85
+
+        # Anti-Fluke Hidden Gem: MUST either prove >= 4 distinct orders (repeatable buyer demand)
+        # OR have verified bot post count <= 3 with >= 50% hit rate! Never tag 1-3 order flukes as A_GEM.
+        is_verified_gem = (
+            (posted_c > 0 and posted_c <= 3 and hit_pct >= 50.0 and comm >= 60.0)
+            or (
+                d_orders >= 4
+                and vids <= 4
+                and (
+                    (use_comm and (comm >= 110.0 or (comm >= 70.0 and cpct >= 8.0)))
+                    or (not use_comm and gmv >= total_metric * 0.015)
+                )
+            )
+        )
+
+        clip_summary = (
+            f"โพสต์ {posted_c} ➡️ ขายออก {vids} คลิป · เฉลี่ยจริง ฿{rcpp:,.1f}/คลิป"
+            if posted_c > 0
+            else f"{d_orders} ออเดอร์ · ขายออก {vids} คลิป (฿{cpv:,.0f}/คลิปขายออก)"
+        )
 
         if (cum_before < 0.85 or rank_idx < 3) and not (use_comm and comm <= 0 and gmv < 1000):
             it["tier"] = "winner"
             it["grade"] = "S"
             it["starred"] = True
             it["reason"] = (
-                f"👑 เกรด S ตัวแบกช่อง (คอม ฿{comm:,.0f} · {cpct}% · เฉลี่ย ฿{cpv:,.0f}/คลิป)"
+                f"👑 เกรด S ตัวแบกช่อง (คอม ฿{comm:,.0f} · {cpct}% · {clip_summary})"
                 if use_comm
                 else f"👑 เกรด S ตัวแบกช่อง (GMV ฿{gmv:,.0f} · {orders} ชิ้น)"
             )
             winners.append(it)
+        elif is_low_hit_waste:
+            it["tier"] = "dropped"
+            it["grade"] = "LOW_HIT"
+            it["starred"] = False
+            it["reason"] = f"⚠️ ปัดตก (เปลืองโควตาคลิป): บอทโพสต์ {posted_c} คลิป ขายออกแค่ {vids} คลิป (ติด {hit_pct:.0f}% · เฉลี่ย ฿{rcpp:.1f}/คลิปโพสต์)"
+            dropped.append(it)
         elif is_volume_trap:
             it["tier"] = "dropped"
             it["grade"] = "TRAP"
             it["starred"] = False
             it["reason"] = f"⚠️ ปัดตก (เหนื่อยฟรีคอมเตี้ย): ขายตั้ง {orders} ชิ้น แต่ได้คอมแค่ ฿{comm:,.1f} (เฉลี่ย ฿{cpo:.1f}/ชิ้น)"
             dropped.append(it)
-        elif vids <= 2 and (
-            (use_comm and (cpv >= 28.0 or cpo >= 22.0 or (cpct >= 8.0 and comm >= 20.0)))
-            or (not use_comm and gmv >= total_metric * 0.015)
-        ):
+        elif is_verified_gem:
             it["tier"] = "winner"
             it["grade"] = "A_GEM"
             it["starred"] = True
             it["reason"] = (
-                f"💎 ช้างเผือกน่าปั้น: ทำแค่ {vids} คลิป แต่ได้คอม ฿{comm:,.0f} (เฉลี่ย ฿{cpv:,.0f}/คลิป · {cpct}%) น่าอัดคลิปเพิ่ม!"
+                f"💎 ช้างเผือกมีหลักฐานซ้ำ: ทำยอดซ้ำได้ถึง {d_orders} ออเดอร์ จากขายออก {vids} คลิป (คอม ฿{comm:,.0f} · {cpct}%)"
                 if use_comm
-                else f"💎 ช้างเผือกน่าปั้น: ทำแค่ {vids} คลิป ได้ยอด ฿{gmv:,.0f}"
+                else f"💎 ช้างเผือกน่าปั้น: {d_orders} ออเดอร์จากขายออก {vids} คลิป (฿{gmv:,.0f})"
             )
             winners.append(it)
-        elif cum_before < 0.935:
+        elif cum_before < 0.935 and (d_orders >= 3 or comm >= 40.0 or not use_comm):
             it["tier"] = "winner"
             it["grade"] = "A"
             it["starred"] = True
             it["reason"] = (
-                f"⭐ เกรด A ทำเงินสม่ำเสมอ (คอม ฿{comm:,.0f} · {cpct}% · {vids} คลิป)"
+                f"⭐ เกรด A ทำเงิน ({clip_summary} · คอม ฿{comm:,.0f} · {cpct}%)"
                 if use_comm
-                else f"⭐ เกรด A ทำเงินสม่ำเสมอ (GMV ฿{gmv:,.0f} · {orders} ชิ้น)"
+                else f"⭐ เกรด A ทำเงิน (GMV ฿{gmv:,.0f} · {orders} ชิ้น)"
             )
             winners.append(it)
         else:
             it["tier"] = "dropped"
             it["grade"] = "C"
             it["starred"] = False
-            it["reason"] = (
-                f"🗑️ หางแถว (~6% ท้ายตาราง): ทั้งเดือนได้คอม ฿{comm:,.1f} ({orders} ชิ้น · {vids} คลิป) เก็บสล็อตไปปั้นตัวท็อปคุ้มกว่า"
-                if use_comm
-                else f"🗑️ หางแถวท้ายตาราง: GMV ฿{gmv:,.0f} ({orders} ชิ้น)"
-            )
+            if d_orders <= 2:
+                it["reason"] = f"🗑️ ปัดตก (กันยอดฟลุค): มีแค่ {d_orders} ออเดอร์ (ขายออก {vids} คลิป · คอม ฿{comm:,.1f}) เสี่ยงลงหลายคลิปแต่เพิ่งขายได้ 1–2 ชิ้น"
+            else:
+                it["reason"] = (
+                    f"🗑️ หางแถว (~6% ท้ายตาราง): ทั้งเดือนได้คอม ฿{comm:,.1f} ({d_orders} ออเดอร์ · ขายออก {vids} คลิป)"
+                    if use_comm
+                    else f"🗑️ หางแถวท้ายตาราง: GMV ฿{gmv:,.0f} ({orders} ชิ้น)"
+                )
             dropped.append(it)
 
     if not winners and dropped:
@@ -1128,8 +1324,10 @@ def run_ai_portfolio_advisor(
             "comm": round(float(p.get("comm") or 0), 1),
             "comm_pct": float(p.get("comm_pct_eff") or 0),
             "orders": int(p.get("orders") or 0),
-            "videos": int(p.get("videos_count") or 0),
-            "comm_per_vid": float(p.get("comm_per_video") or 0),
+            "distinct_orders": int(p.get("distinct_orders") or p.get("orders") or 0),
+            "converting_videos": int(p.get("videos_count") or 0),
+            "posted_clips": int(p.get("posted_clips") or 0),
+            "comm_per_converting_vid": float(p.get("comm_per_video") or 0),
             "name": str(p.get("name") or "")[:55],
         }
         for p in all_channel[:45]
@@ -1162,6 +1360,9 @@ def run_ai_portfolio_advisor(
 
     prompt = (
         "คุณคือที่ปรึกษากลยุทธ์ TikTok Shop Affiliate สายข้อมูลจริง (ห้ามอวย ห้ามพูดเอาใจ ให้วิเคราะห์ตรงไปตรงมาตามตัวเลขเท่านั้น):\n"
+        "⚠️ กฎตีความข้อมูลสำคัญมาก: `converting_videos` คือจำนวนคลิปที่ 'ขายออกแล้วอย่างน้อย 1 ชิ้น' เท่านั้น (ไม่รวมคลิปที่โพสต์แล้วขายไม่ได้ 0 บาท, ยกเว้นเมื่อ `posted_clips > 0` นั่นคือจำนวนที่บอทโพสต์จริง)\n"
+        "- ห้ามหลงอวยสินค้าที่ `distinct_orders` แค่ 1–3 ออเดอร์จาก `converting_videos = 1` ว่าเป็นช้างเผือกเด็ดขาด เพราะอาจลงไป 10 คลิปแล้วฟลุคขายได้คลิปเดียว\n"
+        "- ช้างเผือกที่แท้จริงต้องมีออเดอร์ซ้ำ (`distinct_orders >= 4`) และค่าคอมรวม/ต่อคลิปเด่นชัด (เช่น พรม 3D 34 ออเดอร์จาก 2 คลิปที่ขายออก)\n"
         f"1. ข้อมูลสินค้าของช่องตอนนี้ ({len(compact_channel)} รายการ): {json.dumps(compact_channel, ensure_ascii=False)}\n"
         f"2. รายชื่อสินค้าใหม่ตัวเต็งจาก Kalodata ({len(compact_cands)} รายการ): {json.dumps(compact_cands, ensure_ascii=False)}\n"
         f"3. กลยุทธ์สินค้าใหม่ที่ต้องการ: {strat_desc}\n\n"
@@ -1193,7 +1394,14 @@ def run_ai_portfolio_advisor(
             for promo in (parsed.get("promote_skus") or [])[:3]:
                 psku = str(promo.get("sku") or "").strip()
                 if psku in dropped_by_sku:
-                    obj = dropped_by_sku.pop(psku)
+                    obj = dropped_by_sku[psku]
+                    d_ord = int(obj.get("distinct_orders") or obj.get("orders") or 0)
+                    p_clips = int(obj.get("posted_clips") or 0)
+                    h_pct = float(obj.get("hit_rate_pct") or 0)
+                    # Strictly enforce anti-fluke repeatability rule even on AI promotions
+                    if not (d_ord >= 4 or (p_clips > 0 and p_clips <= 3 and h_pct >= 50.0)):
+                        continue
+                    dropped_by_sku.pop(psku)
                     obj["tier"] = "winner"
                     obj["grade"] = "A_GEM"
                     obj["starred"] = True
@@ -1262,11 +1470,16 @@ def analyze_sales_payload(payload: dict[str, Any]) -> dict[str, Any]:
     parsed_files: list[str] = []
     raw_items: list[dict[str, Any]] = []
 
+    min_order_date = ""
+    max_order_date = ""
+
     if files:
         parsed = parse_sales_files(files)
         raw_items.extend(parsed["products"])
         warnings.extend(parsed["warnings"])
         parsed_files.extend(parsed["parsed_files"])
+        min_order_date = parsed.get("min_order_date", "")
+        max_order_date = parsed.get("max_order_date", "")
     elif text_lines:
         for line in text_lines.splitlines():
             line = line.strip()
@@ -1299,8 +1512,9 @@ def analyze_sales_payload(payload: dict[str, Any]) -> dict[str, Any]:
             "warnings": warnings,
         }
 
-    # Fast local-only SKU/thumbnail pass for all items (<0.1s) before grading
+    # Fast local-only SKU/thumbnail pass + enrich with real Desktop bot posted history
     cat_map = load_channel_catalog()
+    raw_items = enrich_with_bot_posted_stats(raw_items, min_order_date, max_order_date)
     local_resolved = [resolve_product_metadata(item, cat_map, use_remote_api=False) for item in raw_items]
 
     # Dynamic portfolio grading (Real Commission 85/93.5% Pareto + Volume Traps + Hidden Gems)
