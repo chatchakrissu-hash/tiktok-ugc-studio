@@ -1,0 +1,1643 @@
+<!DOCTYPE html>
+<html lang="th" data-theme="dark">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>📅 TikTok Monthly Content Planner — ระบบจัดตารางคลิปรายเดือน & แทรกตัวอย่างฟรี</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap"
+    rel="stylesheet">
+  <style>
+    :root,
+    [data-theme="dark"] {
+      --bg: #0b0d13;
+      --bg-grad-1: rgba(37, 244, 238, 0.08);
+      --bg-grad-2: rgba(254, 44, 85, 0.10);
+      --card: #131722;
+      --card-2: #1a2030;
+      --border: #283147;
+      --text: #f3f6fc;
+      --muted: #9aa6bf;
+      --accent: #fe2c55;
+      --accent-2: #25f4ee;
+      --gold: #ffd600;
+      --green: #10b981;
+      --warn: #f59e0b;
+      --header-bg: linear-gradient(135deg, rgba(26, 32, 48, 0.96), rgba(19, 23, 34, 0.98));
+      --shadow: 0 10px 28px rgba(0, 0, 0, 0.38);
+      --omni5-bg: rgba(245, 158, 11, 0.12);
+      --omni5-border: rgba(245, 158, 11, 0.45);
+      --hardsell-bg: rgba(37, 244, 238, 0.08);
+      --hardsell-border: rgba(37, 244, 238, 0.35);
+      --urgent-bg: rgba(254, 44, 85, 0.14);
+      --urgent-border: rgba(254, 44, 85, 0.65);
+    }
+
+    [data-theme="light"] {
+      --bg: #f4f6fb;
+      --bg-grad-1: rgba(37, 244, 238, 0.14);
+      --bg-grad-2: rgba(254, 44, 85, 0.08);
+      --card: #ffffff;
+      --card-2: #f1f5f9;
+      --border: #cbd5e1;
+      --text: #0f172a;
+      --muted: #475569;
+      --accent: #e11d48;
+      --accent-2: #0284c7;
+      --gold: #b45309;
+      --green: #059669;
+      --warn: #d97706;
+      --header-bg: linear-gradient(135deg, #ffffff, #f8fafc);
+      --shadow: 0 8px 24px rgba(15, 23, 42, 0.07);
+      --omni5-bg: #fef3c7;
+      --omni5-border: #f59e0b;
+      --hardsell-bg: #ecfeff;
+      --hardsell-border: #06b6d4;
+      --urgent-bg: #fee2e2;
+      --urgent-border: #e11d48;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: radial-gradient(circle at top right, var(--bg-grad-1), transparent 40%),
+        radial-gradient(circle at top left, var(--bg-grad-2), transparent 40%),
+        var(--bg);
+      color: var(--text);
+      font-family: 'Kanit', sans-serif;
+      line-height: 1.55;
+      min-height: 100vh;
+      padding-bottom: 80px;
+    }
+
+    .container {
+      max-width: 1360px;
+      margin: 0 auto;
+      padding: 20px 16px;
+    }
+
+    .mono {
+      font-family: 'JetBrains Mono', 'Kanit', monospace;
+    }
+
+    .header {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 14px;
+      padding: 18px 22px;
+      background: var(--header-bg);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      margin-bottom: 18px;
+      box-shadow: var(--shadow);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .brand-logo {
+      width: 46px;
+      height: 46px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, var(--accent), #f59e0b);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      color: #fff;
+      flex-shrink: 0;
+    }
+
+    .brand h1 {
+      font-size: 20px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .brand p {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .btn {
+      background: var(--card-2);
+      color: var(--text);
+      border: 1px solid var(--border);
+      padding: 9px 14px;
+      border-radius: 11px;
+      font-family: inherit;
+      font-size: 13.5px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      text-decoration: none;
+      transition: 0.15s;
+    }
+
+    .btn:hover:not(:disabled) {
+      border-color: var(--accent-2);
+      transform: translateY(-1px);
+    }
+
+    .btn:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+
+    .btn-primary {
+      background: linear-gradient(90deg, var(--accent), #ff5533);
+      border-color: transparent;
+      color: #fff;
+      font-weight: 700;
+      box-shadow: 0 8px 22px rgba(254, 44, 85, 0.3);
+    }
+
+    .btn-green {
+      background: var(--green);
+      border-color: var(--green);
+      color: #fff;
+      font-weight: 700;
+    }
+
+    .btn-gold {
+      background: rgba(245, 158, 11, 0.16);
+      border-color: rgba(245, 158, 11, 0.55);
+      color: var(--gold);
+      font-weight: 700;
+    }
+
+    .btn-sm {
+      padding: 5px 10px;
+      font-size: 12px;
+      border-radius: 8px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 9px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      border: 1px solid var(--border);
+      background: var(--card-2);
+    }
+
+    .badge-winner {
+      background: rgba(16, 185, 129, 0.14);
+      border-color: rgba(16, 185, 129, 0.45);
+      color: var(--green);
+    }
+
+    .badge-star {
+      background: rgba(245, 158, 11, 0.15);
+      border-color: rgba(245, 158, 11, 0.5);
+      color: var(--gold);
+    }
+
+    .badge-free {
+      background: rgba(254, 44, 85, 0.16);
+      border-color: rgba(254, 44, 85, 0.6);
+      color: var(--accent);
+    }
+
+    .badge-dropped {
+      background: rgba(148, 163, 184, 0.12);
+      border-color: rgba(148, 163, 184, 0.35);
+      color: var(--muted);
+    }
+
+    .tabs {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    @media (max-width: 780px) {
+      .tabs {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .tab-btn {
+      background: var(--card);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 13px 16px;
+      border-radius: 14px;
+      font-family: inherit;
+      font-size: 14.5px;
+      font-weight: 700;
+      cursor: pointer;
+      text-align: left;
+      transition: 0.18s;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .tab-btn small {
+      font-size: 12px;
+      font-weight: 400;
+      color: var(--muted);
+    }
+
+    .tab-btn.active {
+      background: linear-gradient(135deg, rgba(254, 44, 85, 0.16), rgba(37, 244, 238, 0.12));
+      border-color: var(--accent-2);
+      box-shadow: 0 0 0 1px rgba(37, 244, 238, 0.25);
+    }
+
+    .tab-panel {
+      display: none;
+    }
+
+    .tab-panel.active {
+      display: block;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 20px 22px;
+      margin-bottom: 18px;
+      box-shadow: var(--shadow);
+    }
+
+    .card-title {
+      font-size: 17px;
+      font-weight: 800;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .dropzone {
+      border: 2px dashed var(--accent-2);
+      border-radius: 16px;
+      padding: 26px 18px;
+      text-align: center;
+      background: rgba(37, 244, 238, 0.04);
+      cursor: pointer;
+      transition: 0.2s;
+      display: block;
+    }
+
+    .dropzone:hover,
+    .dropzone.dragover {
+      background: rgba(37, 244, 238, 0.11);
+      transform: translateY(-1px);
+    }
+
+    input[type="text"],
+    input[type="number"],
+    input[type="date"],
+    select,
+    textarea {
+      background: var(--card-2);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 9px 12px;
+      font-family: inherit;
+      font-size: 13.8px;
+      width: 100%;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      outline: none;
+      border-color: var(--accent-2);
+    }
+
+    .config-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(175px, 1fr));
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    .field-label {
+      display: block;
+      font-size: 12.2px;
+      font-weight: 600;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+
+    .alert-box {
+      border-radius: 14px;
+      padding: 14px 18px;
+      margin-bottom: 16px;
+      border: 1.5px solid var(--warn);
+      background: rgba(245, 158, 11, 0.1);
+    }
+
+    .prod-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13.5px;
+    }
+
+    .prod-table th,
+    .prod-table td {
+      padding: 10px 10px;
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+      vertical-align: middle;
+    }
+
+    .prod-table th {
+      color: var(--muted);
+      font-weight: 700;
+      font-size: 12.5px;
+      background: rgba(128, 128, 128, 0.05);
+    }
+
+    .thumb-sm {
+      width: 50px;
+      height: 50px;
+      border-radius: 10px;
+      object-fit: cover;
+      background: #0d1017;
+      border: 1px solid var(--border);
+      display: block;
+    }
+
+    .thumb-placeholder {
+      width: 50px;
+      height: 50px;
+      border-radius: 10px;
+      background: var(--card-2);
+      border: 1px dashed var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      color: var(--muted);
+    }
+
+    /* Schedule Matrix Table (like User's 7-Omni PDF) */
+    .matrix-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: var(--card);
+    }
+
+    .matrix-table {
+      width: 100%;
+      min-width: 1120px;
+      border-collapse: collapse;
+      font-size: 12.5px;
+    }
+
+    .matrix-table th,
+    .matrix-table td {
+      border: 1px solid var(--border);
+      padding: 8px;
+      vertical-align: top;
+      text-align: left;
+    }
+
+    .matrix-table th {
+      background: rgba(30, 41, 59, 0.9);
+      color: #fff;
+      font-weight: 700;
+      text-align: center;
+      position: sticky;
+      top: 0;
+      z-index: 2;
+    }
+
+    .matrix-table td.date-col {
+      font-weight: 800;
+      text-align: center;
+      white-space: nowrap;
+      background: var(--card-2);
+      width: 96px;
+    }
+
+    .cell-card {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      min-height: 112px;
+    }
+
+    .cell-top {
+      display: flex;
+      gap: 7px;
+      align-items: flex-start;
+    }
+
+    .cell-thumb {
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      object-fit: cover;
+      flex-shrink: 0;
+      border: 1px solid var(--border);
+      background: #000;
+    }
+
+    .cell-name {
+      font-size: 12px;
+      font-weight: 700;
+      line-height: 1.3;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .cell-style {
+      font-size: 11.4px;
+      color: var(--muted);
+      line-height: 1.3;
+    }
+
+    td.role-reply_fallback {
+      background: var(--omni5-bg);
+      border-color: var(--omni5-border);
+    }
+
+    td.role-hardsell {
+      background: var(--hardsell-bg);
+    }
+
+    td.tier-free_sample {
+      background: var(--urgent-bg);
+      border-color: var(--urgent-border);
+    }
+
+    .summary-strip {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+
+    .stat-pill {
+      background: var(--card-2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 8px 14px;
+      font-size: 13px;
+    }
+
+    .stat-pill b {
+      color: var(--gold);
+      font-size: 15px;
+    }
+
+    .status-toast {
+      display: none;
+      position: fixed;
+      bottom: 22px;
+      right: 22px;
+      z-index: 999;
+      background: var(--card);
+      border: 1.5px solid var(--accent-2);
+      color: var(--text);
+      padding: 12px 18px;
+      border-radius: 14px;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
+      max-width: 460px;
+      font-size: 13.8px;
+    }
+
+    .status-toast.show {
+      display: block;
+    }
+
+    /* Simple Edit Slot Modal */
+    .modal-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.65);
+      z-index: 900;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    .modal-backdrop.open {
+      display: flex;
+    }
+
+    .modal-card {
+      background: var(--card);
+      border: 1px solid var(--accent-2);
+      border-radius: 18px;
+      padding: 20px;
+      width: 100%;
+      max-width: 540px;
+      box-shadow: var(--shadow);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <!-- Header -->
+    <div class="header">
+      <div class="brand">
+        <div class="brand-logo">📅</div>
+        <div>
+          <h1>
+            TikTok Monthly Content Planner & Admin
+            <span class="badge badge-winner" id="serverStatusBadge">🔄 กำลังเชื่อมต่อเซิร์ฟเวอร์...</span>
+          </h1>
+          <p>คำนวณตาราง 7 Omni × 16 แนว จากไฟล์ยอดขายจริง + คัดตัวขายดี/ปัดตก/ดาวรุ่ง + แทรกตัวอย่างฟรี 3 คลิป + พุชขึ้นเว็บให้น้องใน 1 คลิก</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <a href="https://chatchakrissu-hash.github.io/tiktok-ugc-studio/" target="_blank" rel="noopener" class="btn">
+          🎬 เปิดหน้าเว็บน้อง (GitHub Pages)
+        </a>
+        <button type="button" class="btn" onclick="toggleTheme()" id="themeBtn">🌙 โหมดมืด</button>
+        <button type="button" class="btn" onclick="exportExcel()" id="btnExportExcel">📥 โหลด Excel (.xlsx)</button>
+        <button type="button" class="btn btn-green" onclick="publishToGitHub()" id="btnPublish">🚀 อัปเดตตารางขึ้นเว็บให้น้อง</button>
+      </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <div class="tabs">
+      <button type="button" class="tab-btn active" onclick="switchTab('analyze', this)">
+        <span>📊 1. คำนวณแผนเดือนใหม่จากไฟล์ยอดขาย</span>
+        <small>โยนไฟล์ .xlsx / .csv → แยกตัวขายดี & ปัดตก → เติมดาวรุ่งอัตโนมัติ</small>
+      </button>
+      <button type="button" class="tab-btn" onclick="switchTab('freesample', this)">
+        <span>🎁 2. แทรกสินค้ารีวิวฟรีกลางเดือน (ด่วน 3 คลิป)</span>
+        <small>แทรกลงช่องหลักภายในเดดไลน์ ไม่ลง OMNI 5 · สลับเฉพาะตัวท็อปโควตาเยอะ</small>
+      </button>
+      <button type="button" class="tab-btn" onclick="switchTab('schedule', this)">
+        <span>📅 3. ตรวจ & แก้ไขตารางทั้งเดือน (7 Omni)</span>
+        <small>ตรวจตารางรายวัน ยืนยันกฎ OMNI 5 & พุชขึ้นหน้าเว็บให้น้องดูทันที</small>
+      </button>
+    </div>
+
+    <!-- TAB 1: ANALYZE SALES & BUILD NEXT MONTH -->
+    <div id="tab-analyze" class="tab-panel active">
+      <div class="card">
+        <div class="card-title">
+          <span>📥 ขั้นที่ 1: ส่งไฟล์ยอดขายรายเดือน (Excel .xlsx หรือ .csv จาก TikTok Affiliate / Creator Center)</span>
+          <span class="badge" id="catalogMemoryBadge">คลังจำช่อง: 0 ชิ้น</span>
+        </div>
+
+        <input type="file" id="salesFileInput" accept=".xlsx,.xlsm,.csv,.tsv" multiple
+          style="position:absolute; width:1px; height:1px; opacity:0; pointer-events:none;"
+          onchange="handleSalesFiles(this.files)" />
+        <label for="salesFileInput" class="dropzone" id="salesDropzone">
+          <div style="font-size:32px; margin-bottom:4px;">📊</div>
+          <div style="font-size:16px; font-weight:700;">คลิกเลือกไฟล์ยอดขาย (.xlsx / .csv) หรือลากไฟล์มาวางที่นี่ได้เลยครับ (ใส่ได้หลายไฟล์พร้อมกัน)</div>
+          <div style="font-size:12.8px; color:var(--muted); margin-top:4px;">
+            อ่านเลขรหัสสินค้า 19 หลักแบบ String ไม่ปัดเศษ · ถ้ารายการไหนไม่มีเลขในไฟล์ ระบบจะค้นเทียบฐาน Kalodata 2.98 ล้านชิ้นให้อัตโนมัติ!
+          </div>
+        </label>
+
+        <details style="margin-top:12px;">
+          <summary style="cursor:pointer; font-size:13.2px; color:var(--accent-2); font-weight:600;">
+            ✍️ หรือวางรายชื่อสินค้า / ลิงก์ TikTok ทีละบรรทัด (กรณีไม่มีไฟล์ Excel อยู่ในมือ)
+          </summary>
+          <div style="margin-top:8px; display:flex; flex-direction:column; gap:8px;">
+            <textarea id="quickPasteLines" rows="4"
+              placeholder="วางชื่อสินค้า ลิงก์ TikTok หรือรหัส 19 หลัก ทีละบรรทัด..."></textarea>
+            <button type="button" class="btn btn-gold" style="align-self:flex-start;" onclick="analyzeQuickPaste()">
+              🔍 วิเคราะห์จากรายการที่วางด้านบน
+            </button>
+          </div>
+        </details>
+
+        <div class="config-grid">
+          <div>
+            <label class="field-label">📅 วันเริ่มต้นแผน</label>
+            <input type="date" id="planStartDate" />
+          </div>
+          <div>
+            <label class="field-label">📅 วันสิ้นสุดแผน</label>
+            <input type="date" id="planEndDate" />
+          </div>
+          <div>
+            <label class="field-label">🎬 จำนวนคลิป / วัน (ค่าเริ่มต้น 7 Omni)</label>
+            <input type="number" id="clipsPerDay" value="7" min="3" max="10" />
+          </div>
+          <div>
+            <label class="field-label">🌟 จำนวนสินค้าใหม่น่าลองที่ให้เติม</label>
+            <input type="number" id="newStarsCount" value="6" min="0" max="15" />
+          </div>
+          <div>
+            <label class="field-label">🎯 คิวหลักต่อสินค้าใหม่ (ตัวละ ~X คลิปหลัก)</label>
+            <input type="number" id="newStarMainQuota" value="5" min="1" max="10" />
+          </div>
+          <div>
+            <label class="field-label">🏆 ขั้นต่ำถือว่าขายได้ (ออเดอร์ >=)</label>
+            <input type="number" id="minOrdersWinner" value="1" min="0" max="1000" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Parse Warnings -->
+      <div id="parseWarningsBox" class="alert-box" style="display:none; border-color:var(--accent-2); background:rgba(37,244,238,0.08);"></div>
+
+      <!-- Missing SKU Alert Box -->
+      <div id="missingSkuPanel" class="alert-box" style="display:none;">
+        <div style="font-size:15.5px; font-weight:800; color:var(--warn); margin-bottom:6px;">
+          ⚠️ พบสินค้าที่ระบบหาเลข 19 หลักอัตโนมัติไม่เจอ (<span id="missingSkuCount">0</span> รายการ) — รบกวนวางลิงก์สินค้า TikTok หรือรหัส 19 หลักเพิ่มตรงนี้ครับ
+        </div>
+        <p style="font-size:12.8px; color:var(--muted); margin-bottom:10px;">
+          พอคุณวางครั้งเดียว ระบบจะจดจำเข้า "คลังจำช่อง" ให้ตลอดไป เดือนหน้าไม่ต้องหาซ้ำอีกแล้วครับ
+        </p>
+        <div id="missingSkuList" style="display:flex; flex-direction:column; gap:10px;"></div>
+      </div>
+
+      <!-- Results 3 Groups -->
+      <div id="analysisGroupsWrap" style="display:none;">
+        <!-- Group 1: Winners -->
+        <div class="card">
+          <div class="card-title">
+            <span>🏆 กลุ่มที่ 1: สินค้าขายดีประจำช่อง (⭐ ติดดาวไปต่อ — <span id="winnersCountLabel">0</span> รายการ)</span>
+            <div style="display:flex; gap:8px; align-items:center;">
+              <input type="text" id="addCustomWinnerInput" placeholder="➕ วางลิงก์/รหัส 19 หลักเพื่อเพิ่มสินค้าประจำช่อง..."
+                style="width:300px;" />
+              <button type="button" class="btn btn-sm btn-green" onclick="addProductManually('winners', 'addCustomWinnerInput')">+ เพิ่มตัวขายดี</button>
+            </div>
+          </div>
+          <div style="overflow-x:auto;">
+            <table class="prod-table" id="winnersTable"></table>
+          </div>
+        </div>
+
+        <!-- Group 2: Starred New Challengers -->
+        <div class="card" style="border-color:rgba(245,158,11,0.45);">
+          <div class="card-title">
+            <span style="color:var(--gold);">🌟 กลุ่มที่ 2: สินค้าใหม่น่าลองจาก Kalodata (⭐ ติดดาวท้าชิง — <span id="newStarsCountLabel">0</span> รายการ)</span>
+            <div style="display:flex; gap:8px; align-items:center;">
+              <input type="text" id="addCustomNewStarInput" placeholder="➕ วางลิงก์/รหัส 19 หลักที่อยากลองเพิ่ม..."
+                style="width:290px;" />
+              <button type="button" class="btn btn-sm btn-gold" onclick="addProductManually('new_stars', 'addCustomNewStarInput')">+ เพิ่มตัวใหม่เอง</button>
+            </div>
+          </div>
+          <div style="overflow-x:auto;">
+            <table class="prod-table" id="newStarsTable"></table>
+          </div>
+        </div>
+
+        <!-- Group 3: Dropped -->
+        <div class="card" style="opacity:0.92;">
+          <div class="card-title">
+            <span style="color:var(--muted);">🗑️ กลุ่มที่ 3: สินค้าที่ระบบปัดตกเดือนนี้ (❌ ยอดขายไม่เดิน — <span id="droppedCountLabel">0</span> รายการ)</span>
+          </div>
+          <div style="overflow-x:auto;">
+            <table class="prod-table" id="droppedTable"></table>
+          </div>
+        </div>
+
+        <button type="button" class="btn btn-primary" style="width:100%; justify-content:center; padding:16px; font-size:17px;"
+          onclick="generateSchedule()">
+          ⚡ คำนวณจัดตารางทั้งเดือนอัตโนมัติ (7 Omni × 16 แนว + ล็อกกฎ OMNI 5 ต้องมีคิวหลัก >= 2 คลิป)
+        </button>
+      </div>
+    </div>
+
+    <!-- TAB 2: MID-MONTH FREE SAMPLE INJECTOR (DEFAULT 3 CLIPS) -->
+    <div id="tab-freesample" class="tab-panel">
+      <div class="card" style="border-color:rgba(254,44,85,0.45);">
+        <div class="card-title">
+          <span>🎁 แทรกคิวด่วน: สินค้ารีวิวฟรีกลางเดือน (ค่าเริ่มต้น 3 คลิปก่อนหมดเขต)</span>
+          <span class="badge badge-free" id="activePlanBadgeForSample">กำลังตรวจแผนปัจจุบัน...</span>
+        </div>
+        <p style="font-size:13.2px; color:var(--muted); margin-bottom:14px;">
+          ✅ ระบบจะแทรกลง <b>ช่องหลัก (OMNI 1–4 หรือ OMNI 6–7) เท่านั้น — ห้ามลง OMNI 5</b> เพื่อกันหลุดเดดไลน์ ·
+          และดึงโควตาจากสินค้าตัวท็อปที่มีคิวเยอะอยู่แล้วมาสลับให้ จำนวนคลิปต่อวันของน้องยังคงเดิม (7 คลิป/วัน) ไม่ล้นครับ
+        </p>
+
+        <div style="display:grid; grid-template-columns: 1fr auto; gap:10px; margin-bottom:12px;">
+          <div>
+            <label class="field-label">🔗 ลิงก์สินค้า TikTok หรือ รหัส 19 หลักของร้านที่ส่งตัวอย่างฟรี (*จำเป็น)</label>
+            <input type="text" id="fsSkuOrLink" placeholder="เช่น https://vt.tiktok.com/... หรือ https://shop.tiktok.com/view/product/173... หรือเลข 19 หลัก" />
+          </div>
+          <div style="display:flex; align-items:flex-end;">
+            <button type="button" class="btn btn-gold" onclick="lookupFreeSampleMeta()">🔍 ดึงชื่อ & รูปอัตโนมัติ</button>
+          </div>
+        </div>
+
+        <div class="config-grid" style="margin-top:0; margin-bottom:12px;">
+          <div style="grid-column: span 2;">
+            <label class="field-label">🏷️ ชื่อสินค้าเต็ม (แก้ให้ตรงร้านได้ — ใช้ตั้งชื่อไฟล์ .mp4 ส่งบอท)</label>
+            <input type="text" id="fsName" placeholder="ระบบจะดึงให้อัตโนมัติ หรือพิมพ์ชื่อสินค้าที่นี่..." />
+          </div>
+          <div>
+            <label class="field-label">📅 วันเริ่มลงคลิปแรก</label>
+            <input type="date" id="fsStartDate" />
+          </div>
+          <div>
+            <label class="field-label">⏰ วันหมดเขตส่งงานร้านค้า</label>
+            <input type="date" id="fsDeadlineDate" />
+          </div>
+          <div>
+            <label class="field-label">🎬 จำนวนคลิปที่แทรก (ค่าเริ่มต้น 3 คลิป)</label>
+            <input type="number" id="fsClipsCount" value="3" min="1" max="10" />
+          </div>
+        </div>
+
+        <div style="margin-bottom:12px;">
+          <label class="field-label">📸 รูปสินค้าจริง / รูปแคปหน้าจอจาก TikTok (ลากรูปมาวาง หรือกด Ctrl+V เพื่อแนบรูปขึ้นเว็บให้น้องเห็นได้เลย)</label>
+          <input type="file" id="fsImageFile" accept="image/*" style="position:absolute; width:1px; height:1px; opacity:0; pointer-events:none;" onchange="handleFsImageUpload(this.files)" />
+          <div style="display:flex; gap:14px; align-items:center; flex-wrap:wrap;">
+            <label for="fsImageFile" class="btn" style="cursor:pointer;">📷 เลือกรูปสินค้าจากเครื่อง / แคปจอ</label>
+            <img id="fsImagePreview" src="" alt="" style="width:74px; height:74px; object-fit:cover; border-radius:12px; border:1px solid var(--border); display:none;" />
+            <span id="fsImageHint" style="font-size:12.5px; color:var(--muted);">ยังไม่ได้แนบรูปเพิ่ม (หรือใช้รูปที่ดึงได้จากลิงก์/ฐานข้อมูล)</span>
+          </div>
+        </div>
+
+        <div style="margin-bottom:16px;">
+          <label class="field-label">📝 โน้ตบรีฟพิเศษให้น้องคนทำคลิป (ไม่บังคับ)</label>
+          <input type="text" id="fsBriefNote" placeholder="เช่น ห้ามเปลี่ยนร้าน SKU นี้เด็ดขาด ต้องถ่ายเห็นแพ็กเกจสินค้าจริง ชวนกดตะกร้าเหลือง" />
+        </div>
+
+        <button type="button" class="btn btn-primary" style="width:100%; justify-content:center; padding:14px; font-size:16px;"
+          onclick="injectFreeSample()">
+          🎁 แทรกคิวตัวอย่างฟรี 3 คลิปลงตารางทันที!
+        </button>
+
+        <div id="fsSwapResultBox" style="display:none; margin-top:16px;" class="alert-box"></div>
+      </div>
+    </div>
+
+    <!-- TAB 3: FULL SCHEDULE & PUBLISH -->
+    <div id="tab-schedule" class="tab-panel">
+      <div class="card">
+        <div class="card-title">
+          <span id="scheduleTitleHeader">📅 ตารางสั่งทำคลิปประจำเดือน</span>
+          <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <button type="button" class="btn btn-sm" onclick="exportExcel()">📥 โหลด Excel (.xlsx)</button>
+            <button type="button" class="btn btn-sm btn-green" onclick="publishToGitHub()">🚀 อัปเดตขึ้นเว็บให้น้อง (GitHub Pages)</button>
+          </div>
+        </div>
+        <div class="summary-strip" id="scheduleSummaryStrip"></div>
+
+        <details open style="margin-bottom:16px;">
+          <summary style="cursor:pointer; font-weight:700; font-size:14.5px; margin-bottom:10px;">
+            📦 สรุปโควตาสินค้าทุกตัว (เทียบคิวหลัก vs สำรอง OMNI 5 — ตรวจความครบถ้วน)
+          </summary>
+          <div style="overflow-x:auto;">
+            <table class="prod-table" id="catalogSummaryTable"></table>
+          </div>
+        </details>
+
+        <div style="font-weight:700; font-size:14.5px; margin-bottom:8px;">
+          🗓️ ตารางรายวัน (คลิกปุ่ม "✏️ แก้ช่อง" เพื่อปรับเปลี่ยนสินค้าหรือแนวคลิปในช่องนั้นได้ทันที)
+        </div>
+        <div class="matrix-wrap">
+          <table class="matrix-table" id="scheduleMatrixTable"></table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Slot Modal -->
+  <div class="modal-backdrop" id="editSlotModal">
+    <div class="modal-card">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+        <h3 id="editSlotTitle" style="font-size:17px; font-weight:800;">✏️ แก้ไขช่องตาราง</h3>
+        <button type="button" class="btn btn-sm" onclick="closeEditSlotModal()">✕</button>
+      </div>
+      <div style="display:flex; flex-direction:column; gap:12px;">
+        <div>
+          <label class="field-label">เลือกสินค้าที่จะลงในช่องนี้</label>
+          <select id="editSlotProductSelect"></select>
+        </div>
+        <div>
+          <label class="field-label">เลือกแนวคลิป (จาก 16 แนวหลัก)</label>
+          <select id="editSlotStyleSelect"></select>
+        </div>
+        <div>
+          <label class="field-label">โน้ตสั้นๆ เพิ่มเติม (ถ้ามี)</label>
+          <input type="text" id="editSlotBriefInput" placeholder="เช่น เน้นขยี้โปรราคาประหยัด..." />
+        </div>
+        <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:4px;">
+          <button type="button" class="btn" onclick="closeEditSlotModal()">ยกเลิก</button>
+          <button type="button" class="btn btn-green" onclick="saveSlotEdit()">💾 บันทึกการแก้ไข</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="status-toast" id="statusToast"></div>
+
+  <script>
+    const THEME_KEY = 'AGY_TIKTOK_STUDIO_THEME';
+    let stylesList = [];
+    let analysisState = {
+      winners: [],
+      new_stars: [],
+      backup_new_stars: [],
+      dropped: [],
+      warnings: []
+    };
+    let currentPlan = null;
+    let fsUploadedBase64 = '';
+    let editingTarget = null; // { dayIdx, slotIdx }
+
+    (function initTheme() {
+      const saved = localStorage.getItem(THEME_KEY) || 'dark';
+      document.documentElement.setAttribute('data-theme', saved);
+      const btn = document.getElementById('themeBtn');
+      if (btn) btn.innerHTML = saved === 'light' ? '☀️ โหมดสว่าง' : '🌙 โหมดมืด';
+    })();
+
+    function toggleTheme() {
+      const cur = document.documentElement.getAttribute('data-theme') || 'dark';
+      const next = cur === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      localStorage.setItem(THEME_KEY, next);
+      document.getElementById('themeBtn').innerHTML = next === 'light' ? '☀️ โหมดสว่าง' : '🌙 โหมดมืด';
+    }
+
+    function escapeHtml(s) {
+      return String(s || '')
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;').replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function showToast(msg, duration = 4500) {
+      const el = document.getElementById('statusToast');
+      el.innerHTML = msg;
+      el.classList.add('show');
+      clearTimeout(el._timer);
+      if (duration > 0) {
+        el._timer = setTimeout(() => el.classList.remove('show'), duration);
+      }
+    }
+
+    function switchTab(tabKey, btn) {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+      else {
+        const idx = tabKey === 'analyze' ? 0 : (tabKey === 'freesample' ? 1 : 2);
+        document.querySelectorAll('.tab-btn')[idx]?.classList.add('active');
+      }
+      document.getElementById(`tab-${tabKey}`)?.classList.add('active');
+    }
+
+    function initDefaultDates() {
+      const now = new Date();
+      const y = now.getFullYear();
+      const m = now.getMonth(); // 0-indexed
+      const nextFirst = new Date(y, m + 1, 1);
+      const nextLast = new Date(y, m + 2, 0);
+      const fmt = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+      document.getElementById('planStartDate').value = fmt(nextFirst);
+      document.getElementById('planEndDate').value = fmt(nextLast);
+
+      const tomorrow = new Date(now.getTime() + 86400000);
+      const plus7 = new Date(now.getTime() + 8 * 86400000);
+      document.getElementById('fsStartDate').value = fmt(tomorrow);
+      document.getElementById('fsDeadlineDate').value = fmt(plus7);
+    }
+
+    async function apiPost(endpoint, payload) {
+      const resp = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload || {})
+      });
+      const data = await resp.json();
+      if (!resp.ok || data.ok === false) {
+        throw new Error(data.error || `HTTP ${resp.status}`);
+      }
+      return data;
+    }
+
+    async function bootstrap() {
+      initDefaultDates();
+      try {
+        const [stResp, planResp] = await Promise.all([
+          fetch('/api/styles').then(r => r.json()),
+          fetch('/api/plan').then(r => r.json())
+        ]);
+        stylesList = stResp.styles || [];
+        document.getElementById('serverStatusBadge').textContent = '✅ พร้อมทำงาน';
+        document.getElementById('catalogMemoryBadge').textContent = `คลังจำช่อง: ${planResp.channel_catalog_size || 0} รายการ`;
+        if (planResp.plan && Array.isArray(planResp.plan.days) && planResp.plan.days.length > 0) {
+          currentPlan = planResp.plan;
+          renderScheduleTab();
+          const fBadge = document.getElementById('activePlanBadgeForSample');
+          if (fBadge) fBadge.textContent = `📌 แผนปัจจุบัน: ${currentPlan.days.length} วัน (${currentPlan.start_date} – ${currentPlan.end_date})`;
+        } else {
+          const fBadge = document.getElementById('activePlanBadgeForSample');
+          if (fBadge) fBadge.textContent = 'ℹ️ ยังไม่มีแผนรายเดือน — ให้สร้างในแท็บ 1 ก่อนแทรกครับ';
+        }
+      } catch (err) {
+        document.getElementById('serverStatusBadge').textContent = '❌ ยังไม่ได้เชื่อมต่อ planner_server.py';
+        showToast('❌ กรุณาเปิดผ่าน Start Planner หรือรัน python planner_server.py ครับ', 7000);
+      }
+    }
+
+    // Drag & Drop for Sales Files
+    const salesDz = document.getElementById('salesDropzone');
+    ['dragenter', 'dragover'].forEach(evt => {
+      salesDz.addEventListener(evt, e => { e.preventDefault(); salesDz.classList.add('dragover'); });
+    });
+    ['dragleave', 'drop'].forEach(evt => {
+      salesDz.addEventListener(evt, e => { e.preventDefault(); salesDz.classList.remove('dragover'); });
+    });
+    salesDz.addEventListener('drop', e => {
+      if (e.dataTransfer?.files?.length) handleSalesFiles(e.dataTransfer.files);
+    });
+
+    // Global paste support for Tab 2 Free Sample real product image
+    window.addEventListener('paste', e => {
+      const tab2Active = document.getElementById('tab-freesample')?.classList.contains('active');
+      if (!tab2Active) return;
+      const items = e.clipboardData?.items || [];
+      for (const it of items) {
+        if (it.type && it.type.startsWith('image/')) {
+          const file = it.getAsFile();
+          if (file) handleFsImageUpload([file]);
+          break;
+        }
+      }
+    });
+
+    function fileToBase64(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onerror = () => reject(new Error('อ่านไฟล์ไม่สำเร็จ'));
+        reader.onload = ev => resolve(String(ev.target.result || ''));
+        reader.readAsDataURL(file);
+      });
+    }
+
+    async function handleSalesFiles(fileList) {
+      const arr = Array.from(fileList || []);
+      if (!arr.length) return;
+      showToast('⏳ กำลังอ่านไฟล์ยอดขาย ค้นหารหัส 19 หลัก และคัดแยกสินค้า...', 0);
+      try {
+        const filesPayload = [];
+        for (const f of arr) {
+          const dataUrl = await fileToBase64(f);
+          filesPayload.push({ filename: f.name, content_base64: dataUrl });
+        }
+        const res = await apiPost('/api/analyze-sales', {
+          files: filesPayload,
+          min_orders_winner: Number(document.getElementById('minOrdersWinner').value || 1),
+          new_stars_count: Number(document.getElementById('newStarsCount').value || 6)
+        });
+        applyAnalysisResult(res);
+        showToast(`✅ วิเคราะห์สำเร็จ! ขายดี ${res.winners.length} ตัว · ใหม่น่าลอง ${res.new_stars.length} ตัว · ปัดตก ${res.dropped.length} ตัว`, 5000);
+      } catch (err) {
+        showToast(`❌ ${err.message}`, 7000);
+      }
+    }
+
+    async function analyzeQuickPaste() {
+      const lines = (document.getElementById('quickPasteLines').value || '').trim();
+      if (!lines) { alert('กรุณาวางชื่อสินค้าหรือลิงก์อย่างน้อย 1 บรรทัดครับ'); return; }
+      showToast('⏳ กำลังค้นหารหัส 19 หลักและรูปสินค้าจากรายการที่วาง...', 0);
+      try {
+        const res = await apiPost('/api/analyze-sales', {
+          text_lines: lines,
+          min_orders_winner: 1,
+          new_stars_count: Number(document.getElementById('newStarsCount').value || 6)
+        });
+        applyAnalysisResult(res);
+        showToast(`✅ ดึงข้อมูลเสร็จสิ้น (${res.winners.length} รายการ + ใหม่ ${res.new_stars.length} รายการ)`, 4500);
+      } catch (err) {
+        showToast(`❌ ${err.message}`, 6500);
+      }
+    }
+
+    function applyAnalysisResult(res) {
+      analysisState = {
+        winners: res.winners || [],
+        new_stars: res.new_stars || [],
+        backup_new_stars: res.backup_new_stars || [],
+        dropped: res.dropped || [],
+        warnings: res.warnings || []
+      };
+      const warnBox = document.getElementById('parseWarningsBox');
+      if (analysisState.warnings.length) {
+        warnBox.style.display = 'block';
+        warnBox.innerHTML = '<b>ℹ️ ข้อมูลเพิ่มเติมจากการอ่านไฟล์:</b><br>' + analysisState.warnings.map(escapeHtml).join('<br>');
+      } else {
+        warnBox.style.display = 'none';
+      }
+      document.getElementById('analysisGroupsWrap').style.display = 'block';
+      renderAnalysisTables();
+    }
+
+    function renderThumbHtml(item) {
+      if (item.image) {
+        return `<img class="thumb-sm" src="${escapeHtml(item.image)}" alt="" loading="lazy" />`;
+      }
+      return `<div class="thumb-placeholder">📦</div>`;
+    }
+
+    function renderAnalysisTables() {
+      // 1. Missing SKU Box (check winners without clean SKU)
+      const missingWinners = analysisState.winners
+        .map((item, idx) => ({ item, idx }))
+        .filter(x => !x.item.sku);
+      const mPanel = document.getElementById('missingSkuPanel');
+      const mList = document.getElementById('missingSkuList');
+      document.getElementById('missingSkuCount').textContent = missingWinners.length;
+
+      if (missingWinners.length > 0) {
+        mPanel.style.display = 'block';
+        mList.innerHTML = missingWinners.map(({ item, idx }) => {
+          const cands = (item.candidates || []).map((c, cIdx) =>
+            `<button type="button" class="btn btn-sm" onclick="pickCandidateSku(${idx}, ${cIdx})">
+              ✅ ${escapeHtml(c.sku)} — ${escapeHtml(String(c.name || '').slice(0, 40))}...
+            </button>`
+          ).join('');
+          return `
+            <div style="background:var(--card); border:1px solid var(--border); border-radius:12px; padding:10px 14px;">
+              <div style="font-weight:700; margin-bottom:6px;">
+                ⚠️ ${escapeHtml(item.name)} <span style="color:var(--muted); font-weight:400;">(${item.orders || 0} ออเดอร์ · ฿${Number(item.gmv || 0).toLocaleString()})</span>
+              </div>
+              <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+                <input type="text" id="fixSkuInput_${idx}" placeholder="วางลิงก์สินค้า TikTok หรือรหัส 19 หลักตรงนี้..." style="flex:1; min-width:260px;" />
+                <button type="button" class="btn btn-sm btn-green" onclick="fixMissingSku(${idx})">🔗 ผูกเลขนี้</button>
+                <button type="button" class="btn btn-sm" onclick="moveItemGroup('winners', 'dropped', ${idx})">🗑️ ปัดตกตัวนี้</button>
+              </div>
+              ${cands ? `<div style="margin-top:8px; display:flex; gap:6px; flex-wrap:wrap;"><span style="font-size:12px; color:var(--muted);">ตัวใกล้เคียง:</span>${cands}</div>` : ''}
+            </div>
+          `;
+        }).join('');
+      } else {
+        mPanel.style.display = 'none';
+      }
+
+      // 2. Winners Table
+      document.getElementById('winnersCountLabel').textContent = analysisState.winners.length;
+      document.getElementById('winnersTable').innerHTML = `
+        <thead>
+          <tr>
+            <th>รูป</th>
+            <th>สินค้า & รหัส 19 หลัก</th>
+            <th>ยอดขาย / ออเดอร์</th>
+            <th style="width:130px;">กำหนดคิวหลักเอง (ว่าง=ออโต้)</th>
+            <th>จัดการ</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${analysisState.winners.map((p, idx) => `
+            <tr>
+              <td>${renderThumbHtml(p)}</td>
+              <td>
+                <div style="font-weight:700;">⭐ ${escapeHtml(p.name)}</div>
+                <div style="font-size:12px; margin-top:2px;">
+                  ${p.sku
+                    ? `<a href="${escapeHtml(p.link || `https://shop.tiktok.com/view/product/${p.sku}`)}" target="_blank" rel="noopener" class="mono" style="color:var(--accent-2); text-decoration:none;">🛒 ${escapeHtml(p.sku)}</a>`
+                    : `<span style="color:var(--warn); font-weight:700;">⚠️ ยังไม่มีเลข 19 หลัก (กรอกด้านบน)</span>`
+                  }
+                  ${p.cat ? `<span class="badge" style="margin-left:6px;">${escapeHtml(p.cat)}</span>` : ''}
+                </div>
+              </td>
+              <td>
+                <b>฿${Number(p.gmv || 0).toLocaleString()}</b><br>
+                <span style="color:var(--muted); font-size:12px;">${Number(p.orders || 0).toLocaleString()} ออเดอร์</span>
+              </td>
+              <td>
+                <input type="number" min="1" max="31" placeholder="ออโต้"
+                  value="${p.target_main_slots || ''}"
+                  onchange="analysisState.winners[${idx}].target_main_slots = this.value ? Number(this.value) : null" />
+              </td>
+              <td>
+                <button type="button" class="btn btn-sm" onclick="moveItemGroup('winners', 'dropped', ${idx})">❌ ปัดตก</button>
+              </td>
+            </tr>
+          `).join('')}
+        </tbody>
+      `;
+
+      // 3. New Stars Table
+      document.getElementById('newStarsCountLabel').textContent = analysisState.new_stars.length;
+      document.getElementById('newStarsTable').innerHTML = `
+        <thead>
+          <tr>
+            <th>รูป</th>
+            <th>สินค้าใหม่ดาวรุ่ง (ติดดาว)</th>
+            <th>ผลงานตลาด Kalodata</th>
+            <th style="width:120px;">คิวหลัก</th>
+            <th>จัดการ</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${analysisState.new_stars.map((p, idx) => `
+            <tr>
+              <td>${renderThumbHtml(p)}</td>
+              <td>
+                <div style="font-weight:700; color:var(--gold);">🌟 ${escapeHtml(p.name)}</div>
+                <div style="font-size:12px; margin-top:2px;">
+                  <a href="${escapeHtml(p.link || `https://shop.tiktok.com/view/product/${p.sku}`)}" target="_blank" rel="noopener" class="mono" style="color:var(--accent-2); text-decoration:none;">🛒 ${escapeHtml(p.sku)}</a>
+                  ${p.cat ? `<span class="badge" style="margin-left:6px;">${escapeHtml(p.cat)}</span>` : ''}
+                </div>
+              </td>
+              <td style="font-size:12.5px;">
+                ราคา <b>฿${Math.round(p.price || 0).toLocaleString()}</b> · คอมฯ <b style="color:var(--green);">${p.comm || 0}%</b><br>
+                ยอดคลิป <b>฿${Math.round(p.v_rev || 0).toLocaleString()}</b> · คนทำ ${p.creators || 0} · โต ${p.growth || 0}%
+              </td>
+              <td>
+                <input type="number" min="1" max="31" placeholder="ออโต้"
+                  value="${p.target_main_slots || ''}"
+                  onchange="analysisState.new_stars[${idx}].target_main_slots = this.value ? Number(this.value) : null" />
+              </td>
+              <td style="white-space:nowrap;">
+                <button type="button" class="btn btn-sm btn-gold" onclick="swapNewStar(${idx})">🔄 เปลี่ยนตัว</button>
+                <button type="button" class="btn btn-sm" onclick="analysisState.new_stars.splice(${idx},1); renderAnalysisTables();">✕</button>
+              </td>
+            </tr>
+          `).join('')}
+        </tbody>
+      `;
+
+      // 4. Dropped Table
+      document.getElementById('droppedCountLabel').textContent = analysisState.dropped.length;
+      document.getElementById('droppedTable').innerHTML = analysisState.dropped.length ? `
+        <thead>
+          <tr><th>สินค้าที่ปัดตก</th><th>ยอดขาย / ออเดอร์</th><th>เหตุผล</th><th>จัดการ</th></tr>
+        </thead>
+        <tbody>
+          ${analysisState.dropped.map((p, idx) => `
+            <tr>
+              <td>
+                <div>${escapeHtml(p.name)}</div>
+                <div class="mono" style="font-size:11.5px; color:var(--muted);">${escapeHtml(p.sku || 'ไม่มี SKU')}</div>
+              </td>
+              <td>฿${Number(p.gmv || 0).toLocaleString()} / ${p.orders || 0} ออเดอร์</td>
+              <td style="font-size:12.5px; color:var(--muted);">${escapeHtml(p.reason || 'ยอดไม่เดิน')}</td>
+              <td>
+                <button type="button" class="btn btn-sm btn-green" onclick="moveItemGroup('dropped', 'winners', ${idx})">↩️ ดึงกลับมาทำต่อ</button>
+              </td>
+            </tr>
+          `).join('')}
+        </tbody>
+      ` : `<tbody><tr><td style="color:var(--muted);">ไม่มีสินค้าที่ถูกปัดตกครับ (ขายได้ทุกรายการ!)</td></tr></tbody>`;
+    }
+
+    function pickCandidateSku(winnerIdx, candIdx) {
+      const w = analysisState.winners[winnerIdx];
+      const c = w?.candidates?.[candIdx];
+      if (!w || !c) return;
+      w.sku = c.sku;
+      w.image = w.image || c.image;
+      w.cat = w.cat || c.cat;
+      w.link = `https://shop.tiktok.com/view/product/${c.sku}?region=TH&locale=th-TH`;
+      renderAnalysisTables();
+      showToast(`✅ ผูกรหัส ${c.sku} ให้สินค้า "${w.name.slice(0, 35)}..." แล้ว!`);
+    }
+
+    async function fixMissingSku(winnerIdx) {
+      const inp = document.getElementById(`fixSkuInput_${winnerIdx}`);
+      const val = (inp?.value || '').trim();
+      if (!val) { alert('กรุณาวางลิงก์ TikTok หรือรหัส 19 หลักก่อนครับ'); return; }
+      const w = analysisState.winners[winnerIdx];
+      try {
+        showToast('🔍 กำลังแกะรหัส 19 หลักและดึงรูปสินค้า...', 0);
+        const res = await apiPost('/api/resolve-item', { sku_or_link: val, name: w.name });
+        const item = res.item || {};
+        if (!item.sku) {
+          showToast('❌ ยังไม่เจอรหัส 19 หลักจากข้อความที่วาง กรุณาวางลิงก์เต็มจาก TikTok Shop หรือพิมพ์เลข 19 หลักตรงๆ ครับ', 6000);
+          return;
+        }
+        w.sku = item.sku;
+        w.image = item.image || w.image;
+        w.cat = item.cat || w.cat;
+        w.link = item.link || `https://shop.tiktok.com/view/product/${item.sku}?region=TH&locale=th-TH`;
+        renderAnalysisTables();
+        showToast(`✅ บันทึกรหัส ${item.sku} เข้าคลังจำช่องเรียบร้อย!`);
+      } catch (err) {
+        showToast(`❌ ${err.message}`, 6000);
+      }
+    }
+
+    function moveItemGroup(fromKey, toKey, idx) {
+      const item = analysisState[fromKey]?.[idx];
+      if (!item) return;
+      analysisState[fromKey].splice(idx, 1);
+      item.tier = toKey === 'winners' ? 'winner' : 'dropped';
+      item.starred = toKey === 'winners';
+      analysisState[toKey].unshift(item);
+      renderAnalysisTables();
+    }
+
+    function swapNewStar(idx) {
+      if (!analysisState.backup_new_stars.length) {
+        showToast('ไม่มีตัวสำรองเพิ่มเติมในรอบนี้แล้วครับ ลองเพิ่มลิงก์เองได้ด้านบนขวาเลย');
+        return;
+      }
+      const nextStar = analysisState.backup_new_stars.shift();
+      const old = analysisState.new_stars[idx];
+      analysisState.new_stars[idx] = nextStar;
+      if (old) analysisState.backup_new_stars.push(old);
+      renderAnalysisTables();
+    }
+
+    async function addProductManually(targetGroup, inputId) {
+      const inp = document.getElementById(inputId);
+      const val = (inp?.value || '').trim();
+      if (!val) return;
+      try {
+        showToast('🔍 กำลังดึงข้อมูลสินค้าจากลิงก์/รหัส...', 0);
+        const res = await apiPost('/api/resolve-item', { sku_or_link: val });
+        const item = res.item;
+        if (!item || !item.sku) {
+          showToast('❌ ไม่พบรหัส 19 หลักจากข้อความนี้ กรุณาวางลิงก์สินค้า TikTok หรือเลข 19 หลักครับ', 6000);
+          return;
+        }
+        item.tier = targetGroup === 'winners' ? 'winner' : 'new_star';
+        item.starred = true;
+        item.gmv = item.gmv || 1000;
+        item.orders = item.orders || 5;
+        analysisState[targetGroup].unshift(item);
+        inp.value = '';
+        renderAnalysisTables();
+        showToast(`✅ เพิ่มสินค้า "${item.name.slice(0, 40)}" เข้ารายการแล้ว!`);
+      } catch (err) {
+        showToast(`❌ ${err.message}`, 6000);
+      }
+    }
+
+    async function generateSchedule() {
+      if (!analysisState.winners.length && !analysisState.new_stars.length) {
+        alert('กรุณาอัปโหลดไฟล์ยอดขายหรือเพิ่มสินค้าอย่างน้อย 1 รายการก่อนครับ');
+        return;
+      }
+      const missingCount = analysisState.winners.filter(x => !x.sku).length;
+      if (missingCount > 0) {
+        if (!confirm(`ยังมีสินค้า ${missingCount} ตัวที่ยังไม่มีเลข 19 หลัก (ไปกรอกตรงกล่องสีส้มด้านบนได้เลย)\n\nกด OK เพื่อจัดตารางดูก่อน (ยังอัปขึ้นเว็บไม่ผ่านจนกว่าจะเติมครบ) หรือกด Cancel เพื่อกลับไปเติมเลข 19 หลักก่อน`)) {
+          document.getElementById('missingSkuPanel')?.scrollIntoView({ behavior: 'smooth' });
+          return;
+        }
+      }
+      showToast('⚡ กำลังจัดตารางทั้งเดือน 7 Omni × 16 แนว และเช็กกฎ OMNI 5...', 0);
+      try {
+        const plan = await apiPost('/api/generate-schedule', {
+          start_date: document.getElementById('planStartDate').value,
+          end_date: document.getElementById('planEndDate').value,
+          clips_per_day: Number(document.getElementById('clipsPerDay').value || 7),
+          new_star_main_quota: Number(document.getElementById('newStarMainQuota').value || 5),
+          winners: analysisState.winners,
+          new_stars: analysisState.new_stars,
+          dropped_products: analysisState.dropped
+        });
+        currentPlan = plan;
+        await apiPost('/api/save-draft', { plan: currentPlan });
+        renderScheduleTab();
+        document.getElementById('activePlanBadgeForSample').textContent = `📌 แผนปัจจุบัน: ${currentPlan.days.length} วัน (${currentPlan.start_date} – ${currentPlan.end_date})`;
+        switchTab('schedule');
+        showToast(`🎉 จัดตารางเสร็จสิ้น! ${plan.summary.total_days} วัน (${plan.summary.total_clips} คลิป) — ตรวจแล้วกดปุ่มเขียวเพื่ออัปเดตขึ้นเว็บให้น้องได้เลย!`, 6500);
+      } catch (err) {
+        showToast(`❌ ${err.message}`, 7000);
+      }
+    }
+
+    // Tab 2: Urgent Free Sample Injector
+    async function handleFsImageUpload(files) {
+      const f = files && files[0];
+      if (!f) return;
+      try {
+        fsUploadedBase64 = await fileToBase64(f);
+        const imgEl = document.getElementById('fsImagePreview');
+        imgEl.src = fsUploadedBase64;
+        imgEl.style.display = 'block';
+        document.getElementById('fsImageHint').textContent = `✅ แนบรูปแล้ว (${f.name || 'จาก Clipboard'}) — พร้อมบันทึกขึ้นเว็บให้น้อง`;
+      } catch (err) {
+        showToast(`❌ อ่านรูปไม่สำเร็จ: ${err.message}`);
+      }
+    }
+
+    async function lookupFreeSampleMeta() {
+      const raw = (document.getElementById('fsSkuOrLink').value || '').trim();
+      if (!raw) { alert('วางลิงก์ TikTok หรือรหัส 19 หลักก่อนครับ'); return; }
+      try {
+        showToast('🔍 กำลังดึงชื่อและรูปสินค้าจาก TikTok / Kalodata...', 0);
+        const res = await apiPost('/api/resolve-item', { sku_or_link: raw });
+        const item = res.item || {};
+        if (item.sku) document.getElementById('fsSkuOrLink').value = item.sku;
+        if (item.name && !document.getElementById('fsName').value.trim()) {
+          document.getElementById('fsName').value = item.name;
+        }
+        if (item.image && !fsUploadedBase64) {
+          const imgEl = document.getElementById('fsImagePreview');
+          imgEl.src = item.image;
+          imgEl.style.display = 'block';
+          document.getElementById('fsImageHint').textContent = '✅ ดึงรูปสินค้าจากระบบสำเร็จ (อัปโหลดรูปถ่ายจริงทับได้เสมอ)';
+        }
+        showToast(item.sku ? `✅ พบรหัส SKU: ${item.sku}` : '⚠️ ยังหาเลข 19 หลักไม่เจอ กรุณากรอกเลข 19 หลักตรงช่องด้านบน');
+      } catch (err) {
+        showToast(`❌ ${err.message}`, 6000);
+      }
+    }
+
+    async function injectFreeSample() {
+      const skuOrLink = (document.getElementById('fsSkuOrLink').value || '').trim();
+      if (!skuOrLink) { alert('กรุณาวางลิงก์สินค้า TikTok หรือรหัส 19 หลักก่อนครับ'); return; }
+      showToast('🎁 กำลังแทรกคิวตัวอย่างฟรี 3 คลิปลงช่องหลักและคำนวณโควตาใหม่...', 0);
+      try {
+        const res = await apiPost('/api/inject-free-sample', {
+          plan: currentPlan,
+          sku_or_link: skuOrLink,
+          name: document.getElementById('fsName').value.trim(),
+          start_date: document.getElementById('fsStartDate').value,
+          deadline_date: document.getElementById('fsDeadlineDate').value,
+          clips_count: Number(document.getElementById('fsClipsCount').value || 3),
+          images_base64: fsUploadedBase64 ? [fsUploadedBase64] : [],
+          brief_note: document.getElementById('fsBriefNote').value.trim()
+        });
+        currentPlan = res;
+        await apiPost('/api/save-draft', { plan: currentPlan });
+        renderScheduleTab();
+
+        const swapped = res.swapped_events || [];
+        const box = document.getElementById('fsSwapResultBox');
+        box.style.display = 'block';
+        box.style.borderColor = 'var(--green)';
+        box.style.background = 'rgba(16,185,129,0.1)';
+        box.innerHTML = `
+          <div style="font-weight:800; color:var(--green); font-size:15.5px; margin-bottom:6px;">
+            ✅ แทรกคิวสินค้ารีวิวฟรี ${swapped.length} คลิปเรียบร้อย! (หลบ OMNI 5 ทุกคลิป)
+          </div>
+          <ul style="padding-left:20px; font-size:13.5px; line-height:1.7;">
+            ${swapped.map(ev => `
+              <li><b>คลิปที่ ${ev.clip_index}:</b> วันที่ <b>${escapeHtml(ev.date_thai)}</b> · ช่อง <b>${escapeHtml(ev.slot_label)}</b> · ${escapeHtml(ev.style_name)}
+              <span style="color:var(--muted);">(สลับแทน ${escapeHtml(ev.replaced_code)} ${escapeHtml(ev.replaced_name)})</span></li>
+            `).join('')}
+          </ul>
+          <div style="margin-top:10px; display:flex; gap:8px; flex-wrap:wrap;">
+            <button type="button" class="btn btn-green" onclick="publishToGitHub()">🚀 อัปเดตตารางใหม่ขึ้นเว็บให้น้องเลยตอนนี้</button>
+            <button type="button" class="btn" onclick="switchTab('schedule')">📅 เปิดดูตารางรวม</button>
+          </div>
+        `;
+        showToast(`✅ แทรกคิวตัวอย่างฟรี ${swapped.length} คลิปเสร็จสิ้น! กดปุ่มอัปเดตขึ้นเว็บให้น้องเห็นได้เลย`);
+      } catch (err) {
+        showToast(`❌ ${err.message}`, 7000);
+      }
+    }
+
+    // Tab 3: Schedule Matrix & Product Summary Rendering
+    function renderScheduleTab() {
+      if (!currentPlan || !Array.isArray(currentPlan.days) || !currentPlan.days.length) {
+        document.getElementById('scheduleSummaryStrip').innerHTML = `<div class="stat-pill">ยังไม่มีตารางรายเดือน — ไปที่แท็บที่ 1 เพื่ออัปโหลดไฟล์ยอดขายและสร้างตารางครับ</div>`;
+        document.getElementById('catalogSummaryTable').innerHTML = '';
+        document.getElementById('scheduleMatrixTable').innerHTML = '';
+        return;
+      }
+
+      const sm = currentPlan.summary || {};
+      document.getElementById('scheduleTitleHeader').textContent = currentPlan.title || '📅 ตารางสั่งทำคลิปประจำเดือน';
+      document.getElementById('scheduleSummaryStrip').innerHTML = `
+        <div class="stat-pill">🗓️ จำนวนวัน: <b>${sm.total_days || 0}</b> วัน</div>
+        <div class="stat-pill">🎬 คลิปรวม: <b>${sm.total_clips || 0}</b> คลิป</div>
+        <div class="stat-pill">⭐ ขายดีช่องเรา: <b>${sm.winners_count || 0}</b></div>
+        <div class="stat-pill">🌟 ใหม่น่าลอง: <b>${sm.new_stars_count || 0}</b></div>
+        <div class="stat-pill">🎁 ตัวอย่างฟรี: <b>${sm.free_samples_count || 0}</b></div>
+        <div class="stat-pill" style="border-color:${sm.omni5_invariant_ok ? 'var(--green)' : 'var(--accent)'};">
+          🛡️ กฎ OMNI 5 (สำรองทุกตัวมีคิวหลัก >= 2 คลิป):
+          <b style="color:${sm.omni5_invariant_ok ? 'var(--green)' : 'var(--accent)'};">${sm.omni5_invariant_ok ? 'ผ่าน 100%' : 'ต้องตรวจ'}</b>
+        </div>
+        ${sm.missing_sku_in_slots ? `<div class="stat-pill" style="border-color:var(--warn);">⚠️ ช่องไม่มี SKU: <b style="color:var(--warn);">${sm.missing_sku_in_slots}</b></div>` : ''}
+      `;
+
+      // Catalog Allocation Summary Table
+      const tierBadge = t => {
+        if (t === 'free_sample') return `<span class="badge badge-free">🎁 ตัวอย่างฟรี</span>`;
+        if (t === 'new_star') return `<span class="badge badge-star">🌟 ใหม่น่าลอง</span>`;
+        return `<span class="badge badge-winner">⭐ ขายดี</span>`;
+      };
+      document.getElementById('catalogSummaryTable').innerHTML = `
+        <thead>
+          <tr>
+            <th>รหัส</th>
+            <th>รูป</th>
+            <th>สินค้า & SKU 19 หลัก</th>
+            <th>กลุ่ม</th>
+            <th>คิวหลัก</th>
+            <th>สำรอง OMNI5</th>
+            <th>รวม</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${(currentPlan.catalog || []).map(p => `
+            <tr>
+              <td class="mono" style="font-weight:800;">${escapeHtml(p.code)}</td>
+              <td>${renderThumbHtml(p)}</td>
+              <td>
+                <div style="font-weight:700;">${escapeHtml(p.name)}</div>
+                <div class="mono" style="font-size:11.8px; color:var(--accent-2);">${escapeHtml(p.sku || '⚠️ ไม่มี SKU')}</div>
+              </td>
+              <td>${tierBadge(p.tier)}</td>
+              <td><b>${p.main_slots || 0}</b></td>
+              <td>${p.fallback_slots || 0}</td>
+              <td><b style="color:var(--gold);">${p.total_slots || 0}</b></td>
+            </tr>
+          `).join('')}
+        </tbody>
+      `;
+
+      // Matrix Header & Rows
+      const k = currentPlan.clips_per_day || 7;
+      const headCols = Array.from({ length: k }, (_, i) => {
+        const n = i + 1;
+        if (n === 5 && k >= 5) return `<th style="background:#92400e;">OMNI 5 (สำรอง/ตอบเม้นต์)</th>`;
+        if (k >= 6 && n >= k - 1) return `<th style="background:#0e7490;">OMNI ${n} (ฮาร์ดเซล 13–16)</th>`;
+        return `<th>OMNI ${n}</th>`;
+      }).join('');
+
+      const rowsHtml = (currentPlan.days || []).map((day, dIdx) => `
+        <tr>
+          <td class="date-col">${escapeHtml(day.date_thai)}<br><span style="font-size:10.8px; color:var(--muted); font-weight:400;">${escapeHtml(day.date)}</span></td>
+          ${(day.slots || []).map((sl, sIdx) => {
+            const cls = sl.tier === 'free_sample' ? 'tier-free_sample' : `role-${sl.slot_role}`;
+            const tag = sl.tier === 'free_sample'
+              ? `<div style="font-size:10.8px; font-weight:800; color:var(--accent);">${escapeHtml(sl.urgent_badge || '🎁 ตัวอย่างฟรี')}</div>`
+              : (sl.slot_role === 'reply_fallback'
+                ? `<div style="font-size:10.5px; font-weight:700; color:var(--warn);">💬 ตอบเม้นต์แทนได้ · สำรอง</div>`
+                : '');
+            return `
+              <td class="${cls}">
+                <div class="cell-card">
+                  <div class="cell-top">
+                    ${sl.image ? `<img class="cell-thumb" src="${escapeHtml(sl.image)}" alt="" loading="lazy" />` : `<div class="cell-thumb" style="display:flex;align-items:center;justify-content:center;">📦</div>`}
+                    <div>
+                      <div style="font-size:11px; font-weight:800; color:var(--accent-2);">${escapeHtml(sl.code)} ${sl.tier === 'new_star' ? '🌟' : (sl.tier === 'free_sample' ? '🎁' : '⭐')}</div>
+                      <div class="cell-name" title="${escapeHtml(sl.name)}">${escapeHtml(sl.name)}</div>
+                    </div>
+                  </div>
+                  <div class="cell-style">${escapeHtml(sl.style_name)}</div>
+                  ${tag}
+                  <div style="margin-top:auto; display:flex; justify-content:space-between; align-items:center; gap:4px;">
+                    <span class="mono" style="font-size:10px; color:var(--muted);">${sl.sku ? escapeHtml(sl.sku.slice(-6)) : 'NO SKU'}</span>
+                    <button type="button" class="btn btn-sm" style="padding:2px 7px; font-size:11px;" onclick="openEditSlot(${dIdx}, ${sIdx})">✏️ แก้</button>
+                  </div>
+                </div>
+              </td>
+            `;
+          }).join('')}
+        </tr>
+      `).join('');
+
+      document.getElementById('scheduleMatrixTable').innerHTML = `
+        <thead><tr><th>วันที่</th>${headCols}</tr></thead>
+        <tbody>${rowsHtml}</tbody>
+      `;
+    }
+
+    function openEditSlot(dayIdx, slotIdx) {
+      if (!currentPlan?.days?.[dayIdx]?.slots?.[slotIdx]) return;
+      editingTarget = { dayIdx, slotIdx };
+      const day = currentPlan.days[dayIdx];
+      const sl = day.slots[slotIdx];
+      document.getElementById('editSlotTitle').textContent = `✏️ แก้ไขวันที่ ${day.date_thai} · ${sl.slot_label}`;
+
+      const prodSel = document.getElementById('editSlotProductSelect');
+      prodSel.innerHTML = (currentPlan.catalog || []).map(p =>
+        `<option value="${escapeHtml(p.sku)}" ${p.sku === sl.sku ? 'selected' : ''}>${escapeHtml(p.code)} | ${escapeHtml(p.name.slice(0, 65))} (คิวหลัก ${p.main_slots})</option>`
+      ).join('');
+
+      const stSel = document.getElementById('editSlotStyleSelect');
+      stSel.innerHTML = stylesList.map(st =>
+        `<option value="${st.num}" ${st.num === sl.style_num ? 'selected' : ''}>${escapeHtml(st.short)}</option>`
+      ).join('');
+
+      document.getElementById('editSlotBriefInput').value = sl.brief_note || '';
+      document.getElementById('editSlotModal').classList.add('open');
+    }
+
+    function closeEditSlotModal() {
+      document.getElementById('editSlotModal').classList.remove('open');
+      editingTarget = null;
+    }
+
+    async function saveSlotEdit() {
+      if (!editingTarget || !currentPlan) return;
+      const { dayIdx, slotIdx } = editingTarget;
+      const sl = currentPlan.days[dayIdx].slots[slotIdx];
+      const newSku = document.getElementById('editSlotProductSelect').value;
+      const newStNum = Number(document.getElementById('editSlotStyleSelect').value);
+      const newBrief = document.getElementById('editSlotBriefInput').value.trim();
+
+      const prod = (currentPlan.catalog || []).find(p => p.sku === newSku);
+      const stObj = stylesList.find(s => s.num === newStNum);
+      if (prod) {
+        sl.code = prod.code;
+        sl.sku = prod.sku;
+        sl.name = prod.name;
+        sl.image = prod.image;
+        sl.cat = prod.cat;
+        sl.price = prod.price;
+        sl.comm = prod.comm;
+        sl.tier = prod.tier;
+        sl.link = prod.link;
+        sl.safe_filename = prod.safe_filename;
+      }
+      if (stObj) {
+        sl.style_num = stObj.num;
+        sl.style_name = stObj.short;
+        sl.style_chip_match = stObj.chip_match;
+      }
+      sl.brief_note = newBrief;
+
+      try {
+        currentPlan = await apiPost('/api/recompute-plan', currentPlan);
+        await apiPost('/api/save-draft', { plan: currentPlan });
+        renderScheduleTab();
+        closeEditSlotModal();
+        showToast('✅ แก้ไขช่องตารางและคำนวณโควตาใหม่เรียบร้อย!');
+      } catch (err) {
+        showToast(`❌ ${err.message}`);
+      }
+    }
+
+    async function exportExcel() {
+      if (!currentPlan || !currentPlan.days?.length) {
+        alert('ยังไม่มีตารางให้ส่งออกครับ กรุณาสร้างตารางก่อนนะครับ');
+        return;
+      }
+      try {
+        showToast('📥 กำลังสร้างไฟล์ Excel ตารางงาน...', 0);
+        const resp = await fetch('/api/export-excel', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ plan: currentPlan })
+        });
+        if (!resp.ok) throw new Error('สร้างไฟล์ Excel ไม่สำเร็จ');
+        const blob = await resp.blob();
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `TikTok_Schedule_${currentPlan.start_date || 'Monthly'}.xlsx`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+        showToast('✅ ดาวน์โหลดไฟล์ Excel (.xlsx) พร้อม SKU 19 หลักครบเรียบร้อย!');
+      } catch (err) {
+        showToast(`❌ ${err.message}`, 6000);
+      }
+    }
+
+    async function publishToGitHub() {
+      if (!currentPlan || !currentPlan.days?.length) {
+        alert('ยังไม่มีตารางที่จะอัปเดตขึ้นเว็บครับ กรุณาสร้างตารางก่อนนะครับ');
+        return;
+      }
+      if (!confirm('ยืนยันอัปเดตตารางล่าสุดขึ้นหน้าเว็บ GitHub Pages เพื่อให้น้องเปิดดูและกดทำคลิปได้เลยใช่ไหมครับ?')) {
+        return;
+      }
+      const btn = document.getElementById('btnPublish');
+      btn.disabled = true;
+      showToast('🚀 กำลังบันทึกและพุชตารางขึ้น GitHub Pages...', 0);
+      try {
+        const res = await apiPost('/api/publish', { plan: currentPlan });
+        showToast(`🎉 อัปเดตขึ้นเว็บให้น้องเรียบร้อยแล้ว!<br><a href="${res.live_url}" target="_blank" style="color:var(--accent-2);">${res.live_url}</a> (รอ GitHub Pages รีเฟรช ~30 วินาที)`, 9000);
+      } catch (err) {
+        showToast(`❌ ${err.message}`, 9000);
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    bootstrap();
+  </script>
+</body>
+
+</html>
