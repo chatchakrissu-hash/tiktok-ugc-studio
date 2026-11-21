@@ -685,6 +685,20 @@ def _parse_date_iso(raw_val: Any) -> str:
     return ""
 
 
+def _decode_tiktok_content_pub_date(content_id: Any) -> str:
+    """Decode publish date (YYYY-MM-DD, local time) from 64-bit TikTok Snowflake content_id (int >> 32)."""
+    s = re.sub(r"\D+", "", str(content_id or "").strip())
+    if not (17 <= len(s) <= 20):
+        return ""
+    try:
+        ts = int(s) >> 32
+    except ValueError:
+        return ""
+    if 1_500_000_000 <= ts <= 2_100_000_000:
+        return dt.datetime.fromtimestamp(ts).strftime("%Y-%m-%d")
+    return ""
+
+
 def parse_sales_files(files_payload: list[dict[str, str]]) -> dict[str, Any]:
     """Parse uploaded TikTok monthly Excel/CSV files and aggregate unique products cleanly."""
     aggregated: dict[str, dict[str, Any]] = {}
@@ -769,6 +783,14 @@ def parse_sales_files(files_payload: list[dict[str, str]]) -> dict[str, Any]:
                 continue
 
             if agg_key not in aggregated:
+                cid_stats: dict[str, dict[str, Any]] = {}
+                if content_id and (net_orders > 0 or gmv_eff > 0):
+                    cid_stats[content_id] = {
+                        "pub_date": _decode_tiktok_content_pub_date(content_id),
+                        "comm": comm_eff,
+                        "gmv": gmv_eff,
+                        "orders": net_orders,
+                    }
                 aggregated[agg_key] = {
                     "sku": sku,
                     "name": name or f"สินค้า TikTok ({sku})",
@@ -781,7 +803,7 @@ def parse_sales_files(files_payload: list[dict[str, str]]) -> dict[str, Any]:
                     "refunded": refunded,
                     "comm": round(comm_eff, 2),
                     "price": round(price, 2),
-                    "_content_ids": {content_id} if content_id else set(),
+                    "_cid_stats": cid_stats,
                     "_order_ids": {order_id} if order_id else set(),
                 }
             else:
@@ -790,8 +812,20 @@ def parse_sales_files(files_payload: list[dict[str, str]]) -> dict[str, Any]:
                 cur["orders"] += net_orders
                 cur["refunded"] = cur.get("refunded", 0) + refunded
                 cur["comm"] = round(cur["comm"] + comm_eff, 2)
-                if content_id:
-                    cur["_content_ids"].add(content_id)
+                if content_id and (net_orders > 0 or gmv_eff > 0):
+                    cid_map = cur["_cid_stats"]
+                    if content_id not in cid_map:
+                        cid_map[content_id] = {
+                            "pub_date": _decode_tiktok_content_pub_date(content_id),
+                            "comm": comm_eff,
+                            "gmv": gmv_eff,
+                            "orders": net_orders,
+                        }
+                    else:
+                        st = cid_map[content_id]
+                        st["comm"] += comm_eff
+                        st["gmv"] += gmv_eff
+                        st["orders"] += net_orders
                 if order_id:
                     cur["_order_ids"].add(order_id)
                 if len(name) > len(cur["name"]):
@@ -808,14 +842,26 @@ def parse_sales_files(files_payload: list[dict[str, str]]) -> dict[str, Any]:
 
     products_out: list[dict[str, Any]] = []
     for prod in aggregated.values():
-        cids = prod.pop("_content_ids", set())
+        cid_stats = prod.pop("_cid_stats", {})
         oids = prod.pop("_order_ids", set())
         orders = int(prod.get("orders") or 0)
         gmv = float(prod.get("gmv") or 0)
         comm = float(prod.get("comm") or 0)
-        videos_count = len(cids) if cids else (1 if (orders > 0 or gmv > 0) else 0)
+        videos_count = len(cid_stats) if cid_stats else (1 if (orders > 0 or gmv > 0) else 0)
         distinct_orders = len(oids) if oids else orders
+        if min_order_date:
+            evergreen_cids = [c for c, st in cid_stats.items() if st["pub_date"] and st["pub_date"] < min_order_date]
+            new_cids = [c for c, st in cid_stats.items() if not st["pub_date"] or st["pub_date"] >= min_order_date]
+        else:
+            evergreen_cids = []
+            new_cids = list(cid_stats.keys())
+        evergreen_comm = round(sum(cid_stats[c]["comm"] for c in evergreen_cids), 2)
         prod["videos_count"] = videos_count
+        prod["new_videos_count"] = len(new_cids) if cid_stats else videos_count
+        prod["evergreen_videos_count"] = len(evergreen_cids)
+        prod["evergreen_comm"] = evergreen_comm
+        prod["new_comm"] = round(max(0.0, comm - evergreen_comm), 2)
+        prod["converting_new_clips"] = 0
         prod["distinct_orders"] = distinct_orders
         prod["comm_pct_eff"] = round((comm / gmv) * 100.0, 1) if gmv > 0 else 0.0
         prod["comm_per_video"] = round(comm / max(1, videos_count), 2) if (orders > 0 or gmv > 0) else 0.0
@@ -824,6 +870,10 @@ def parse_sales_files(files_payload: list[dict[str, str]]) -> dict[str, Any]:
         prod["bot_logged_clips"] = 0
         prod["hit_rate_pct"] = 0.0
         prod["real_comm_per_posted"] = 0.0
+        prod["_cid_pub_comm"] = {
+            c: {"pub_date": st["pub_date"], "comm": round(st["comm"], 2)}
+            for c, st in cid_stats.items()
+        }
         products_out.append(prod)
 
     return {
@@ -839,16 +889,29 @@ def enrich_with_bot_posted_stats(
     items: list[dict[str, Any]],
     min_date: str = "",
     max_date: str = "",
+    hist_path: Path | None = None,
+    log_path: Path | None = None,
 ) -> list[dict[str, Any]]:
-    """Cross-reference Desktop bot posted history & logs strictly within the Excel's known date window."""
+    """Cross-reference Desktop bot posted history strictly against new-in-window clips (excluding old evergreen clips)."""
     if not min_date and not max_date:
+        for it in items:
+            it.pop("_cid_pub_comm", None)
         return items
-    hist_file = Path.home() / "Desktop" / "posted_clip_history.json"
-    log_file = Path.home() / "Desktop" / "ประวัติการทำงานออโต้_TikTok.log"
+    hist_file = hist_path or (Path.home() / "Desktop" / "posted_clip_history.json")
+    log_file = log_path or (Path.home() / "Desktop" / "ประวัติการทำงานออโต้_TikTok.log")
+
+    matured_cutoff = max_date
+    if max_date:
+        try:
+            matured_cutoff = (dt.date.fromisoformat(max_date) - dt.timedelta(days=2)).isoformat()
+        except ValueError:
+            matured_cutoff = max_date
 
     sku_post_counts: dict[str, int] = {}
+    sku_matured_counts: dict[str, int] = {}
     sku_meta: dict[str, dict[str, str]] = {}
     name_entries: list[str] = []
+    matured_name_entries: list[str] = []
     all_log_dates: list[str] = []
 
     if hist_file.is_file():
@@ -863,14 +926,19 @@ def enrich_with_bot_posted_stats(
                         continue
                     if max_date and d_str and d_str > max_date:
                         continue
+                    is_matured = (not matured_cutoff) or (not d_str) or (d_str <= matured_cutoff)
                     sku = extract_clean_sku(row.get("sku") or row.get("filename"))
                     nm = normalize_thai_text(row.get("name") or "")
                     if sku:
                         sku_post_counts[sku] = sku_post_counts.get(sku, 0) + 1
+                        if is_matured:
+                            sku_matured_counts[sku] = sku_matured_counts.get(sku, 0) + 1
                         if nm and sku not in sku_meta:
                             sku_meta[sku] = {"name": nm}
                     elif nm:
                         name_entries.append(nm)
+                        if is_matured:
+                            matured_name_entries.append(nm)
         except Exception:
             pass
 
@@ -886,48 +954,78 @@ def enrich_with_bot_posted_stats(
                     continue
                 if max_date and d_str > max_date:
                     continue
+                is_matured = (not matured_cutoff) or (d_str <= matured_cutoff)
                 sku = extract_clean_sku(body)
                 if sku:
-                    # Prefer structured posted_clip_history.json for SKU counts if present on same date, else count log line
                     if not hist_file.is_file():
                         sku_post_counts[sku] = sku_post_counts.get(sku, 0) + 1
+                        if is_matured:
+                            sku_matured_counts[sku] = sku_matured_counts.get(sku, 0) + 1
                 else:
                     clean_b = re.sub(r"\.mp4$", "", body, flags=re.I)
                     clean_b = re.sub(r"^ตอบ(?:คอมเมนต์|comment)\s*", "", clean_b, flags=re.I).strip()
                     if clean_b:
                         name_entries.append(clean_b)
+                        if is_matured:
+                            matured_name_entries.append(clean_b)
         except Exception:
             pass
 
     first_log_date = min(all_log_dates) if all_log_dates else ""
+    if min_date and first_log_date:
+        match_start = max(min_date, first_log_date)
+    else:
+        match_start = min_date or first_log_date
     item_skus_present: set[str] = set()
 
     for it in items:
         sku = str(it.get("sku") or "")
         if sku:
             item_skus_present.add(sku)
-        vids = int(it.get("videos_count") or 0)
-        comm = float(it.get("comm") or 0)
+        cid_pub_comm = it.pop("_cid_pub_comm", {})
+
+        if cid_pub_comm:
+            win_cids = [
+                c for c, st in cid_pub_comm.items()
+                if (not st["pub_date"]) or (
+                    (not match_start or st["pub_date"] >= match_start)
+                    and (not max_date or st["pub_date"] <= max_date)
+                )
+            ]
+            conv_new = len(win_cids)
+            win_new_comm = sum(float(cid_pub_comm[c]["comm"]) for c in win_cids)
+        else:
+            conv_new = int(it.get("new_videos_count") if it.get("new_videos_count") is not None else (it.get("videos_count") or 0))
+            win_new_comm = float(it.get("new_comm") if it.get("new_comm") is not None else (it.get("comm") or 0))
 
         logged = sku_post_counts.get(sku, 0) if sku else 0
+        matured_logged = sku_matured_counts.get(sku, 0) if sku else 0
         if logged == 0 and name_entries and it.get("name"):
             it_name = str(it["name"])
             logged = sum(1 for ne in name_entries if name_similarity(it_name, ne) >= 0.72)
+            matured_logged = sum(1 for ne in matured_name_entries if name_similarity(it_name, ne) >= 0.72)
 
         it["bot_logged_clips"] = logged
-        if logged > 0 and (logged > vids or (first_log_date and min_date and min_date >= first_log_date)):
-            eff_posted = max(logged, vids, 1)
+        it["converting_new_clips"] = conv_new
+        window_aligned = (
+            bool(cid_pub_comm)
+            or bool(first_log_date and min_date and min_date >= first_log_date)
+            or (logged > conv_new)
+        )
+        if window_aligned and (matured_logged > 0 or (logged > 0 and conv_new > 0)):
+            base_posted = matured_logged if matured_logged >= conv_new else logged
+            eff_posted = max(base_posted, conv_new, 1)
             it["posted_clips"] = eff_posted
-            it["hit_rate_pct"] = round(min(100.0, (vids / eff_posted) * 100.0), 0)
-            it["real_comm_per_posted"] = round(comm / eff_posted, 2)
+            it["hit_rate_pct"] = round(min(100.0, (conv_new / eff_posted) * 100.0), 0)
+            it["real_comm_per_posted"] = round(win_new_comm / eff_posted, 2)
         else:
             it["posted_clips"] = 0
             it["hit_rate_pct"] = 0.0
             it["real_comm_per_posted"] = 0.0
 
-    # Inject SKUs that have >= 3 structured bot posts in window and 0 orders in Excel
-    for sku, cnt in sku_post_counts.items():
-        if cnt >= 3 and sku not in item_skus_present:
+    # Inject SKUs with >= 3 matured bot posts (>48h before max_date) in window and 0 orders in Excel
+    for sku, matured_cnt in sku_matured_counts.items():
+        if matured_cnt >= 3 and sku not in item_skus_present:
             meta = sku_meta.get(sku, {})
             items.append({
                 "sku": sku,
@@ -940,12 +1038,15 @@ def enrich_with_bot_posted_stats(
                 "comm": 0.0,
                 "price": 0.0,
                 "videos_count": 0,
+                "new_videos_count": 0,
+                "evergreen_videos_count": 0,
+                "converting_new_clips": 0,
                 "distinct_orders": 0,
                 "comm_pct_eff": 0.0,
                 "comm_per_video": 0.0,
                 "comm_per_order": 0.0,
-                "posted_clips": cnt,
-                "bot_logged_clips": cnt,
+                "posted_clips": matured_cnt,
+                "bot_logged_clips": sku_post_counts.get(sku, matured_cnt),
                 "hit_rate_pct": 0.0,
                 "real_comm_per_posted": 0.0,
             })
@@ -1191,6 +1292,9 @@ def grade_channel_products_smart(items: list[dict[str, Any]]) -> tuple[list[dict
         orders = int(it.get("orders") or 0)
         d_orders = int(it.get("distinct_orders") or orders)
         vids = int(it.get("videos_count") or 1)
+        new_vids = int(it.get("new_videos_count") if it.get("new_videos_count") is not None else vids)
+        old_vids = int(it.get("evergreen_videos_count") or 0)
+        conv_new = int(it.get("converting_new_clips") or 0)
         posted_c = int(it.get("posted_clips") or 0)
         hit_pct = float(it.get("hit_rate_pct") or 0)
         rcpp = float(it.get("real_comm_per_posted") or 0)
@@ -1220,11 +1324,19 @@ def grade_channel_products_smart(items: list[dict[str, Any]]) -> tuple[list[dict
             )
         )
 
-        clip_summary = (
-            f"โพสต์ {posted_c} ➡️ ขายออก {vids} คลิป · เฉลี่ยจริง ฿{rcpp:,.1f}/คลิป"
-            if posted_c > 0
-            else f"{d_orders} ออเดอร์ · ขายออก {vids} คลิป (฿{cpv:,.0f}/คลิปขายออก)"
-        )
+        if posted_c > 0:
+            clip_summary = (
+                f"โพสต์ใหม่ {posted_c} ➡️ ขายติด {conv_new} คลิป ({hit_pct:.0f}%) · เฉลี่ย ฿{rcpp:,.1f}/คลิปใหม่"
+                + (f" + คลิปเก่ากินยาว {old_vids} คลิป" if old_vids > 0 else "")
+            )
+        else:
+            if old_vids > 0 and new_vids > 0:
+                vid_txt = f"ขายออก {vids} คลิป (ใหม่ {new_vids} · เก่ากินยาว {old_vids})"
+            elif old_vids > 0:
+                vid_txt = f"ขายออกจากคลิปเก่ากินยาว {old_vids} คลิป"
+            else:
+                vid_txt = f"ขายออก {vids} คลิป"
+            clip_summary = f"{d_orders} ออเดอร์ · {vid_txt} (฿{cpv:,.0f}/คลิป)"
 
         if (cum_before < 0.85 or rank_idx < 3) and not (use_comm and comm <= 0 and gmv < 1000):
             it["tier"] = "winner"
@@ -1240,7 +1352,8 @@ def grade_channel_products_smart(items: list[dict[str, Any]]) -> tuple[list[dict
             it["tier"] = "dropped"
             it["grade"] = "LOW_HIT"
             it["starred"] = False
-            it["reason"] = f"⚠️ ปัดตก (เปลืองโควตาคลิป): บอทโพสต์ {posted_c} คลิป ขายออกแค่ {vids} คลิป (ติด {hit_pct:.0f}% · เฉลี่ย ฿{rcpp:.1f}/คลิปโพสต์)"
+            extra_old = f" (ส่วนคลิปเก่าค้างช่อง {old_vids} คลิปปล่อยกินยาวต่อได้ ไม่ต้องเปลืองคิวถ่ายใหม่)" if old_vids > 0 else ""
+            it["reason"] = f"⚠️ ปัดตกคิวถ่ายใหม่: บอทโพสต์ใหม่ {posted_c} คลิป ขายติดแค่ {conv_new} คลิป (ติด {hit_pct:.0f}% · เฉลี่ย ฿{rcpp:.1f}/คลิปใหม่){extra_old}"
             dropped.append(it)
         elif is_volume_trap:
             it["tier"] = "dropped"
@@ -1326,7 +1439,10 @@ def run_ai_portfolio_advisor(
             "orders": int(p.get("orders") or 0),
             "distinct_orders": int(p.get("distinct_orders") or p.get("orders") or 0),
             "converting_videos": int(p.get("videos_count") or 0),
+            "new_converting_videos": int(p.get("new_videos_count") or 0),
+            "evergreen_old_videos": int(p.get("evergreen_videos_count") or 0),
             "posted_clips": int(p.get("posted_clips") or 0),
+            "converting_new_from_posted": int(p.get("converting_new_clips") or 0),
             "comm_per_converting_vid": float(p.get("comm_per_video") or 0),
             "name": str(p.get("name") or "")[:55],
         }
@@ -1361,6 +1477,7 @@ def run_ai_portfolio_advisor(
     prompt = (
         "คุณคือที่ปรึกษากลยุทธ์ TikTok Shop Affiliate สายข้อมูลจริง (ห้ามอวย ห้ามพูดเอาใจ ให้วิเคราะห์ตรงไปตรงมาตามตัวเลขเท่านั้น):\n"
         "⚠️ กฎตีความข้อมูลสำคัญมาก: `converting_videos` คือจำนวนคลิปที่ 'ขายออกแล้วอย่างน้อย 1 ชิ้น' เท่านั้น (ไม่รวมคลิปที่โพสต์แล้วขายไม่ได้ 0 บาท, ยกเว้นเมื่อ `posted_clips > 0` นั่นคือจำนวนที่บอทโพสต์จริง)\n"
+        "- ระบบถอดวันโพสต์จริงจาก Snowflake ID แล้วแยก `new_converting_videos` (คลิปใหม่ที่โพสต์ในรอบเดือนนี้แล้วขายออก) ออกจาก `evergreen_old_videos` (คลิปเก่าจากเดือนก่อนๆ ที่ยังกินยาวขายออกอยู่) เพื่อไม่ให้คลิปเก่ามาหลอกสัดส่วนคลิปใหม่ (`converting_new_from_posted`)\n"
         "- ห้ามหลงอวยสินค้าที่ `distinct_orders` แค่ 1–3 ออเดอร์จาก `converting_videos = 1` ว่าเป็นช้างเผือกเด็ดขาด เพราะอาจลงไป 10 คลิปแล้วฟลุคขายได้คลิปเดียว\n"
         "- ช้างเผือกที่แท้จริงต้องมีออเดอร์ซ้ำ (`distinct_orders >= 4`) และค่าคอมรวม/ต่อคลิปเด่นชัด (เช่น พรม 3D 34 ออเดอร์จาก 2 คลิปที่ขายออก)\n"
         f"1. ข้อมูลสินค้าของช่องตอนนี้ ({len(compact_channel)} รายการ): {json.dumps(compact_channel, ensure_ascii=False)}\n"

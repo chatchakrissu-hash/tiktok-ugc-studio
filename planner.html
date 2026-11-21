@@ -1130,6 +1130,23 @@
       return `<div class="thumb-placeholder">📦</div>`;
     }
 
+    function formatClipBreakdownHtml(p) {
+      const ev = Number(p.evergreen_videos_count || 0);
+      const nw = Number(p.new_videos_count ?? p.videos_count ?? 0);
+      const tot = Number(p.videos_count || 0);
+      if (Number(p.posted_clips || 0) > 0) {
+        return `<b>โพสต์ใหม่ ${p.posted_clips} ➡️ ขายติด ${p.converting_new_clips ?? 0} คลิป (${p.hit_rate_pct || 0}%)</b>` +
+          (ev > 0 ? ` · <span style="color:var(--accent-2);">คลิปเก่ากินยาว +${ev} คลิป</span>` : '');
+      }
+      if (ev > 0 && nw > 0) {
+        return `<b>ขายออก ${tot} คลิป</b> <span style="color:var(--accent-2);">(ใหม่เดือนนี้ ${nw} · เก่ากินยาว ${ev})</span>`;
+      }
+      if (ev > 0) {
+        return `<b>ขายออก ${tot} คลิป</b> <span style="color:var(--accent-2);">(คลิปเก่ากินยาวล้วน ${ev} คลิป)</span>`;
+      }
+      return `<b>ขายออก ${p.videos_count ?? 1} คลิป</b>`;
+    }
+
     function renderAnalysisTables() {
       // 1. Missing SKU Box (check winners without clean SKU)
       const missingWinners = analysisState.winners
@@ -1199,8 +1216,8 @@
               </td>
               <td>
                 <b style="color:var(--green);">คอม ฿${Number(p.comm || 0).toLocaleString(undefined, { maximumFractionDigits: 1 })}</b>
-                <span style="font-size:12px; color:var(--muted);">(${p.comm_pct_eff || 0}% · ${p.posted_clips > 0 ? `เฉลี่ยจริง ฿${Number(p.real_comm_per_posted || 0).toLocaleString()}/คลิปโพสต์` : `฿${Number(p.comm_per_video || 0).toLocaleString()}/คลิปที่ขายออก`})</span><br>
-                <span style="color:var(--muted); font-size:12px;">GMV ฿${Number(p.gmv || 0).toLocaleString()} · ${Number(p.orders || 0).toLocaleString()} ชิ้น (${Number(p.distinct_orders || p.orders || 0).toLocaleString()} ออเดอร์) · ${p.posted_clips > 0 ? `<b>โพสต์ ${p.posted_clips} คลิป ➡️ ขายออก ${p.videos_count} คลิป (ติด ${p.hit_rate_pct}%)</b>` : `<b>ขายออก ${p.videos_count || 1} คลิป</b>`}</span>
+                <span style="font-size:12px; color:var(--muted);">(${p.comm_pct_eff || 0}% · ${p.posted_clips > 0 ? `เฉลี่ยจริง ฿${Number(p.real_comm_per_posted || 0).toLocaleString()}/คลิปโพสต์ใหม่` : `฿${Number(p.comm_per_video || 0).toLocaleString()}/คลิปที่ขายออก`})</span><br>
+                <span style="color:var(--muted); font-size:12px;">GMV ฿${Number(p.gmv || 0).toLocaleString()} · ${Number(p.orders || 0).toLocaleString()} ชิ้น (${Number(p.distinct_orders || p.orders || 0).toLocaleString()} ออเดอร์) · ${formatClipBreakdownHtml(p)}</span>
               </td>
               <td>
                 <input type="number" min="1" max="31" placeholder="ออโต้"
@@ -1272,7 +1289,7 @@
               </td>
               <td>
                 <b>คอม ฿${Number(p.comm || 0).toLocaleString(undefined, { maximumFractionDigits: 1 })}</b> (${p.comm_pct_eff || 0}%)<br>
-                <span style="font-size:12px; color:var(--muted);">GMV ฿${Number(p.gmv || 0).toLocaleString()} · ${p.orders || 0} ชิ้น (${p.distinct_orders || p.orders || 0} ออเดอร์) · ${p.posted_clips > 0 ? `โพสต์ ${p.posted_clips} ➡️ ขายออก ${p.videos_count || 0} คลิป` : `ขายออก ${p.videos_count || 0} คลิป`}</span>
+                <span style="font-size:12px; color:var(--muted);">GMV ฿${Number(p.gmv || 0).toLocaleString()} · ${p.orders || 0} ชิ้น (${p.distinct_orders || p.orders || 0} ออเดอร์) · ${formatClipBreakdownHtml(p)}</span>
               </td>
               <td style="font-size:12.5px; color:var(--muted);">${escapeHtml(p.reason || 'ยอดไม่เดิน')}</td>
               <td>
