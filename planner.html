@@ -608,6 +608,10 @@
         <span>📅 3. ตรวจ & แก้ไขตารางทั้งเดือน (7 Omni)</span>
         <small>ตรวจตารางรายวัน ยืนยันกฎ OMNI 5 & พุชขึ้นหน้าเว็บให้น้องดูทันที</small>
       </button>
+      <button type="button" class="tab-btn" onclick="switchTab('weekly', this)">
+        <span>🔁 4. อัปเดตยอดขายราย 7 วัน (ทุกวันอาทิตย์)</span>
+        <small>ตัดตัวแป้ก เสียบตัวใหม่ ล็อกมุมที่ขายออก — แก้เฉพาะคิววันข้างหน้า</small>
+      </button>
     </div>
 
     <!-- TAB 1: ANALYZE SALES & BUILD NEXT MONTH -->
@@ -846,6 +850,59 @@
         </div>
       </div>
     </div>
+
+    <!-- TAB 4: WEEKLY SALES REVIEW (EVERY SUNDAY) -->
+    <div id="tab-weekly" class="tab-panel">
+      <div class="card" style="border-color:rgba(16,185,129,0.45);">
+        <div class="card-title">
+          <span>🔁 รีวิวยอดขายราย 7 วัน — แก้เฉพาะคิว "วันพรุ่งนี้เป็นต้นไป" (งานที่น้องทำไปแล้วไม่ถูกแตะ)</span>
+          <span class="badge" id="weeklyPlanBadge">กำลังตรวจแผนปัจจุบัน...</span>
+        </div>
+        <p style="font-size:13.2px; color:var(--muted); margin-bottom:12px; line-height:1.7;">
+          ✅ <b>ตัดออก:</b> บอทโพสต์คลิปใหม่ครบตามเกณฑ์ (เกินจำนวนวันที่ตั้ง) แต่คลิปใหม่ขายได้ 0 ชิ้น → เสียบสินค้าใหม่ที่ผ่านเกณฑ์ภาพพิสูจน์แทนทุกคิวที่เหลือ<br>
+          ✅ <b>ขยี้ต่อ:</b> คลิปใหม่ขายออก → ถ้ารู้ว่ามุมไหน (A1/A2/A3) ขาย จะล็อกคิวที่เหลือให้ใช้มุมนั้น 4 ใน 6 คลิป<br>
+          ⏳ <b>ปล่อยเทสต์:</b> เพิ่งโพสต์ 1–2 คลิป ยังเร็วไปที่จะตัดสิน · 🎁 สินค้ารีวิวฟรีไม่ถูกตัดเด็ดขาด
+        </p>
+
+        <input type="file" id="weeklyFileInput" accept=".xlsx,.xlsm,.csv,.tsv" multiple
+          style="position:absolute; width:1px; height:1px; opacity:0; pointer-events:none;"
+          onchange="handleWeeklyFiles(this.files)" />
+        <label for="weeklyFileInput" class="dropzone" id="weeklyDropzone">
+          <div style="font-size:30px; margin-bottom:4px;">🧾</div>
+          <div style="font-size:15.5px; font-weight:700;" id="weeklyFileLabel">คลิกเลือกไฟล์ออเดอร์ล่าสุด (affiliate_orders_*.xlsx) หรือลากมาวางที่นี่</div>
+          <div style="font-size:12.5px; color:var(--muted); margin-top:4px;">ใช้ไฟล์ที่มีคอลัมน์ "รหัสเนื้อหา" เพื่อแยกยอดขายคลิปใหม่ vs คลิปเก่า และแยกว่ามุมไหนขายออก</div>
+        </label>
+
+        <div class="config-grid">
+          <div>
+            <label class="field-label">📅 วันที่รีวิว (คิวหลังวันนี้เท่านั้นที่จะถูกปรับ)</label>
+            <input type="date" id="weeklyReviewDate" />
+          </div>
+          <div>
+            <label class="field-label">❌ ตัดเมื่อโพสต์ครบกี่คลิปแล้วขาย 0</label>
+            <input type="number" id="weeklyMinPosts" value="4" min="2" max="15" />
+          </div>
+          <div>
+            <label class="field-label">⏰ นับเฉพาะคลิปที่โพสต์มาแล้วเกินกี่วัน</label>
+            <input type="number" id="weeklyMinAge" value="3" min="1" max="10" />
+          </div>
+          <div>
+            <label class="field-label">🧠 วิเคราะห์มุมขายของสินค้าใหม่</label>
+            <select id="weeklyUseAi">
+              <option value="1" selected>🤖 ให้ AI วิเคราะห์ + คัดภาพพิสูจน์ (แนะนำ)</option>
+              <option value="0">📊 สูตรสำรอง (เร็ว ไม่เรียก AI)</option>
+            </select>
+          </div>
+        </div>
+
+        <button type="button" class="btn btn-primary" style="width:100%; justify-content:center; padding:14px; font-size:16px; margin-top:12px;"
+          onclick="runWeeklyReview()">
+          🔁 รีวิวยอดขาย + ปรับคิวที่เหลือของเดือนอัตโนมัติ
+        </button>
+
+        <div id="weeklyResultBox" style="display:none; margin-top:16px;"></div>
+      </div>
+    </div>
   </div>
 
   <!-- Edit Slot Modal -->
@@ -863,6 +920,10 @@
         <div>
           <label class="field-label">เลือกแนวคลิป (จาก 16 แนวหลัก)</label>
           <select id="editSlotStyleSelect"></select>
+        </div>
+        <div>
+          <label class="field-label">🎯 มุมลูกค้าที่จะเจาะ (A1 / A2 / A3)</label>
+          <select id="editSlotAngleSelect"></select>
         </div>
         <div>
           <label class="field-label">โน้ตสั้นๆ เพิ่มเติม (ถ้ามี)</label>
@@ -929,7 +990,7 @@
       document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
       if (btn) btn.classList.add('active');
       else {
-        const idx = tabKey === 'analyze' ? 0 : (tabKey === 'freesample' ? 1 : 2);
+        const idx = { analyze: 0, freesample: 1, schedule: 2, weekly: 3 }[tabKey] ?? 0;
         document.querySelectorAll('.tab-btn')[idx]?.classList.add('active');
       }
       document.getElementById(`tab-${tabKey}`)?.classList.add('active');
@@ -949,6 +1010,41 @@
       const plus7 = new Date(now.getTime() + 8 * 86400000);
       document.getElementById('fsStartDate').value = fmt(tomorrow);
       document.getElementById('fsDeadlineDate').value = fmt(plus7);
+      const wrd = document.getElementById('weeklyReviewDate');
+      if (wrd) wrd.value = fmt(now);
+    }
+
+    function updateWeeklyPlanBadge() {
+      const b = document.getElementById('weeklyPlanBadge');
+      if (!b) return;
+      if (currentPlan && Array.isArray(currentPlan.days) && currentPlan.days.length) {
+        const lastRv = (currentPlan.weekly_reviews || []).slice(-1)[0];
+        b.textContent = `📌 แผน ${currentPlan.start_date} – ${currentPlan.end_date}` + (lastRv ? ` · รีวิวล่าสุด ${lastRv.review_date}` : ' · ยังไม่เคยรีวิว');
+      } else {
+        b.textContent = 'ℹ️ ยังไม่มีแผนรายเดือน — สร้างในแท็บ 1 ก่อนครับ';
+      }
+    }
+
+    function angleChipHtml(code, label) {
+      if (!code) return '';
+      const colors = { A1: '#f97316', A2: '#eab308', A3: '#22c55e' };
+      return `<span class="badge" style="border-color:${colors[code] || 'var(--border)'}; color:${colors[code] || 'var(--text)'};" title="${escapeHtml(label || '')}">🎯 ${escapeHtml(code)}${label ? ' · ' + escapeHtml(String(label).slice(0, 22)) : ''}</span>`;
+    }
+
+    function marketingSummaryHtml(p) {
+      const m = p.marketing || {};
+      if (!m.angles || !m.angles.length) return '';
+      const vps = Number(m.visual_proof_score || 0);
+      const vpsColor = vps >= 4 ? 'var(--green)' : (vps >= 3 ? 'var(--gold)' : 'var(--accent)');
+      const src = m.source === 'ai' ? '🤖 AI' : '📊 สูตรสำรอง';
+      const best = p.best_angle ? ` · <b style="color:var(--green);">มุมที่ขายออก: ${escapeHtml(p.best_angle)}</b>` : '';
+      return `
+        <details style="margin-top:4px; font-size:11.8px;">
+          <summary style="cursor:pointer; color:var(--accent-2);">🧠 ภาพพิสูจน์ <b style="color:${vpsColor};">${vps}/5</b> · กลัว: ${escapeHtml(String(m.core_objection || '').slice(0, 60))}${best} <span style="color:var(--muted);">(${src})</span></summary>
+          <div style="margin-top:4px; display:flex; flex-direction:column; gap:3px;">
+            ${m.angles.map(a => `<div>${angleChipHtml(a.code, a.label)} <span style="color:var(--muted);">${escapeHtml(a.persona || '')}</span><br><span style="color:var(--text);">ฮุค: "${escapeHtml(a.hook_th || '')}"</span></div>`).join('')}
+          </div>
+        </details>`;
     }
 
     async function apiPost(endpoint, payload) {
@@ -977,6 +1073,7 @@
         if (planResp.plan && Array.isArray(planResp.plan.days) && planResp.plan.days.length > 0) {
           currentPlan = planResp.plan;
           renderScheduleTab();
+          updateWeeklyPlanBadge();
           const fBadge = document.getElementById('activePlanBadgeForSample');
           if (fBadge) fBadge.textContent = `📌 แผนปัจจุบัน: ${currentPlan.days.length} วัน (${currentPlan.start_date} – ${currentPlan.end_date})`;
         } else {
@@ -1000,6 +1097,13 @@
     salesDz.addEventListener('drop', e => {
       if (e.dataTransfer?.files?.length) handleSalesFiles(e.dataTransfer.files);
     });
+
+    const weeklyDz = document.getElementById('weeklyDropzone');
+    if (weeklyDz) {
+      ['dragenter', 'dragover'].forEach(evt => weeklyDz.addEventListener(evt, e => { e.preventDefault(); weeklyDz.classList.add('dragover'); }));
+      ['dragleave', 'drop'].forEach(evt => weeklyDz.addEventListener(evt, e => { e.preventDefault(); weeklyDz.classList.remove('dragover'); }));
+      weeklyDz.addEventListener('drop', e => { if (e.dataTransfer?.files?.length) handleWeeklyFiles(e.dataTransfer.files); });
+    }
 
     // Global paste support for Tab 2 Free Sample real product image
     window.addEventListener('paste', e => {
@@ -1109,7 +1213,9 @@
       const aiBox = document.getElementById('aiCritiqueBox');
       if (aiBox) {
         const st = analysisState.portfolio_stats || {};
-        const headerStats = `📊 <b>สรุปพอร์ตจริงทั้งเดือน:</b> GMV รวม <b>฿${Number(st.total_gmv || 0).toLocaleString()}</b> · ค่าคอมจริงรวม <b style="color:var(--green);">฿${Number(st.total_comm || 0).toLocaleString()}</b> · เก็บทำต่อ <b>${st.winners_count || 0}</b> ตัว (💎 ช้างเผือก <b>${st.gems_count || 0}</b> ตัว) · ปัดตก <b>${st.dropped_count || 0}</b> ตัว`;
+        const headerStats = `📊 <b>สรุปพอร์ตจริงทั้งเดือน:</b> GMV รวม <b>฿${Number(st.total_gmv || 0).toLocaleString()}</b> · ค่าคอมจริงรวม <b style="color:var(--green);">฿${Number(st.total_comm || 0).toLocaleString()}</b> · เก็บทำต่อ <b>${st.winners_count || 0}</b> ตัว (💎 ช้างเผือก <b>${st.gems_count || 0}</b> ตัว) · ปัดตก <b>${st.dropped_count || 0}</b> ตัว`
+          + `<div style="margin-top:6px; font-size:12.8px;">🧠 <b>มุมขาย 3 มุม/สินค้า:</b> AI วิเคราะห์ ${res.angles_ai_count || 0} ตัว · สูตรสำรอง ${res.angles_heuristic_count || 0} ตัว${(res.angles_heuristic_count || 0) > 0 ? ' <span style="color:var(--muted);">(สูตรสำรอง = AI ปิดอยู่หรือโควตาเต็ม — กด 🔄 คัดเกรดรอบใหม่เพื่อให้ AI วิเคราะห์อีกครั้ง)</span>' : ''}</div>`
+          + ((res.marketing_notes || []).length ? `<ul style="padding-left:20px; margin-top:4px; font-size:12.8px; line-height:1.6;">${res.marketing_notes.map(n => `<li>${escapeHtml(n)}</li>`).join('')}</ul>` : '');
         if (analysisState.ai_used && analysisState.ai_critique.length) {
           aiBox.style.display = 'block';
           aiBox.innerHTML = `${headerStats}<div style="margin-top:8px; font-weight:800; color:var(--gold);">🤖 ความเห็นตรงไปตรงมาจาก AI Strategist (${escapeHtml(analysisState.ai_model)}):</div><ul style="padding-left:20px; margin-top:4px; font-size:13.2px; line-height:1.6;">${analysisState.ai_critique.map(c => `<li>${escapeHtml(c)}</li>`).join('')}</ul>`;
@@ -1213,6 +1319,7 @@
                   ${p.cat ? `<span class="badge" style="margin-left:6px;">${escapeHtml(p.cat)}</span>` : ''}
                 </div>
                 ${p.reason ? `<div style="font-size:11.6px; color:var(--muted); margin-top:2px;">${escapeHtml(p.reason)}</div>` : ''}
+                ${marketingSummaryHtml(p)}
               </td>
               <td>
                 <b style="color:var(--green);">คอม ฿${Number(p.comm || 0).toLocaleString(undefined, { maximumFractionDigits: 1 })}</b>
@@ -1255,6 +1362,7 @@
                   ${p.cat ? `<span class="badge" style="margin-left:6px;">${escapeHtml(p.cat)}</span>` : ''}
                 </div>
                 ${p.reason ? `<div style="font-size:11.6px; color:var(--green); margin-top:2px;">${escapeHtml(p.reason)}</div>` : ''}
+                ${marketingSummaryHtml(p)}
               </td>
               <td style="font-size:12.5px;">
                 ราคา <b>฿${Math.round(p.price || 0).toLocaleString()}</b> · คอมฯ <b style="color:var(--green);">${p.comm || 0}% (~฿${Math.round((p.price || 0) * (p.comm || 0) / 100)}/ชิ้น)</b><br>
@@ -1405,11 +1513,14 @@
           new_star_main_quota: Number(document.getElementById('newStarMainQuota').value || 5),
           winners: analysisState.winners,
           new_stars: analysisState.new_stars,
-          dropped_products: analysisState.dropped
+          dropped_products: analysisState.dropped,
+          use_ai: (document.getElementById('gradingMode')?.value || 'ai_smart') === 'ai_smart',
+          gemini_api_key: localStorage.getItem('AGY_TIKTOK_STUDIO_GEMINI_KEY') || ''
         });
         currentPlan = plan;
         await apiPost('/api/save-draft', { plan: currentPlan });
         renderScheduleTab();
+        updateWeeklyPlanBadge();
         document.getElementById('activePlanBadgeForSample').textContent = `📌 แผนปัจจุบัน: ${currentPlan.days.length} วัน (${currentPlan.start_date} – ${currentPlan.end_date})`;
         switchTab('schedule');
         showToast(`🎉 จัดตารางเสร็จสิ้น! ${plan.summary.total_days} วัน (${plan.summary.total_clips} คลิป) — ตรวจแล้วกดปุ่มเขียวเพื่ออัปเดตขึ้นเว็บให้น้องได้เลย!`, 6500);
@@ -1469,7 +1580,9 @@
           deadline_date: document.getElementById('fsDeadlineDate').value,
           clips_count: Number(document.getElementById('fsClipsCount').value || 3),
           images_base64: fsUploadedBase64 ? [fsUploadedBase64] : [],
-          brief_note: document.getElementById('fsBriefNote').value.trim()
+          brief_note: document.getElementById('fsBriefNote').value.trim(),
+          use_ai: (document.getElementById('gradingMode')?.value || 'ai_smart') === 'ai_smart',
+          gemini_api_key: localStorage.getItem('AGY_TIKTOK_STUDIO_GEMINI_KEY') || ''
         });
         currentPlan = res;
         await apiPost('/api/save-draft', { plan: currentPlan });
@@ -1541,21 +1654,23 @@
             <th>คิวหลัก</th>
             <th>สำรอง OMNI5</th>
             <th>รวม</th>
+            <th>🧠 มุมขาย / ภาพพิสูจน์</th>
           </tr>
         </thead>
         <tbody>
           ${(currentPlan.catalog || []).map(p => `
-            <tr>
+            <tr style="${p.review_status === 'dropped_weekly' ? 'opacity:0.55;' : ''}">
               <td class="mono" style="font-weight:800;">${escapeHtml(p.code)}</td>
               <td>${renderThumbHtml(p)}</td>
               <td>
-                <div style="font-weight:700;">${escapeHtml(p.name)}</div>
+                <div style="font-weight:700;">${escapeHtml(p.name)}${p.review_status === 'dropped_weekly' ? ' <span class="badge" style="color:var(--accent);">❌ ตัดออกหลังรีวิว</span>' : ''}</div>
                 <div class="mono" style="font-size:11.8px; color:var(--accent-2);">${escapeHtml(p.sku || '⚠️ ไม่มี SKU')}</div>
               </td>
               <td>${tierBadge(p.tier)}</td>
               <td><b>${p.main_slots || 0}</b></td>
               <td>${p.fallback_slots || 0}</td>
               <td><b style="color:var(--gold);">${p.total_slots || 0}</b></td>
+              <td style="min-width:220px;">${marketingSummaryHtml(p) || '<span style="color:var(--muted); font-size:12px;">—</span>'}</td>
             </tr>
           `).join('')}
         </tbody>
@@ -1591,6 +1706,7 @@
                     </div>
                   </div>
                   <div class="cell-style">${escapeHtml(sl.style_name)}</div>
+                  ${sl.angle_code ? `<div style="font-size:10.6px; line-height:1.35;" title="${escapeHtml(sl.angle_brief || '')}">${angleChipHtml(sl.angle_code, sl.angle_label)}</div>` : ''}
                   ${tag}
                   <div style="margin-top:auto; display:flex; justify-content:space-between; align-items:center; gap:4px;">
                     <span class="mono" style="font-size:10px; color:var(--muted);">${sl.sku ? escapeHtml(sl.sku.slice(-6)) : 'NO SKU'}</span>
@@ -1627,7 +1743,47 @@
       ).join('');
 
       document.getElementById('editSlotBriefInput').value = sl.brief_note || '';
+      fillEditAngleSelect(sl.sku, sl.angle_code);
+      prodSel.onchange = () => fillEditAngleSelect(prodSel.value, '');
       document.getElementById('editSlotModal').classList.add('open');
+    }
+
+    function fillEditAngleSelect(sku, currentCode) {
+      const sel = document.getElementById('editSlotAngleSelect');
+      if (!sel) return;
+      const prod = (currentPlan?.catalog || []).find(p => p.sku === sku);
+      const angles = prod?.marketing?.angles || [];
+      if (!angles.length) {
+        sel.innerHTML = `<option value="">— สินค้านี้ยังไม่มีมุมขาย (ระบบจะใส่ให้ตอนรีวิว/จัดตารางใหม่) —</option>`;
+        return;
+      }
+      sel.innerHTML = angles.map(a =>
+        `<option value="${escapeHtml(a.code)}" ${a.code === currentCode ? 'selected' : ''}>${escapeHtml(a.code)} · ${escapeHtml(a.label || '')}${prod.best_angle === a.code ? ' (✅ ขายออกจริง)' : ''}</option>`
+      ).join('');
+    }
+
+    function applyAngleToSlotClient(sl, prod, code) {
+      const m = prod?.marketing || {};
+      const a = (m.angles || []).find(x => x.code === code);
+      const baseName = String(sl.name || '').replace(/\s*\[(?:มุม\s*)?A[1-3]\]/gi, '');
+      const baseFile = String(prod?.safe_filename || sl.safe_filename || '').replace(/\s*\[(?:มุม\s*)?A[1-3]\]/gi, '');
+      if (!a) {
+        ['angle_code', 'angle_label', 'angle_persona', 'angle_behavior', 'angle_objection', 'angle_hook', 'angle_visual', 'angle_brief'].forEach(k => { sl[k] = ''; });
+        sl.safe_filename = baseFile;
+        return;
+      }
+      sl.angle_code = a.code;
+      sl.angle_label = a.label || '';
+      sl.angle_persona = a.persona || '';
+      sl.angle_behavior = a.buying_behavior || '';
+      sl.angle_objection = a.objection || '';
+      sl.angle_hook = a.hook_th || '';
+      sl.angle_visual = a.visual_proof || '';
+      sl.angle_triggers = a.trigger_words || [];
+      sl.angle_source = m.source || '';
+      sl.visual_proof_score = m.visual_proof_score || 3;
+      sl.angle_brief = `🎯 มุม ${a.code} ${a.label || ''} · ลูกค้า: ${a.persona || ''} · ข้อกังวลที่ต้องพิสูจน์: ${a.objection || ''} · เปิดคลิป 2 วิแรก: ${a.visual_proof || ''} · ฮุค: "${a.hook_th || ''}"`;
+      sl.safe_filename = baseFile ? `${baseFile} [${a.code}]` : `${baseName} [${a.code}]`;
     }
 
     function closeEditSlotModal() {
@@ -1663,6 +1819,8 @@
         sl.style_chip_match = stObj.chip_match;
       }
       sl.brief_note = newBrief;
+      const angleSel = document.getElementById('editSlotAngleSelect');
+      applyAngleToSlotClient(sl, prod || (currentPlan.catalog || []).find(p => p.sku === sl.sku), angleSel ? angleSel.value : '');
 
       try {
         currentPlan = await apiPost('/api/recompute-plan', currentPlan);
@@ -1672,6 +1830,107 @@
         showToast('✅ แก้ไขช่องตารางและคำนวณโควตาใหม่เรียบร้อย!');
       } catch (err) {
         showToast(`❌ ${err.message}`);
+      }
+    }
+
+    // Tab 4: Weekly (every Sunday) sales review — re-plans ONLY future slots
+    let weeklyFilesPayload = [];
+
+    async function handleWeeklyFiles(fileList) {
+      const arr = Array.from(fileList || []);
+      if (!arr.length) return;
+      weeklyFilesPayload = [];
+      for (const f of arr) {
+        weeklyFilesPayload.push({ filename: f.name, content_base64: await fileToBase64(f) });
+      }
+      document.getElementById('weeklyFileLabel').textContent = `✅ แนบแล้ว ${arr.length} ไฟล์: ${arr.map(f => f.name).join(', ')}`;
+    }
+
+    function weeklyRowsTable(rows, extraCol) {
+      if (!rows || !rows.length) return '<div style="color:var(--muted); font-size:12.5px;">— ไม่มีรายการ —</div>';
+      return `
+        <div style="overflow-x:auto;"><table class="prod-table">
+          <thead><tr><th>รหัส</th><th>สินค้า</th><th>โพสต์ใหม่ (เกินเกณฑ์วัน)</th><th>ออเดอร์คลิปใหม่</th><th>มุมที่ขาย</th><th>${escapeHtml(extraCol || 'เหตุผล')}</th></tr></thead>
+          <tbody>
+            ${rows.map(r => {
+              const st = r.angle_stats || {};
+              const angleTxt = ['A1', 'A2', 'A3'].filter(c => st[c] && (st[c].posted || st[c].orders))
+                .map(c => `${c}: โพสต์ ${st[c].posted} · ขาย ${st[c].orders}`).join('<br>');
+              const repl = r.replaced_by
+                ? `<div style="color:var(--green); font-size:12px; margin-top:3px;">🔁 คิวที่เหลือ → ${escapeHtml(r.replaced_by.code || '')} ${escapeHtml(r.replaced_by.name || '')}${r.replaced_by.fallback ? ' (ไม่มีตัวใหม่ผ่านเกณฑ์ เลยเติมให้ตัวที่ขายดีแทน)' : ''}</div>`
+                : '';
+              return `<tr>
+                <td class="mono" style="font-weight:800;">${escapeHtml(r.code || '')}</td>
+                <td><div style="font-weight:700;">${escapeHtml(r.name || '')}</div><div class="mono" style="font-size:11px; color:var(--muted);">${escapeHtml(r.sku || '')}</div></td>
+                <td><b>${r.posted}</b> (${r.matured})</td>
+                <td><b style="color:${r.new_orders > 0 ? 'var(--green)' : 'var(--muted)'};">${r.new_orders}</b>${r.new_comm ? ` · ฿${Number(r.new_comm).toLocaleString()}` : ''}</td>
+                <td style="font-size:12px;">${r.best_angle ? angleChipHtml(r.best_angle, '') + '<br>' : ''}${angleTxt || '<span style="color:var(--muted);">ยังแยกมุมไม่ได้</span>'}</td>
+                <td style="font-size:12.5px;">${escapeHtml(r.reason || '')}${repl}</td>
+              </tr>`;
+            }).join('')}
+          </tbody>
+        </table></div>`;
+    }
+
+    function renderWeeklyReport(rep) {
+      const box = document.getElementById('weeklyResultBox');
+      box.style.display = 'block';
+      const notes = [...(rep.marketing_notes || []), ...(rep.warnings || [])];
+      box.innerHTML = `
+        <div class="alert-box" style="border-color:var(--green); background:rgba(16,185,129,0.08);">
+          <div style="font-weight:800; color:var(--green); font-size:15.5px; margin-bottom:6px;">
+            ✅ รีวิววันที่ ${escapeHtml(rep.review_date)} เสร็จแล้ว — ปรับเฉพาะคิว ${rep.future_days} วันข้างหน้า
+          </div>
+          <div style="font-size:13.2px; line-height:1.7;">
+            ช่วงยอดขายในไฟล์: <b>${escapeHtml(rep.sales_window)}</b> · แผน: <b>${escapeHtml(rep.plan_window)}</b><br>
+            ❌ ตัดออก <b>${rep.dropped.length}</b> ตัว (เสียบสินค้าใหม่แทน <b>${rep.replaced_slots}</b> คิว) ·
+            ✅ ขยี้ต่อ <b>${rep.scale.length}</b> ตัว (ล็อกมุมที่ขายออก <b>${rep.relocked_slots}</b> คิว) ·
+            ⏳ ปล่อยเทสต์ <b>${rep.keep_testing.length}</b> · 👀 เฝ้าดู <b>${rep.watching.length}</b>
+            ${rep.omni5_repaired ? ` · 🛡️ ซ่อม OMNI 5 ${rep.omni5_repaired} ช่อง` : ''}
+            ${rep.backfilled_slots ? ` · 🎯 เติมมุมขายให้คิวเก่า ${rep.backfilled_slots} ช่อง` : ''}
+          </div>
+          ${notes.length ? `<ul style="padding-left:20px; margin-top:6px; font-size:12.8px;">${notes.map(n => `<li>${escapeHtml(n)}</li>`).join('')}</ul>` : ''}
+          <div style="margin-top:10px; display:flex; gap:8px; flex-wrap:wrap;">
+            <button type="button" class="btn btn-green" onclick="publishToGitHub()">🚀 อัปเดตตารางใหม่ขึ้นเว็บให้น้องเลย</button>
+            <button type="button" class="btn" onclick="switchTab('schedule')">📅 เปิดดูตารางรวม</button>
+          </div>
+        </div>
+        <div class="card" style="margin-top:12px;"><div class="card-title"><span>❌ ตัดออกจากคิวที่เหลือ</span></div>${weeklyRowsTable(rep.dropped)}</div>
+        <div class="card"><div class="card-title"><span>✅ ขายออก — ขยี้ต่อ</span></div>${weeklyRowsTable(rep.scale)}</div>
+        <div class="card"><div class="card-title"><span>👀 เฝ้าดูอีกสัปดาห์ / ⏳ ปล่อยเทสต์ต่อ</span></div>${weeklyRowsTable([...(rep.watching || []), ...(rep.keep_testing || [])])}</div>
+        ${(rep.protected || []).length ? `<div class="card"><div class="card-title"><span>🎁 สินค้ารีวิวฟรี (ไม่ตัด)</span></div>${weeklyRowsTable(rep.protected)}</div>` : ''}
+      `;
+    }
+
+    async function runWeeklyReview() {
+      if (!currentPlan || !currentPlan.days?.length) {
+        alert('ยังไม่มีตารางรายเดือนครับ กรุณาสร้างตารางในแท็บที่ 1 ก่อน');
+        return;
+      }
+      if (!weeklyFilesPayload.length) {
+        alert('กรุณาแนบไฟล์ออเดอร์ล่าสุด (affiliate_orders_*.xlsx) ก่อนครับ');
+        return;
+      }
+      showToast('🔁 กำลังอ่านยอดขาย จับคู่คลิปที่บอทโพสต์ และปรับคิววันข้างหน้า...', 0);
+      try {
+        const res = await apiPost('/api/weekly-review', {
+          plan: currentPlan,
+          files: weeklyFilesPayload,
+          review_date: document.getElementById('weeklyReviewDate').value,
+          min_posts_to_drop: Number(document.getElementById('weeklyMinPosts').value || 4),
+          min_age_days: Number(document.getElementById('weeklyMinAge').value || 3),
+          use_ai: document.getElementById('weeklyUseAi').value === '1',
+          new_star_strategy: document.getElementById('newStarStrategy')?.value || 'balanced',
+          gemini_api_key: localStorage.getItem('AGY_TIKTOK_STUDIO_GEMINI_KEY') || ''
+        });
+        currentPlan = res.plan;
+        await apiPost('/api/save-draft', { plan: currentPlan });
+        renderScheduleTab();
+        updateWeeklyPlanBadge();
+        renderWeeklyReport(res.report);
+        showToast(`✅ รีวิวเสร็จ: ตัด ${res.report.dropped.length} · ขยี้ต่อ ${res.report.scale.length} · ปรับ ${res.report.replaced_slots + res.report.relocked_slots} คิว — กดปุ่มเขียวเพื่ออัปขึ้นเว็บให้น้อง`, 7000);
+      } catch (err) {
+        showToast(`❌ ${err.message}`, 8000);
       }
     }
 

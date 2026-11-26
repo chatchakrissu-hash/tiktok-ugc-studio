@@ -2048,6 +2048,7 @@
     function clearAllImages() {
       uploadedImages = [];
       selectedKalodataProduct = null;
+      clearActivePlanAngle();
       const fileInput = document.getElementById('fileInput');
       if (fileInput) fileInput.value = '';
       const skuInput = document.getElementById('productSkuInput');
@@ -2359,6 +2360,9 @@
           : `แนวความต้องการ: ${selectedChipStyle}`);
 
       const randomAngle = pickRandomScenarioSeed();
+      const planAngleInstruction = activePlanAngle
+        ? `\n🎯 มุมลูกค้าที่ตารางรายเดือนกำหนดไว้ (ต้องยึดมุมนี้เป็นหลักทั้งบทพูด ฮุค ช็อตเปิด และ Video Prompt — ห้ามเปลี่ยนไปมุมอื่น): ${activePlanAngle.code} ${activePlanAngle.label} | ลูกค้า: ${activePlanAngle.persona} | พฤติกรรมการซื้อ: ${activePlanAngle.behavior} | สิ่งที่ลูกค้ากลัวและต้องพิสูจน์ให้เห็นในคลิป: ${activePlanAngle.objection} | ช็อตเปิด 2 วินาทีแรก: ${activePlanAngle.visual} | ฮุคตั้งต้น (ปรับคำให้ลื่นได้แต่คงความหมาย): "${activePlanAngle.hook}"`
+        : '';
 
       let livelyInstruction = '';
       if (customLively) {
@@ -2382,7 +2386,7 @@
       });
 
       userPromptParts.push({
-        text: `กรุณาวิเคราะห์ข้อมูลจากภาพสินค้าที่แนบมานี้ ${infoText ? `(ข้อมูลเพิ่มเติมจากผู้ใช้: ${infoText})` : ''}\n${styleInstruction}\n${livelyInstruction}\nจำกฎเหล็ก:\n0) ต้องถอดข้อความชื่อสินค้าทั้งหมดที่ปรากฏในรูปภาพแบบคำต่อคำครบทุกตัวอักษรใส่ใน exact_product_name_from_image (ส่วนในบทพูด ปก แคปชั่น ตะกร้า ห้ามมีคำว่า ปวดหลัง/แก้ปวดหลัง/ไม่ปวดหลัง/ภูมิแพ้/ฆ่าเชื้อ/99.9%/100% เด็ดขาด)\n1) ห้ามเปิดบทพูดด้วยคำว่า "เบื่อไหม...", "ใครเคย...", "ทุกคน วันนี้..." ให้เปิดใน 1.5 วิแรกด้วยสูตรท้าพิสูจน์ "จะรอดหรือร่วง!" / บุกโกดังปล่อยโปร / โชว์ช็อตปะทะจริงทันที และต้องใส่อินเนอร์เสียงพูดภาษาอังกฤษแบบเร้าใจมีชีวิตชีวาใน Video Prompt (ห้ามใช้คำว่า speaking warmly)\n2) คุม Lip-Sync vs Hands-Only: ถ้าเห็นหน้าคนต้องระบุให้ปากขยับพูดภาษาไทยเป๊ะตามบท (accurate Thai lip-sync, never silent smiling face); ถ้าใช้เสียงบรรยายนอกจอให้ถ่ายเฉพาะมือกับสินค้า (hands-only below-chin framing)\n3) ห้ามพูดคำว่า "ราคาหลักสิบ" ให้ปัดเป็นเพดานราคาปลอดภัย (เช่น 79 บาท -> "งบไม่ถึงร้อย / แบงก์ร้อยมีทอน", 2XX บาท -> "สามร้อยมีทอน") และถ้าพูด % ส่วนลด ต้องปัดลงให้ต่ำกว่าในภาพและลงท้ายด้วย 0 หรือ 5 เท่านั้น (เช่น 78% -> 75%)\n4) ห้ามมีข้อความขึ้นในคลิปและใน Storyboard และต้องใส่ "no background music" ใน Negatives ของ Gemini Omni Video Prompt (ฟิลด์ kling_master_prompt) พร้อมใส่บล็อก [Living Background & Natural Life Detail] และห้ามใช้ไวยากรณ์ Kling อย่าง <<<image_1>>> หรือ ++\n5) ชุดแฮชแท็กต้องมี 5 แบบ แบบละ 5 แฮชแท็กเป๊ะๆ`
+        text: `กรุณาวิเคราะห์ข้อมูลจากภาพสินค้าที่แนบมานี้ ${infoText ? `(ข้อมูลเพิ่มเติมจากผู้ใช้: ${infoText})` : ''}\n${styleInstruction}\n${livelyInstruction}${planAngleInstruction}\nจำกฎเหล็ก:\n0) ต้องถอดข้อความชื่อสินค้าทั้งหมดที่ปรากฏในรูปภาพแบบคำต่อคำครบทุกตัวอักษรใส่ใน exact_product_name_from_image (ส่วนในบทพูด ปก แคปชั่น ตะกร้า ห้ามมีคำว่า ปวดหลัง/แก้ปวดหลัง/ไม่ปวดหลัง/ภูมิแพ้/ฆ่าเชื้อ/99.9%/100% เด็ดขาด)\n1) ห้ามเปิดบทพูดด้วยคำว่า "เบื่อไหม...", "ใครเคย...", "ทุกคน วันนี้..." ให้เปิดใน 1.5 วิแรกด้วยสูตรท้าพิสูจน์ "จะรอดหรือร่วง!" / บุกโกดังปล่อยโปร / โชว์ช็อตปะทะจริงทันที และต้องใส่อินเนอร์เสียงพูดภาษาอังกฤษแบบเร้าใจมีชีวิตชีวาใน Video Prompt (ห้ามใช้คำว่า speaking warmly)\n2) คุม Lip-Sync vs Hands-Only: ถ้าเห็นหน้าคนต้องระบุให้ปากขยับพูดภาษาไทยเป๊ะตามบท (accurate Thai lip-sync, never silent smiling face); ถ้าใช้เสียงบรรยายนอกจอให้ถ่ายเฉพาะมือกับสินค้า (hands-only below-chin framing)\n3) ห้ามพูดคำว่า "ราคาหลักสิบ" ให้ปัดเป็นเพดานราคาปลอดภัย (เช่น 79 บาท -> "งบไม่ถึงร้อย / แบงก์ร้อยมีทอน", 2XX บาท -> "สามร้อยมีทอน") และถ้าพูด % ส่วนลด ต้องปัดลงให้ต่ำกว่าในภาพและลงท้ายด้วย 0 หรือ 5 เท่านั้น (เช่น 78% -> 75%)\n4) ห้ามมีข้อความขึ้นในคลิปและใน Storyboard และต้องใส่ "no background music" ใน Negatives ของ Gemini Omni Video Prompt (ฟิลด์ kling_master_prompt) พร้อมใส่บล็อก [Living Background & Natural Life Detail] และห้ามใช้ไวยากรณ์ Kling อย่าง <<<image_1>>> หรือ ++\n5) ชุดแฮชแท็กต้องมี 5 แบบ แบบละ 5 แฮชแท็กเป๊ะๆ`
       });
 
       const modelsToTry = getModelQueue();
@@ -2638,7 +2642,7 @@
       document.getElementById('ocrProductNameBox').textContent = ocrFullName;
 
       const activeSku = extractCleanSku(document.getElementById('productSkuInput')?.value || selectedKalodataProduct?.sku || '');
-      const readyFilename = buildSafeVideoFilename(activeSku, ocrFullName);
+      const readyFilename = buildSafeVideoFilename(activeSku, ocrFullName, activePlanAngle?.code);
       const vfBox = document.getElementById('videoFilenameBox');
       if (vfBox) {
         vfBox.textContent = readyFilename;
@@ -3030,10 +3034,47 @@
       return s || 'คลิปสินค้า_TikTok';
     }
 
-    function buildSafeVideoFilename(sku, fullName) {
+    function buildSafeVideoFilename(sku, fullName, angleCode = '') {
       const cleanSku = extractCleanSku(sku);
-      const cleanName = sanitizeFilenamePart(fullName);
+      let cleanName = sanitizeFilenamePart(String(fullName || '').replace(/\s*\[(?:มุม\s*)?A[1-3]\]/gi, ' '));
+      const code = String(angleCode || '').trim().toUpperCase();
+      if (/^A[1-3]$/.test(code)) cleanName = `${cleanName} [${code}]`;
       return cleanSku ? `${cleanSku}__${cleanName}` : cleanName;
+    }
+
+    // Marketing angle carried from the monthly plan slot (A1/A2/A3) — tags the Drive filename for sales attribution
+    var activePlanAngle = null;
+
+    function clearActivePlanAngle() {
+      activePlanAngle = null;
+      const box = document.getElementById('planAngleBanner');
+      if (box) box.style.display = 'none';
+    }
+
+    function renderPlanAngleBanner() {
+      let box = document.getElementById('planAngleBanner');
+      const anchor = document.getElementById('liveFilenameBanner');
+      if (!box && anchor && anchor.parentNode) {
+        box = document.createElement('div');
+        box.id = 'planAngleBanner';
+        box.className = 'filename-ready-box';
+        box.style.borderColor = 'rgba(249,115,22,0.55)';
+        anchor.parentNode.insertBefore(box, anchor);
+      }
+      if (!box) return;
+      if (!activePlanAngle) { box.style.display = 'none'; return; }
+      const a = activePlanAngle;
+      box.style.display = 'block';
+      box.innerHTML = `
+        <div style="font-size:14.5px; font-weight:800; color:#f97316; margin-bottom:6px;">🎯 มุมลูกค้าที่ต้องเจาะวันนี้: ${escapeHtml(a.code)} · ${escapeHtml(a.label || '')}</div>
+        <div style="font-size:13px; line-height:1.65;">
+          <b>ลูกค้า:</b> ${escapeHtml(a.persona || '-')}<br>
+          <b>พฤติกรรมการซื้อ:</b> ${escapeHtml(a.behavior || '-')}<br>
+          <b>สิ่งที่ลูกค้ากลัว (ต้องพิสูจน์ในคลิป):</b> ${escapeHtml(a.objection || '-')}<br>
+          <b>เปิดคลิป 2 วิแรก:</b> ${escapeHtml(a.visual || '-')}<br>
+          <b>ฮุคเปิด:</b> "${escapeHtml(a.hook || '-')}"
+        </div>
+        <div style="font-size:11.8px; color:var(--muted); margin-top:6px;">ชื่อไฟล์คลิปจะมี [${escapeHtml(a.code)}] ต่อท้ายอัตโนมัติ เพื่อให้ระบบรู้ว่ามุมไหนขายออก — ห้ามลบป้ายนี้ตอนอัปลง Drive</div>`;
     }
 
     function updateLiveFilenamePreview() {
@@ -3055,7 +3096,7 @@
       const textEl = document.getElementById('liveFilenameText');
       if (banner && textEl) {
         if (cleanSku || baseName) {
-          textEl.textContent = buildSafeVideoFilename(cleanSku, baseName || 'ชื่อสินค้าเต็มจากรูปภาพ');
+          textEl.textContent = buildSafeVideoFilename(cleanSku, baseName || 'ชื่อสินค้าเต็มจากรูปภาพ', activePlanAngle?.code);
           banner.style.display = 'block';
         } else {
           banner.style.display = 'none';
@@ -3066,7 +3107,7 @@
       const vfBox = document.getElementById('videoFilenameBox');
       const ocrBox = document.getElementById('ocrProductNameBox');
       if (vfBox && ocrBox && ocrBox.textContent.trim()) {
-        vfBox.textContent = buildSafeVideoFilename(cleanSku, ocrBox.textContent.trim());
+        vfBox.textContent = buildSafeVideoFilename(cleanSku, ocrBox.textContent.trim(), activePlanAngle?.code);
       }
     }
 
@@ -3230,6 +3271,7 @@
       const p = kalodataBySku[sku];
       if (!p) return;
       selectedKalodataProduct = p;
+      clearActivePlanAngle();
 
       const origText = btn ? btn.innerHTML : '';
       if (btn) {
@@ -3405,6 +3447,16 @@
       if (!sl) return;
 
       selectedKalodataProduct = { sku: sl.sku, name: sl.name, image: sl.image };
+      activePlanAngle = sl.angle_code ? {
+        code: sl.angle_code,
+        label: sl.angle_label || '',
+        persona: sl.angle_persona || '',
+        behavior: sl.angle_behavior || '',
+        objection: sl.angle_objection || '',
+        hook: sl.angle_hook || '',
+        visual: sl.angle_visual || ''
+      } : null;
+      renderPlanAngleBanner();
       const origHtml = btn ? btn.innerHTML : '';
       if (btn) {
         btn.disabled = true;
@@ -3420,6 +3472,13 @@
         const extraLines = [`ชื่อสินค้าเต็ม: ${sl.name}`];
         if (sl.cat) extraLines.push(`หมวดหมู่: ${sl.cat}${sl.price ? ` | ราคาประมาณ ${Math.round(sl.price)} บาท` : ''}`);
         if (sl.style_name) extraLines.push(`แนวคลิปที่วางไว้ในตาราง (${day.date_thai} · ${sl.slot_label}): ${sl.style_name}`);
+        if (sl.angle_code) {
+          extraLines.push(`มุมลูกค้าที่ต้องเจาะ (${sl.angle_code}): ${sl.angle_label || ''} — ${sl.angle_persona || ''}`);
+          if (sl.angle_behavior) extraLines.push(`พฤติกรรมการซื้อของกลุ่มนี้: ${sl.angle_behavior}`);
+          if (sl.angle_objection) extraLines.push(`สิ่งที่ลูกค้ากลัว (ต้องพิสูจน์ให้เห็นในคลิป): ${sl.angle_objection}`);
+          if (sl.angle_visual) extraLines.push(`ช็อตเปิด 2 วินาทีแรก: ${sl.angle_visual}`);
+          if (sl.angle_hook) extraLines.push(`ฮุคเปิดที่วางไว้: "${sl.angle_hook}"`);
+        }
         if (sl.brief_note) extraLines.push(`คำสั่งพิเศษ: ${sl.brief_note}`);
         infoEl.value = extraLines.join('\n');
       }
@@ -3508,6 +3567,8 @@
 
           <div style="font-size:12px; color:var(--text); background:var(--card); padding:6px 8px; border-radius:8px; border:1px solid var(--border);">
             🎬 <b>${escapeHtml(sl.style_name || '')}</b>
+            ${sl.angle_code ? `<div style="font-size:11.4px; color:#f97316; margin-top:2px; font-weight:700;" title="${escapeHtml(sl.angle_brief || '')}">🎯 มุม ${escapeHtml(sl.angle_code)} · ${escapeHtml(sl.angle_label || '')}</div>` : ''}
+            ${sl.angle_hook ? `<div style="font-size:11.2px; color:var(--muted); margin-top:1px;">ฮุค: "${escapeHtml(sl.angle_hook)}"</div>` : ''}
             ${sl.brief_note ? `<div style="font-size:11.3px; color:var(--gold); margin-top:2px;">📝 ${escapeHtml(sl.brief_note)}</div>` : ''}
           </div>
 

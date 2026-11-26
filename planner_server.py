@@ -136,15 +136,28 @@ def name_similarity(a: str, b: str) -> float:
     return inter / union if union else 0.0
 
 
-def build_safe_video_filename(sku: str, name: str) -> str:
-    """Match index.html buildSafeVideoFilename(): `<19-digit-sku>__<clean_name>`."""
+ANGLE_CODES = ("A1", "A2", "A3")
+ANGLE_TAG_RE = re.compile(r"\s*\[(?:มุม\s*)?(A[1-3])\]", re.IGNORECASE)
+
+
+def extract_angle_tag(text: Any) -> str:
+    """Read the marketing angle tag `[A1]` / `[A2]` / `[A3]` from a filename or name (empty when absent)."""
+    m = ANGLE_TAG_RE.search(str(text or ""))
+    return m.group(1).upper() if m else ""
+
+
+def build_safe_video_filename(sku: str, name: str, angle_code: str = "") -> str:
+    """Match index.html buildSafeVideoFilename(): `<19-digit-sku>__<clean_name>[ [A1]]`."""
     clean_sku = extract_clean_sku(sku)
-    clean = normalize_thai_text(name)
+    clean = normalize_thai_text(ANGLE_TAG_RE.sub(" ", str(name or "")))
     clean = re.sub(r'[<>:"/\\|?*\x00-\x1F]+', " ", clean)
     clean = re.sub(r"\s+", " ", clean).strip()
     if len(clean) > 105:
         clean = clean[:105].strip()
     clean = clean or "คลิปสินค้า_TikTok"
+    code = str(angle_code or "").strip().upper()
+    if code in ANGLE_CODES:
+        clean = f"{clean} [{code}]"
     return f"{clean_sku}__{clean}" if clean_sku else clean
 
 
@@ -687,16 +700,20 @@ def _parse_date_iso(raw_val: Any) -> str:
 
 def _decode_tiktok_content_pub_date(content_id: Any) -> str:
     """Decode publish date (YYYY-MM-DD, local time) from 64-bit TikTok Snowflake content_id (int >> 32)."""
+    ts = _decode_content_ts(content_id)
+    return dt.datetime.fromtimestamp(ts).strftime("%Y-%m-%d") if ts else ""
+
+
+def _decode_content_ts(content_id: Any) -> int:
+    """Decode the Unix timestamp (seconds) embedded in a TikTok Snowflake content_id; 0 when invalid."""
     s = re.sub(r"\D+", "", str(content_id or "").strip())
     if not (17 <= len(s) <= 20):
-        return ""
+        return 0
     try:
         ts = int(s) >> 32
     except ValueError:
-        return ""
-    if 1_500_000_000 <= ts <= 2_100_000_000:
-        return dt.datetime.fromtimestamp(ts).strftime("%Y-%m-%d")
-    return ""
+        return 0
+    return ts if 1_500_000_000 <= ts <= 2_100_000_000 else 0
 
 
 def parse_sales_files(files_payload: list[dict[str, str]]) -> dict[str, Any]:
@@ -871,7 +888,12 @@ def parse_sales_files(files_payload: list[dict[str, str]]) -> dict[str, Any]:
         prod["hit_rate_pct"] = 0.0
         prod["real_comm_per_posted"] = 0.0
         prod["_cid_pub_comm"] = {
-            c: {"pub_date": st["pub_date"], "comm": round(st["comm"], 2)}
+            c: {
+                "pub_date": st["pub_date"],
+                "comm": round(st["comm"], 2),
+                "orders": int(st.get("orders") or 0),
+                "pub_ts": _decode_content_ts(c),
+            }
             for c, st in cid_stats.items()
         }
         products_out.append(prod)
@@ -1574,6 +1596,595 @@ def run_ai_portfolio_advisor(
     return {"ai_used": False, "ai_model": "", "ai_critique": [], "winners": winners, "dropped": dropped, "new_stars": picked_stars}
 
 
+# ======================================================================================
+# Marketing Angles Engine (skill: ~/.gemini/config/skills/tiktok-shop-marketing)
+# Each product -> visual proof score + #1 buyer objection + 3 film-ready angles A1/A2/A3
+# ======================================================================================
+ANGLE_CACHE_FILE = BASE_DIR / "product_angles.json"
+VISUAL_PROOF_MIN_SCORE = 3
+_ANGLE_LOCK = threading.Lock()
+_ANGLE_MODELS = ("gemini-2.5-flash", "gemini-3-flash-preview", "gemini-2.5-flash-lite")
+
+_FORBIDDEN_CLAIM_REPLACEMENTS: list[tuple[str, str]] = [
+    ("หายปวดหลัง", "นอนสบายขึ้น"),
+    ("ไม่ปวดหลัง", "นอนนุ่มสบาย"),
+    ("ลดอาการปวดหลัง", "รองรับสรีระได้ดี"),
+    ("ลดปวดหลัง", "นอนนุ่มสบาย"),
+    ("แก้ปวดหลัง", "นอนสบายขึ้น"),
+    ("คนปวดหลัง", "คนชอบนอนนุ่ม"),
+    ("ปวดหลัง", "ที่นอนแข็ง"),
+    ("ปวดเอว", "นอนไม่สบาย"),
+    ("ปวดคอ", "นอนไม่สบาย"),
+    ("ออฟฟิศซินโดรม", "นั่งนานเมื่อยล้า"),
+    ("ลดอาการปวด", "สัมผัสนุ่มสบาย"),
+    ("อาการปวด", "ความไม่สบายตัว"),
+    ("แก้ภูมิแพ้", "ลดฝุ่นสะสม"),
+    ("ภูมิแพ้", "ฝุ่นสะสม"),
+    ("ฆ่าเชื้อแบคทีเรีย", "ดูแลความสะอาด"),
+    ("ฆ่าเชื้อโรค", "ทำความสะอาด"),
+    ("ฆ่าเชื้อ", "ทำความสะอาด"),
+    ("รักษาโรค", "ดูแลตัวเอง"),
+    ("หายขาด", "ดีขึ้นมาก"),
+    ("ชีวิตเปลี่ยน", "สบายขึ้นทันตา"),
+    ("เปลี่ยนชีวิต", "สบายขึ้นทันตา"),
+    ("ดีที่สุด", "ตัวตึง"),
+    ("ดูแลสุขภาพการนอน", "อยากนอนสบายขึ้น"),
+    ("สุขภาพการนอน", "การนอนที่สบาย"),
+    ("ประโยชน์ต่อสุขภาพ", "ความสบายตอนใช้งาน"),
+    ("ลงทุนเพื่อสุขภาพ", "ลงทุนเพื่อความสบาย"),
+    ("ตะกร้าส้ม", "ตะกร้าเหลือง"),
+    ("Shopee", "TikTok Shop"),
+    ("Lazada", "TikTok Shop"),
+]
+_THAI_HUNDREDS = {1: "ร้อย", 2: "สองร้อย", 3: "สามร้อย", 4: "สี่ร้อย", 5: "ห้าร้อย", 6: "หกร้อย", 7: "เจ็ดร้อย", 8: "แปดร้อย", 9: "เก้าร้อย", 10: "พัน"}
+# Dead openers that made recent clips flop (vague questions instead of a visual/price/challenge statement)
+_WEAK_HOOK_RE = re.compile(r"^\s*(?:เบื่อไหม|ใครเคย|ใครที่|บ้านไหน|สวัสดี|วันนี้มารีวิว|วันนี้จะมารีวิว|อยากให้|หา.{0,30}อยู่)|ใช่ไหม\s*[?!]*\s*$")
+
+
+def sanitize_marketing_text(text: Any, limit: int = 220) -> str:
+    """Strip TikTok Shop TH forbidden claims (medical/pain/germ/100%) and competitor apps from AI marketing copy."""
+    s = normalize_thai_text(str(text or ""))
+    for bad, good in _FORBIDDEN_CLAIM_REPLACEMENTS:
+        s = s.replace(bad, good)
+    s = re.sub(r"(?:ราคาแค่|ราคา|แค่|งบ)?หลักสิบ(?:บาท)?", "งบไม่ถึงร้อย", s)
+    s = re.sub(r"99\.9\s*%|100\s*%", "", s)
+    s = re.sub(r"\s+", " ", s).strip()
+    return s[:limit].strip()
+
+
+def price_cushion_phrase(price: Any) -> str:
+    """Safe price ceiling wording (never the exact price): 79 -> งบไม่ถึงร้อย, 259 -> สามร้อยมีทอน."""
+    try:
+        p = float(price or 0)
+    except (TypeError, ValueError):
+        p = 0.0
+    if p <= 0:
+        return "ราคาโปรคุ้มมาก"
+    if p < 100:
+        return "งบไม่ถึงร้อย"
+    n = int(math.floor(p / 100.0)) + 1
+    return f"{_THAI_HUNDREDS[n]}มีทอน" if n in _THAI_HUNDREDS else "ราคาโปรคุ้มมาก"
+
+
+def short_product_label(name: Any, max_len: int = 26) -> str:
+    """Short spoken product label from a long shop title (cut on word boundaries)."""
+    s = clean_product_query(str(name or ""))
+    s = re.sub(r"[^\u0E00-\u0E7Fa-zA-Z0-9 ]+", " ", s)
+    words = s.split()
+    out = ""
+    for w in words:
+        cand = f"{out} {w}".strip()
+        if len(cand) > max_len:
+            break
+        out = cand
+    return out or (words[0][:max_len] if words else "สินค้านี้")
+
+
+def _angle_key(prod: dict[str, Any]) -> str:
+    return extract_clean_sku(prod.get("sku")) or norm_token_key(prod.get("name", ""))
+
+
+def load_angle_cache() -> dict[str, dict[str, Any]]:
+    with _ANGLE_LOCK:
+        if not ANGLE_CACHE_FILE.exists():
+            return {}
+        try:
+            data = json.loads(ANGLE_CACHE_FILE.read_text(encoding="utf-8"))
+            return data if isinstance(data, dict) else {}
+        except Exception:
+            return {}
+
+
+def save_angle_cache(updates: dict[str, dict[str, Any]]) -> None:
+    if not updates:
+        return
+    with _ANGLE_LOCK:
+        cur: dict[str, Any] = {}
+        if ANGLE_CACHE_FILE.exists():
+            try:
+                loaded = json.loads(ANGLE_CACHE_FILE.read_text(encoding="utf-8"))
+                if isinstance(loaded, dict):
+                    cur = loaded
+            except Exception:
+                cur = {}
+        cur.update(updates)
+        ANGLE_CACHE_FILE.write_text(json.dumps(cur, ensure_ascii=False, indent=1), encoding="utf-8")
+
+
+def heuristic_product_angles(prod: dict[str, Any]) -> dict[str, Any]:
+    """Deterministic fallback angles (used when AI is off/unavailable). Never gates a product (score 3)."""
+    short = short_product_label(prod.get("name"))
+    cushion = price_cushion_phrase(prod.get("price"))
+    angles = [
+        {
+            "code": "A1",
+            "label": "สายขี้ระแวง กลัวของจกตา",
+            "persona": "คนที่เคยโดนของไม่ตรงปก ต้องเห็นการทดสอบจริงก่อนถึงจะยอมกดตะกร้า",
+            "buying_behavior": "ปัดทิ้งทันทีถ้าเปิดมาด้วยคำชม เชื่อภาพทดสอบหนักๆ คาตามากกว่าคำพูด และชอบอ่านคอมเมนต์ก่อนซื้อ",
+            "objection": f"กลัวว่า{short}ของจริงจะไม่ตรงปก คุณภาพไม่ถึง",
+            "hook_th": f"{cushion}ได้{short}...จะรอดหรือร่วง มาดู!",
+            "visual_proof": "เปิดเฟรมแรกด้วยการทดสอบที่หนักที่สุดของสินค้า (เท/กด/ดึง/ใช้งานจริง) ให้เห็นผลภายใน 2 วินาที",
+            "trigger_words": ["รอดไหม", "ของจริง", "ไม่จกตา"],
+            "style_nums": [3, 9, 1],
+            "hardsell_style": 16,
+        },
+        {
+            "code": "A2",
+            "label": "สายล่าโปรคุ้ม เห็นราคาแล้วมือลั่น",
+            "persona": "คนชอบของคุ้ม ไม่ได้ตั้งใจหาซื้อแต่แพ้ความคุ้มค่าและภาพสต็อกแน่นๆ",
+            "buying_behavior": "ตัดสินใจเร็วเมื่อเห็นจำนวนชิ้นหรือความคุ้มชัดๆ แพ้คำว่าตัดสต็อก ราคาโรงงาน และกดตะกร้าทันทีถ้ารู้สึกคุ้ม",
+            "objection": "กลัวซื้อแพงกว่าที่อื่น หรือได้ของน้อยกว่าที่คิด",
+            "hook_th": f"บุกคลังตัดสต็อก! {short} {cushion}",
+            "visual_proof": "โชว์ปริมาณหรือจำนวนชิ้นจริงเต็มเฟรม เทียบขนาดกับมือหรือของรอบตัว ให้เห็นความคุ้มทันที",
+            "trigger_words": ["ตัดสต็อก", "ราคาโรงงาน", "คุ้ม"],
+            "style_nums": [5, 11, 8],
+            "hardsell_style": 13,
+        },
+        {
+            "code": "A3",
+            "label": "สายแก้ปัญหาในบ้านทุกวัน",
+            "persona": "คนที่รำคาญปัญหาเดิมในชีวิตประจำวัน อยากได้ตัวช่วยที่จบปัญหาได้จริงในบ้านตัวเอง",
+            "buying_behavior": "หยุดดูเมื่อเห็นปัญหาที่ตัวเองเจออยู่ทุกวัน เชื่อคนใช้จริงในบ้านจริง และซื้อเมื่อเห็นก่อน-หลังชัดเจน",
+            "objection": "ไม่แน่ใจว่าจะช่วยแก้ปัญหาในบ้านตัวเองได้จริง หรือใช้ยุ่งยาก",
+            "hook_th": f"ปัญหาเดิมทุกวันจบได้ด้วย{short} ดูนี่!",
+            "visual_proof": "เปิดด้วยภาพปัญหาจริงในบ้าน แล้วตัดเห็นผลหลังใช้สินค้าภายในไม่กี่วินาที",
+            "trigger_words": ["จบปัญหา", "ใช้ง่าย", "ในบ้าน"],
+            "style_nums": [2, 1, 6],
+            "hardsell_style": 14,
+        },
+    ]
+    return {
+        "visual_proof_score": 3,
+        "visual_proof_note": "ประเมินด้วยสูตรสำรอง (ยังไม่ได้ให้ AI วิเคราะห์สินค้าตัวนี้)",
+        "core_objection": angles[0]["objection"],
+        "angles": angles,
+        "source": "heuristic",
+        "model": "",
+        "updated_at": dt.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+    }
+
+
+def _validate_angle_entry(raw: Any, prod: dict[str, Any]) -> dict[str, Any] | None:
+    """Normalize an AI/cached angle entry: exactly 3 angles, valid style numbers, sanitized claims."""
+    if not isinstance(raw, dict):
+        return None
+    angles_in = raw.get("angles") if isinstance(raw.get("angles"), list) else []
+    if len(angles_in) < 3:
+        return None
+    base = heuristic_product_angles(prod)
+    out_angles: list[dict[str, Any]] = []
+    for i, code in enumerate(ANGLE_CODES):
+        a = angles_in[i] if isinstance(angles_in[i], dict) else {}
+        fb = base["angles"][i]
+        styles: list[int] = []
+        for v in a.get("style_nums") or []:
+            try:
+                n = int(v)
+            except (TypeError, ValueError):
+                continue
+            if n in UGC_STYLE_NUMS and n not in styles:
+                styles.append(n)
+        for n in fb["style_nums"]:
+            if len(styles) >= 3:
+                break
+            if n not in styles:
+                styles.append(n)
+        try:
+            hs = int(a.get("hardsell_style"))
+        except (TypeError, ValueError):
+            hs = fb["hardsell_style"]
+        if hs not in HARDSELL_STYLE_NUMS:
+            hs = fb["hardsell_style"]
+        triggers = [sanitize_marketing_text(t, 28) for t in (a.get("trigger_words") or []) if str(t).strip()][:4]
+        hook = sanitize_marketing_text(a.get("hook_th") or "", 140)
+        if not hook or _WEAK_HOOK_RE.search(hook):
+            hook = fb["hook_th"]
+        out_angles.append({
+            "code": code,
+            "label": sanitize_marketing_text(a.get("label") or fb["label"], 70),
+            "persona": sanitize_marketing_text(a.get("persona") or fb["persona"], 220),
+            "buying_behavior": sanitize_marketing_text(a.get("buying_behavior") or fb["buying_behavior"], 260),
+            "objection": sanitize_marketing_text(a.get("objection") or fb["objection"], 200),
+            "hook_th": hook,
+            "visual_proof": sanitize_marketing_text(a.get("visual_proof") or fb["visual_proof"], 220),
+            "trigger_words": [t for t in triggers if t] or fb["trigger_words"],
+            "style_nums": styles[:3],
+            "hardsell_style": hs,
+        })
+    try:
+        vps = int(round(float(raw.get("visual_proof_score"))))
+    except (TypeError, ValueError):
+        vps = 3
+    return {
+        "visual_proof_score": max(1, min(5, vps)),
+        "visual_proof_note": sanitize_marketing_text(raw.get("visual_proof_note") or "", 220),
+        "core_objection": sanitize_marketing_text(raw.get("core_objection") or out_angles[0]["objection"], 200),
+        "angles": out_angles,
+        "source": str(raw.get("source") or "ai"),
+        "model": str(raw.get("model") or ""),
+        "updated_at": str(raw.get("updated_at") or dt.datetime.now().strftime("%Y-%m-%d %H:%M:%S")),
+    }
+
+
+def _build_angle_prompt(compact_products: list[dict[str, Any]]) -> str:
+    ugc_list = ", ".join(f"{s['num']}={s['short']}" for s in STYLES_16 if s["role"] == "ugc")
+    hard_list = ", ".join(f"{s['num']}={s['short']}" for s in STYLES_16 if s["role"] == "hardsell")
+    return (
+        "คุณคือ TikTok Shop Thailand Marketing Strategist (สกิล tiktok-shop-marketing) ให้ช่อง Affiliate ที่ทำคลิป AI แนวตั้ง 10 วินาที "
+        "ขายของใช้ในบ้านให้คนไทย วิเคราะห์ตรงไปตรงมา ห้ามอวย ห้ามแต่งข้อมูลที่ไม่รู้\n"
+        "วิเคราะห์สินค้าทุกตัวตาม 5 ชั้น:\n"
+        "1) visual_proof_score (1-5): ถ้าทำคลิป 10 วินาที จะเห็นผลพิสูจน์ด้วยตาภายใน 2 วินาทีแรกได้ชัดแค่ไหน "
+        "(5 = เห็นชัดมาก เช่น เทน้ำแล้วซึมหาย, 3 = พอทำได้ถ้าคิดช็อตดีๆ, 1 = ดูด้วยตาไม่ออก ต้องอธิบายยาว) พร้อม visual_proof_note สั้นๆ ว่าทำไม\n"
+        "2) core_objection: เหตุผลอันดับ 1 ที่คนไทยไถฟีดแล้วไม่กดซื้อสินค้านี้ (กลัวจกตา บาง เล็กกว่าปก ลื่น พังไว ใช้ยาก แพงไป ฯลฯ)\n"
+        "3) angles: 3 มุมขาย A1 A2 A3 สำหรับกลุ่มลูกค้าที่ต่างกันจริง (ห้ามกว้างแบบ 'ผู้หญิง 20-50 ปี') แต่ละมุมมีฟิลด์:\n"
+        "   label (ชื่อกลุ่มสั้นๆ), persona (ใครซื้อ ซื้อเพื่ออะไร), buying_behavior (หยุดนิ้วเพราะอะไร เชื่อคนพูดแบบไหน ตัดสินใจซื้อยังไง), "
+        "objection (สิ่งที่กลุ่มนี้กลัว), hook_th (ประโยคเปิด 1.5 วิแรก ภาษาพูดไทย ห้ามขึ้นต้นด้วย เบื่อไหม/ใครเคย/สวัสดี/วันนี้มารีวิว), "
+        "visual_proof (ช็อตเปิด 2 วิแรกที่ต้องถ่ายให้เห็น), trigger_words (2-4 คำกระตุ้น), "
+        f"style_nums (เลือก 3 แนวจาก 1-12 ที่เข้ากับมุมนี้: {ugc_list}), hardsell_style (1 แนวจาก 13-16: {hard_list})\n"
+        "กฎเหล็ก: ห้ามเคลมการแพทย์/อาการปวด/ภูมิแพ้/ฆ่าเชื้อ/99.9%/100% และห้ามวางมุมเป็นเรื่องสุขภาพ (เช่น 'ดูแลสุขภาพการนอน') ให้พูดเรื่องสัมผัส/ความสบาย/ความคุ้มแทน, ห้ามพูดราคาเป๊ะหรือคำว่าหลักสิบ "
+        "ให้ใช้เพดานราคา (งบไม่ถึงร้อย / สองร้อยมีทอน / สามร้อยมีทอน), ห้ามพูดถึงแอปอื่น\n"
+        "กฎฮุค (สำคัญมาก): hook_th ต้องเป็นประโยคบอกเล่า/ท้าทาย/ช็อตราคาที่เห็นภาพทันที ห้ามเป็นคำถามลอยๆ ลงท้าย 'ใช่ไหม' "
+        "และห้ามขึ้นต้นด้วย 'บ้านไหน...', 'ใครที่...', 'หา...อยู่', 'อยากให้...' "
+        "A1 ต้องเป็นมุม 'ท้าพิสูจน์ของจริง จะรอดหรือร่วง' เสมอ (สูตรที่ช่องนี้เคยทำได้ 500K วิว) "
+        "ตัวอย่างฮุคที่ขายได้จริงในช่องนี้: 'งบไม่ถึงร้อยได้ 2 ผืน...จะรอดหรือร่วง มาดู!', 'บุกคลังตัดสต็อก! ยกเซ็ตนี้แบงก์ร้อยมีทอน', "
+        "'เทน้ำใส่ให้ดูสดๆ ซับไวแค่ไหนดูเอง!', 'กดลงไปสุดมือ...ดูมันเด้งกลับ!'\n"
+        "ตอบเป็น JSON เท่านั้น: {\"products\":[{\"key\":\"...\",\"visual_proof_score\":4,\"visual_proof_note\":\"...\","
+        "\"core_objection\":\"...\",\"angles\":[{...A1...},{...A2...},{...A3...}]}]}\n"
+        f"สินค้า ({len(compact_products)} รายการ): {json.dumps(compact_products, ensure_ascii=False)}"
+    )
+
+
+def _ai_generate_angles(batch: list[tuple[str, dict[str, Any]]], api_key: str) -> tuple[dict[str, dict[str, Any]], str]:
+    """Ask Gemini for angles of up to ~10 products in one JSON call; returns ({key: raw_entry}, model_used)."""
+    try:
+        from google import genai
+        from google.genai import types
+    except Exception:
+        return {}, ""
+    compact = [
+        {
+            "key": k,
+            "name": str(p.get("name") or "")[:100],
+            "cat": str(p.get("cat") or ""),
+            "price_band": price_cushion_phrase(p.get("price")),
+            "tier": str(p.get("tier") or ""),
+        }
+        for k, p in batch
+    ]
+    prompt = _build_angle_prompt(compact)
+    try:
+        client = genai.Client(api_key=api_key, http_options=types.HttpOptions(timeout=120_000))
+    except Exception:
+        try:
+            client = genai.Client(api_key=api_key)
+        except Exception:
+            return {}, ""
+    for model_name in _ANGLE_MODELS:
+        try:
+            resp = client.models.generate_content(
+                model=model_name,
+                contents=prompt,
+                config=types.GenerateContentConfig(temperature=0.4, response_mime_type="application/json"),
+            )
+            parsed = json.loads(resp.text or "{}")
+            items = parsed.get("products") if isinstance(parsed, dict) else parsed
+            out: dict[str, dict[str, Any]] = {}
+            for it in items or []:
+                if isinstance(it, dict) and str(it.get("key") or ""):
+                    out[str(it["key"])] = it
+            if out:
+                return out, model_name
+        except Exception:
+            continue
+    return {}, ""
+
+
+def build_product_angles(
+    products: list[dict[str, Any]],
+    use_ai: bool = True,
+    explicit_key: str = "",
+    force: bool = False,
+) -> dict[str, dict[str, Any]]:
+    """Attach `marketing` (visual proof + objection + 3 angles) to every product. Cached in product_angles.json."""
+    cache = load_angle_cache()
+    results: dict[str, dict[str, Any]] = {}
+    need_ai: list[tuple[str, dict[str, Any]]] = []
+    for prod in products:
+        k = _angle_key(prod)
+        if not k:
+            continue
+        entry: dict[str, Any] | None = None
+        if not force and isinstance(prod.get("marketing"), dict):
+            cand = _validate_angle_entry(prod["marketing"], prod)
+            if cand and (cand["source"] == "ai" or not use_ai):
+                entry = cand
+        if entry is None and not force and k in cache:
+            cand = _validate_angle_entry(cache[k], prod)
+            if cand and (cand["source"] == "ai" or not use_ai):
+                entry = cand
+        if entry is None:
+            if use_ai:
+                need_ai.append((k, prod))
+                continue
+            entry = heuristic_product_angles(prod)
+        results[k] = entry
+        prod["marketing"] = entry
+
+    if need_ai:
+        api_key = _discover_gemini_api_key(explicit_key)
+        ai_out: dict[str, dict[str, Any]] = {}
+        model_by_key: dict[str, str] = {}
+        if api_key:
+            chunks = [need_ai[i : i + 10] for i in range(0, len(need_ai), 10)]
+            with concurrent.futures.ThreadPoolExecutor(max_workers=min(3, len(chunks))) as ex:
+                for out, model_used in ex.map(lambda ch: _ai_generate_angles(ch, api_key), chunks):
+                    for kk, vv in out.items():
+                        ai_out[kk] = vv
+                        model_by_key[kk] = model_used
+        new_cache: dict[str, dict[str, Any]] = {}
+        for k, prod in need_ai:
+            entry = None
+            if k in ai_out:
+                raw = dict(ai_out[k])
+                raw["source"] = "ai"
+                raw["model"] = model_by_key.get(k, "")
+                raw["updated_at"] = dt.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                entry = _validate_angle_entry(raw, prod)
+                if entry:
+                    new_cache[k] = entry
+            if entry is None:
+                entry = heuristic_product_angles(prod)
+            results[k] = entry
+            prod["marketing"] = entry
+        save_angle_cache(new_cache)
+    return results
+
+
+def gate_new_stars_by_visual_proof(
+    picked: list[dict[str, Any]],
+    backups: list[dict[str, Any]],
+    desired_count: int,
+    use_ai: bool = True,
+    explicit_key: str = "",
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]], list[str]]:
+    """Replace new-star candidates whose visual proof score < 3 with backups that pass (keeps count when possible)."""
+    notes: list[str] = []
+    if not picked or desired_count <= 0:
+        return picked, backups, notes
+    build_product_angles(picked, use_ai=use_ai, explicit_key=explicit_key)
+    kept = [p for p in picked if int((p.get("marketing") or {}).get("visual_proof_score") or 3) >= VISUAL_PROOF_MIN_SCORE]
+    rejected = [p for p in picked if p not in kept]
+    for r in rejected:
+        m = r.get("marketing") or {}
+        notes.append(
+            f"🧠 ตัด '{str(r.get('name') or '')[:42]}' ออกจากสินค้าใหม่: ภาพพิสูจน์ {m.get('visual_proof_score')}/5 — {m.get('visual_proof_note') or 'คลิป 10 วิดูด้วยตาไม่ออก'}"
+        )
+    used = {p.get("sku") for p in picked}
+    pool = [b for b in backups if b.get("sku") not in used]
+    idx = 0
+    while len(kept) < desired_count and idx < len(pool) and idx < 15:
+        batch = pool[idx : idx + max(1, desired_count - len(kept))]
+        idx += len(batch)
+        build_product_angles(batch, use_ai=use_ai, explicit_key=explicit_key)
+        for b in batch:
+            score = int((b.get("marketing") or {}).get("visual_proof_score") or 3)
+            if score >= VISUAL_PROOF_MIN_SCORE and len(kept) < desired_count:
+                b["reason"] = f"{b.get('reason') or ''} · 🧠 ผ่านเกณฑ์ภาพพิสูจน์ {score}/5".strip(" ·")
+                kept.append(b)
+    if len(kept) < desired_count and rejected:
+        # Not enough passing backups: keep the strongest rejected ones but flag them honestly
+        for r in sorted(rejected, key=lambda x: -int((x.get("marketing") or {}).get("visual_proof_score") or 0)):
+            if len(kept) >= desired_count:
+                break
+            r["reason"] = f"{r.get('reason') or ''} · ⚠️ ภาพพิสูจน์อ่อน ({(r.get('marketing') or {}).get('visual_proof_score')}/5) ต้องคิดช็อตเปรียบเทียบให้ดี".strip(" ·")
+            kept.append(r)
+            notes.append(f"⚠️ ไม่มีตัวสำรองที่ผ่านเกณฑ์พอ จึงคง '{str(r.get('name') or '')[:42]}' ไว้แบบมีคำเตือน")
+    kept_skus = {p.get("sku") for p in kept}
+    return kept, [b for b in backups if b.get("sku") not in kept_skus], notes
+
+
+def get_angle(marketing: dict[str, Any] | None, code: str) -> dict[str, Any]:
+    for a in (marketing or {}).get("angles") or []:
+        if a.get("code") == code:
+            return a
+    angles = (marketing or {}).get("angles") or []
+    return angles[0] if angles else {}
+
+
+def angle_sequence_code(marketing: dict[str, Any] | None, best_angle: str, occ_idx: int) -> str:
+    """Rotate A1->A2->A3 per product; when a best angle is proven by sales it takes 4 of every 6 slots."""
+    codes = [a.get("code") for a in (marketing or {}).get("angles") or [] if a.get("code") in ANGLE_CODES] or list(ANGLE_CODES)
+    if best_angle in codes and len(codes) >= 2:
+        others = [c for c in codes if c != best_angle]
+        pattern = [best_angle, others[0], best_angle, best_angle, others[-1], best_angle]
+        return pattern[occ_idx % len(pattern)]
+    return codes[occ_idx % len(codes)]
+
+
+def preferred_styles_for(prod: dict[str, Any], code: str, role: str) -> list[int]:
+    a = get_angle(prod.get("marketing"), code)
+    if role == "hardsell":
+        hs = a.get("hardsell_style")
+        return [hs] if hs in HARDSELL_STYLE_NUMS else []
+    return [n for n in (a.get("style_nums") or []) if n in UGC_STYLE_NUMS]
+
+
+def angle_slot_fields(prod: dict[str, Any], code: str) -> dict[str, Any]:
+    """Fields copied into a schedule slot so the clip maker gets the exact persona/objection/hook to film."""
+    m = prod.get("marketing") or {}
+    a = get_angle(m, code)
+    if not a:
+        return {"angle_code": ""}
+    brief = (
+        f"🎯 มุม {code} {a.get('label', '')} · ลูกค้า: {a.get('persona', '')} · "
+        f"ข้อกังวลที่ต้องพิสูจน์: {a.get('objection', '')} · เปิดคลิป 2 วิแรก: {a.get('visual_proof', '')} · "
+        f"ฮุค: \"{a.get('hook_th', '')}\""
+    )
+    return {
+        "angle_code": code,
+        "angle_label": a.get("label", ""),
+        "angle_persona": a.get("persona", ""),
+        "angle_behavior": a.get("buying_behavior", ""),
+        "angle_objection": a.get("objection", ""),
+        "angle_hook": a.get("hook_th", ""),
+        "angle_visual": a.get("visual_proof", ""),
+        "angle_triggers": list(a.get("trigger_words") or []),
+        "angle_brief": brief,
+        "angle_source": m.get("source", ""),
+        "visual_proof_score": m.get("visual_proof_score", 3),
+    }
+
+
+def _parse_bot_row_times(row: dict[str, Any]) -> list[float]:
+    """Upload time + scheduled publish time of a bot post row (epoch seconds)."""
+    times: list[float] = []
+    base_dt: dt.datetime | None = None
+    ts_str = str(row.get("ts") or row.get("date") or "").strip()
+    try:
+        base_dt = dt.datetime.fromisoformat(ts_str[:19]) if len(ts_str) >= 16 else (
+            dt.datetime.fromisoformat(ts_str[:10] + "T12:00:00") if len(ts_str) >= 10 else None
+        )
+    except ValueError:
+        base_dt = None
+    if base_dt:
+        times.append(base_dt.timestamp())
+    sched = str(row.get("scheduled_at") or "").strip()
+    if sched:
+        try:
+            times.append(dt.datetime.fromisoformat(sched[:19]).timestamp())
+        except ValueError:
+            pass
+    elif base_dt:
+        m = re.search(r"\((\d{1,2})/(\d{1,2})\s+(\d{1,2}):(\d{2})\)", str(row.get("mode") or ""))
+        if m:
+            d_, mo_, hh_, mm_ = (int(x) for x in m.groups())
+            year = base_dt.year + (1 if mo_ < base_dt.month - 6 else 0)
+            try:
+                times.append(dt.datetime(year, mo_, d_, hh_, mm_).timestamp())
+            except ValueError:
+                pass
+    return times
+
+
+def load_bot_post_rows(hist_path: Path | None = None) -> list[dict[str, Any]]:
+    """Read Desktop/posted_clip_history.json written by tiktok_auto_pipeline.py (with angle tags when present)."""
+    hist_file = hist_path or (Path.home() / "Desktop" / "posted_clip_history.json")
+    if not hist_file.is_file():
+        return []
+    try:
+        data = json.loads(hist_file.read_text(encoding="utf-8"))
+    except Exception:
+        return []
+    rows: list[dict[str, Any]] = []
+    for row in data if isinstance(data, list) else []:
+        if not isinstance(row, dict):
+            continue
+        sku = extract_clean_sku(row.get("sku") or row.get("filename"))
+        angle = str(row.get("angle") or "").upper() or extract_angle_tag(row.get("filename"))
+        rows.append({
+            "sku": sku,
+            "angle": angle if angle in ANGLE_CODES else "",
+            "date": str(row.get("date") or row.get("ts") or "")[:10],
+            "times": _parse_bot_row_times(row),
+            "name": normalize_thai_text(row.get("name") or ""),
+        })
+    return rows
+
+
+def attribute_angle_sales(
+    items: list[dict[str, Any]],
+    hist_path: Path | None = None,
+    min_date: str = "",
+    max_date: str = "",
+    max_gap_hours: float = 36.0,
+) -> list[dict[str, Any]]:
+    """Match each converting content_id to the nearest same-SKU bot post -> orders/comm per angle A1/A2/A3.
+
+    Must run BEFORE enrich_with_bot_posted_stats (which consumes `_cid_pub_comm`).
+    Unmatched orders are reported as `unattributed` (never guessed).
+    """
+    rows = load_bot_post_rows(hist_path)
+    by_sku: dict[str, list[dict[str, Any]]] = {}
+    for r in rows:
+        if not r["sku"]:
+            continue
+        if min_date and r["date"] and r["date"] < min_date:
+            continue
+        if max_date and r["date"] and r["date"] > max_date:
+            continue
+        by_sku.setdefault(r["sku"], []).append(r)
+
+    for it in items:
+        sku = extract_clean_sku(it.get("sku"))
+        posts = by_sku.get(sku, []) if sku else []
+        stats: dict[str, dict[str, Any]] = {c: {"posted": 0, "converting_clips": 0, "orders": 0, "comm": 0.0} for c in ANGLE_CODES}
+        stats["untagged"] = {"posted": 0, "converting_clips": 0, "orders": 0, "comm": 0.0}
+        stats["unattributed"] = {"posted": 0, "converting_clips": 0, "orders": 0, "comm": 0.0}
+        for p in posts:
+            stats[p["angle"] or "untagged"]["posted"] += 1
+
+        cids = {
+            c: st for c, st in (it.get("_cid_pub_comm") or {}).items()
+            if not (min_date and st.get("pub_date") and st["pub_date"] < min_date)
+        }
+        pairs: list[tuple[float, str, int]] = []
+        for cid, st in cids.items():
+            cts = int(st.get("pub_ts") or _decode_content_ts(cid))
+            if not cts:
+                continue
+            for pi, p in enumerate(posts):
+                if not p["times"]:
+                    continue
+                gap_h = min(abs(cts - t) for t in p["times"]) / 3600.0
+                if gap_h <= max_gap_hours:
+                    pairs.append((gap_h, cid, pi))
+        pairs.sort()
+        used_c: set[str] = set()
+        used_p: set[int] = set()
+        assigned: dict[str, str] = {}
+        for _gap, cid, pi in pairs:
+            if cid in used_c or pi in used_p:
+                continue
+            used_c.add(cid)
+            used_p.add(pi)
+            assigned[cid] = posts[pi]["angle"] or "untagged"
+        for cid, st in cids.items():
+            bucket = assigned.get(cid, "unattributed")
+            stats[bucket]["converting_clips"] += 1
+            stats[bucket]["orders"] += int(st.get("orders") or 0)
+            stats[bucket]["comm"] = round(stats[bucket]["comm"] + float(st.get("comm") or 0), 2)
+
+        best = ""
+        best_key = (0.0, 0)
+        for c in ANGLE_CODES:
+            s = stats[c]
+            if s["orders"] > 0 and (s["comm"], s["orders"]) > best_key:
+                best, best_key = c, (s["comm"], s["orders"])
+        it["angle_stats"] = stats
+        it["best_angle"] = best
+    return items
+
+
 def analyze_sales_payload(payload: dict[str, Any]) -> dict[str, Any]:
     """Parse sales file(s) or pasted lines, grade via Real Commission + AI Advisor, and pick New Stars."""
     files = payload.get("files") or []
@@ -1631,6 +2242,8 @@ def analyze_sales_payload(payload: dict[str, Any]) -> dict[str, Any]:
 
     # Fast local-only SKU/thumbnail pass + enrich with real Desktop bot posted history
     cat_map = load_channel_catalog()
+    # Angle attribution must read `_cid_pub_comm` before enrich_with_bot_posted_stats() consumes it
+    attribute_angle_sales(raw_items, min_date=min_order_date, max_date=max_order_date)
     raw_items = enrich_with_bot_posted_stats(raw_items, min_order_date, max_order_date)
     local_resolved = [resolve_product_metadata(item, cat_map, use_remote_api=False) for item in raw_items]
 
@@ -1685,6 +2298,13 @@ def analyze_sales_payload(payload: dict[str, Any]) -> dict[str, Any]:
         used_star_skus = {s["sku"] for s in picked_stars}
         backup_stars = [b for b in backup_stars if b["sku"] not in used_star_skus]
 
+    # Marketing skill pass: gate new stars on 2-second visual proof, then 3 angles for every product kept
+    picked_stars, backup_stars, marketing_notes = gate_new_stars_by_visual_proof(
+        picked_stars, backup_stars, new_stars_count, use_ai=use_ai, explicit_key=explicit_key
+    )
+    build_product_angles(winners, use_ai=use_ai, explicit_key=explicit_key)
+    angle_sources = [str((p.get("marketing") or {}).get("source") or "") for p in winners + picked_stars]
+
     save_channel_catalog_entries(picked_stars)
     missing_sku_items = [x for x in winners if not extract_clean_sku(x.get("sku"))]
 
@@ -1704,6 +2324,9 @@ def analyze_sales_payload(payload: dict[str, Any]) -> dict[str, Any]:
         "ai_used": ai_result["ai_used"],
         "ai_model": ai_result["ai_model"],
         "ai_critique": ai_result["ai_critique"],
+        "marketing_notes": marketing_notes,
+        "angles_ai_count": sum(1 for s in angle_sources if s == "ai"),
+        "angles_heuristic_count": sum(1 for s in angle_sources if s == "heuristic"),
         "portfolio_stats": {
             "total_gmv": total_gmv,
             "total_comm": total_comm,
@@ -1893,6 +2516,13 @@ def generate_monthly_schedule(payload: dict[str, Any]) -> dict[str, Any]:
     if not active_list:
         return {"ok": False, "error": "ไม่มีสินค้าในแผนที่จะจัดตาราง กรุณาเลือกอย่างน้อย 1 รายการครับ"}
 
+    # Marketing angles (A1/A2/A3) for every product: reuse analysis result / cache, AI only when asked
+    build_product_angles(
+        active_list,
+        use_ai=bool(payload.get("use_ai") or False),
+        explicit_key=str(payload.get("gemini_api_key") or ""),
+    )
+
     has_omni5 = clips_per_day >= 5
     slot_roles_pattern = [_slot_role_for_index(s_num, clips_per_day) for s_num in range(1, clips_per_day + 1)]
     main_slot_nums = [i + 1 for i, r in enumerate(slot_roles_pattern) if r != "reply_fallback"]
@@ -2074,7 +2704,13 @@ def generate_monthly_schedule(payload: dict[str, Any]) -> dict[str, Any]:
     used_styles_by_prod: dict[str, dict[int, int]] = {}
     last_style_by_prod: dict[str, int] = {}
 
-    def pick_style(prod: dict[str, Any], role: str, used_styles_today: set[int], slot_offset: int) -> dict[str, Any]:
+    def pick_style(
+        prod: dict[str, Any],
+        role: str,
+        used_styles_today: set[int],
+        slot_offset: int,
+        preferred: list[int] | None = None,
+    ) -> dict[str, Any]:
         k = prod_key(prod)
         counts = used_styles_by_prod.setdefault(k, {})
         prev_st = last_style_by_prod.get(k, -1)
@@ -2082,12 +2718,15 @@ def generate_monthly_schedule(payload: dict[str, Any]) -> dict[str, Any]:
         # Rotate baseline candidate list per slot offset for natural day-to-day variety
         shift = slot_offset % len(candidates)
         candidates = candidates[shift:] + candidates[:shift]
+        pref = [p for p in (preferred or []) if p in candidates]
         ranked = sorted(
             candidates,
             key=lambda st_num: (
                 1 if st_num in used_styles_today else 0,
                 1 if st_num == prev_st else 0,
+                0 if st_num in pref else 1,
                 counts.get(st_num, 0),
+                pref.index(st_num) if st_num in pref else 99,
             ),
         )
         chosen_num = ranked[0]
@@ -2096,6 +2735,7 @@ def generate_monthly_schedule(payload: dict[str, Any]) -> dict[str, Any]:
         used_styles_today.add(chosen_num)
         return STYLE_BY_NUM[chosen_num]
 
+    angle_occ: dict[str, int] = {}
     days_out: list[dict[str, Any]] = []
     for d_idx, cur_date in enumerate(dates):
         used_styles_today: set[int] = set()
@@ -2104,7 +2744,11 @@ def generate_monthly_schedule(payload: dict[str, Any]) -> dict[str, Any]:
             role = slot_roles_pattern[s_num - 1]
             prod = omni5_assigned[d_idx] if role == "reply_fallback" else day_main_assigned[d_idx][s_num]
             assert prod is not None
-            st = pick_style(prod, role, used_styles_today, d_idx + s_num)
+            pk = prod_key(prod)
+            occ = angle_occ.get(pk, 0)
+            angle_occ[pk] = occ + 1
+            angle_code = angle_sequence_code(prod.get("marketing"), str(prod.get("best_angle") or ""), occ)
+            st = pick_style(prod, role, used_styles_today, d_idx + s_num, preferred_styles_for(prod, angle_code, role))
             sku = extract_clean_sku(prod.get("sku"))
             name = str(prod.get("name") or "")
             urgent_badge = ""
@@ -2133,8 +2777,9 @@ def generate_monthly_schedule(payload: dict[str, Any]) -> dict[str, Any]:
                 "deadline": str(prod.get("deadline") or ""),
                 "brief_note": str(prod.get("brief_note") or ""),
                 "link": prod.get("link") or (f"https://shop.tiktok.com/view/product/{sku}?region=TH&locale=th-TH" if sku else ""),
-                "safe_filename": build_safe_video_filename(sku, name),
+                "safe_filename": build_safe_video_filename(sku, name, angle_code),
             }
+            slot_obj.update(angle_slot_fields(prod, angle_code))
             slots_out.append(slot_obj)
 
         days_out.append({
@@ -2165,6 +2810,10 @@ def generate_monthly_schedule(payload: dict[str, Any]) -> dict[str, Any]:
             "reason": str(p.get("reason") or ""),
             "link": p.get("link") or (f"https://shop.tiktok.com/view/product/{sku}?region=TH&locale=th-TH" if sku else ""),
             "safe_filename": build_safe_video_filename(sku, str(p.get("name") or "")),
+            "marketing": p.get("marketing") or {},
+            "best_angle": str(p.get("best_angle") or ""),
+            "angle_stats": p.get("angle_stats") or {},
+            "grade": str(p.get("grade") or ""),
         })
 
     month_label = str(payload.get("month_label") or f"{_format_thai_date(dates[0])} – {_format_thai_date(dates[-1])}")
@@ -2321,6 +2970,18 @@ def inject_free_sample_into_plan(payload: dict[str, Any]) -> dict[str, Any]:
     swapped_events: list[dict[str, Any]] = []
     safe_fn = build_safe_video_filename(sku, final_name)
     link_url = f"https://shop.tiktok.com/view/product/{sku}?region=TH&locale=th-TH"
+    fs_prod = {
+        "sku": sku,
+        "name": final_name,
+        "cat": resolved.get("cat", ""),
+        "price": float(resolved.get("price") or 0),
+        "tier": "free_sample",
+    }
+    build_product_angles(
+        [fs_prod],
+        use_ai=bool(payload.get("use_ai") or False),
+        explicit_key=str(payload.get("gemini_api_key") or ""),
+    )
 
     # Style plan for the 3 Free Sample clips:
     # Clip 1 -> Style 1 Real-Use Demo (UGC), Clip 2 -> Style 2 Problem->Solution (UGC), Clip 3 -> Style 13 Warehouse Hard-Sell (if OMNI 6/7) or Style 11 Banter (UGC)
@@ -2389,9 +3050,10 @@ def inject_free_sample_into_plan(payload: dict[str, Any]) -> dict[str, Any]:
             "deadline": deadline_date,
             "brief_note": brief_note,
             "link": link_url,
-            "safe_filename": safe_fn,
+            "safe_filename": build_safe_video_filename(sku, final_name, ANGLE_CODES[clip_idx % len(ANGLE_CODES)]),
             "reason": f"แทรกคิวตัวอย่างฟรีแทน {replaced_code}",
         })
+        target_slot.update(angle_slot_fields(fs_prod, ANGLE_CODES[clip_idx % len(ANGLE_CODES)]))
         swapped_events.append({
             "clip_index": clip_idx + 1,
             "date": day.get("date"),
@@ -2424,6 +3086,7 @@ def inject_free_sample_into_plan(payload: dict[str, Any]) -> dict[str, Any]:
         "reason": f"สินค้ารีวิวฟรีกลางเดือน (แทรก {len(swapped_events)} คลิป ส่งก่อน {dl_short})",
         "link": link_url,
         "safe_filename": safe_fn,
+        "marketing": fs_prod.get("marketing") or {},
     }
     if existing_entry:
         existing_entry.update(entry_payload)
@@ -2435,6 +3098,370 @@ def inject_free_sample_into_plan(payload: dict[str, Any]) -> dict[str, Any]:
     plan["ok"] = True
     plan["swapped_events"] = swapped_events
     return plan
+
+
+def _pick_style_simple(role: str, preferred: list[int], used_today: set[int]) -> dict[str, Any]:
+    """Pick a style for a single re-assigned slot: angle preference first, avoid styles already used that day."""
+    cands = list(HARDSELL_STYLE_NUMS if role == "hardsell" else UGC_STYLE_NUMS)
+    order = [p for p in preferred if p in cands] + [c for c in cands if c not in preferred]
+    for c in order:
+        if c not in used_today:
+            return STYLE_BY_NUM[c]
+    return STYLE_BY_NUM[order[0]]
+
+
+def _apply_product_to_slot(sl: dict[str, Any], prod: dict[str, Any], angle_code: str, style: dict[str, Any], reason: str = "") -> None:
+    """Overwrite a schedule slot with a product + angle + style (keeps slot_num/slot_role/fallback_note)."""
+    sku = extract_clean_sku(prod.get("sku"))
+    name = str(prod.get("name") or "")
+    sl.update({
+        "code": prod.get("code") or sl.get("code"),
+        "sku": sku,
+        "name": name,
+        "image": str(prod.get("image") or ""),
+        "cat": str(prod.get("cat") or ""),
+        "price": float(prod.get("price") or 0),
+        "comm": float(prod.get("comm") or 0),
+        "tier": prod.get("tier") or "winner",
+        "starred": True,
+        "style_num": style["num"],
+        "style_name": style["short"],
+        "style_chip_match": style["chip_match"],
+        "urgent_badge": "",
+        "deadline": "",
+        "brief_note": "",
+        "link": prod.get("link") or (f"https://shop.tiktok.com/view/product/{sku}?region=TH&locale=th-TH" if sku else ""),
+        "safe_filename": build_safe_video_filename(sku, name, angle_code),
+        "reason": reason or sl.get("reason", ""),
+    })
+    sl.update(angle_slot_fields(prod, angle_code))
+
+
+def _reangle_slot(sl: dict[str, Any], prod: dict[str, Any], angle_code: str, used_today: set[int]) -> None:
+    """Switch an existing slot (same product) to another angle and an angle-matching style."""
+    role = sl.get("slot_role") or "ugc"
+    style = _pick_style_simple(role, preferred_styles_for(prod, angle_code, role), used_today)
+    sl.update({
+        "style_num": style["num"],
+        "style_name": style["short"],
+        "style_chip_match": style["chip_match"],
+        "safe_filename": build_safe_video_filename(sl.get("sku", ""), sl.get("name", ""), angle_code),
+    })
+    sl.update(angle_slot_fields(prod, angle_code))
+
+
+def _repair_future_omni5(plan: dict[str, Any], after_date: str) -> int:
+    """Re-assign future OMNI 5 slots whose product no longer has >= 2 main slots (keeps the OMNI 5 invariant)."""
+    repaired = 0
+    catalog = plan.get("catalog") or []
+    for v in (plan.get("summary") or {}).get("omni5_violations") or []:
+        if str(v.get("date") or "") <= after_date:
+            continue
+        day = next((d for d in plan.get("days") or [] if d.get("date") == v.get("date")), None)
+        if not day:
+            continue
+        sl = next((s for s in day.get("slots") or [] if s.get("slot_num") == v.get("slot_num")), None)
+        if not sl:
+            continue
+        main_today = {s.get("sku") for s in day.get("slots") or [] if s.get("slot_role") != "reply_fallback"}
+        cands = [
+            p for p in catalog
+            if int(p.get("main_slots") or 0) >= 2
+            and p.get("tier") in ("winner", "new_star")
+            and p.get("review_status") != "dropped_weekly"
+            and p.get("sku")
+        ]
+        cands.sort(key=lambda p: (1 if p.get("sku") in main_today else 0, -int(p.get("main_slots") or 0)))
+        if not cands:
+            continue
+        best = cands[0]
+        if not best.get("marketing"):
+            build_product_angles([best], use_ai=False)
+        used_today = {s.get("style_num") for s in day.get("slots") or [] if s is not sl}
+        code = angle_sequence_code(best.get("marketing"), str(best.get("best_angle") or ""), int(best.get("fallback_slots") or 0))
+        _apply_product_to_slot(sl, best, code, _pick_style_simple("ugc", preferred_styles_for(best, code, "ugc"), used_today), reason="สำรอง OMNI 5 หลังรีวิวราย 7 วัน")
+        repaired += 1
+    return repaired
+
+
+def weekly_review_plan(payload: dict[str, Any]) -> dict[str, Any]:
+    """Sunday 5-minute review: re-plan ONLY future slots from the latest sales file + bot post log.
+
+    Rules (agreed with the owner):
+      - >= `min_posts_to_drop` (4) bot posts older than `min_age_days` (3) AND 0 orders from new clips -> drop,
+        replace its future slots with a fresh visual-proof-gated new star.
+      - orders attributed to an angle -> lock that SKU's future slots onto its best angle (4 of 6 slots).
+      - 1-2 posts -> keep testing. Free samples are never dropped.
+    """
+    plan = payload.get("plan")
+    if not plan or not plan.get("days"):
+        if PLAN_FILE.exists():
+            plan = json.loads(PLAN_FILE.read_text(encoding="utf-8"))
+        else:
+            return {"ok": False, "error": "ยังไม่มีตารางรายเดือนให้รีวิว กรุณาสร้างตารางในแท็บที่ 1 ก่อนครับ"}
+    plan = json.loads(json.dumps(plan, ensure_ascii=False))
+    days = plan.get("days") or []
+    if not days:
+        return {"ok": False, "error": "ตารางปัจจุบันยังว่างอยู่ กรุณาสร้างตารางรายเดือนก่อนครับ"}
+    files = payload.get("files") or []
+    if not files:
+        return {"ok": False, "error": "กรุณาแนบไฟล์ยอดขายล่าสุด (affiliate_orders_*.xlsx) ก่อนกดรีวิวครับ"}
+
+    review_date = str(payload.get("review_date") or "").strip() or dt.date.today().isoformat()
+    min_posts = max(2, int(payload.get("min_posts_to_drop") or 4))
+    min_age = max(1, int(payload.get("min_age_days") or 3))
+    use_ai = bool(payload.get("use_ai") or False)
+    explicit_key = str(payload.get("gemini_api_key") or "")
+    hist_path = Path(str(payload["_hist_path"])) if payload.get("_hist_path") else None
+    plan_start = str(plan.get("start_date") or days[0].get("date") or "")
+
+    parsed = parse_sales_files(files)
+    items = parsed["products"]
+    attribute_angle_sales(items, hist_path=hist_path, min_date=plan_start, max_date=review_date)
+
+    sales_by_sku: dict[str, dict[str, Any]] = {}
+    for it in items:
+        sku = extract_clean_sku(it.get("sku"))
+        cids = it.pop("_cid_pub_comm", None) or {}
+        if not sku:
+            continue
+        if cids:
+            new_cids = [st for st in cids.values() if not st.get("pub_date") or st["pub_date"] >= plan_start]
+            new_orders = sum(int(st.get("orders") or 0) for st in new_cids)
+            new_comm = sum(float(st.get("comm") or 0) for st in new_cids)
+        else:
+            new_orders = int(it.get("orders") or 0)
+            new_comm = float(it.get("comm") or 0)
+        sales_by_sku[sku] = {
+            "orders_total": int(it.get("orders") or 0),
+            "comm_total": round(float(it.get("comm") or 0), 2),
+            "new_orders": new_orders,
+            "new_comm": round(new_comm, 2),
+            "angle_stats": it.get("angle_stats") or {},
+            "best_angle": str(it.get("best_angle") or ""),
+        }
+
+    matured_cutoff = (dt.date.fromisoformat(review_date) - dt.timedelta(days=min_age)).isoformat()
+    posted_by_sku: dict[str, int] = {}
+    matured_by_sku: dict[str, int] = {}
+    for r in load_bot_post_rows(hist_path):
+        if not r["sku"] or not r["date"] or r["date"] < plan_start or r["date"] > review_date:
+            continue
+        posted_by_sku[r["sku"]] = posted_by_sku.get(r["sku"], 0) + 1
+        if r["date"] <= matured_cutoff:
+            matured_by_sku[r["sku"]] = matured_by_sku.get(r["sku"], 0) + 1
+
+    future_idx = [i for i, d in enumerate(days) if str(d.get("date") or "") > review_date]
+    future_slots_by_sku: dict[str, list[tuple[int, dict[str, Any]]]] = {}
+    for i in future_idx:
+        for sl in days[i].get("slots") or []:
+            future_slots_by_sku.setdefault(str(sl.get("sku") or ""), []).append((i, sl))
+
+    catalog = plan.get("catalog") or []
+    cat_by_sku = {extract_clean_sku(p.get("sku")): p for p in catalog if extract_clean_sku(p.get("sku"))}
+    build_product_angles(list(cat_by_sku.values()), use_ai=use_ai, explicit_key=explicit_key)
+
+    decisions: dict[str, list[dict[str, Any]]] = {"drop": [], "scale": [], "keep_testing": [], "watching": [], "protected": []}
+    for sku, prod in cat_by_sku.items():
+        if prod.get("review_status") == "dropped_weekly":
+            continue
+        s = sales_by_sku.get(sku, {})
+        posted = posted_by_sku.get(sku, 0)
+        matured = matured_by_sku.get(sku, 0)
+        new_orders = int(s.get("new_orders") or 0)
+        row = {
+            "sku": sku,
+            "code": prod.get("code", ""),
+            "name": str(prod.get("name") or "")[:80],
+            "tier": prod.get("tier", ""),
+            "posted": posted,
+            "matured": matured,
+            "new_orders": new_orders,
+            "new_comm": float(s.get("new_comm") or 0),
+            "orders_total": int(s.get("orders_total") or 0),
+            "future_slots": len(future_slots_by_sku.get(sku, [])),
+            "best_angle": str(s.get("best_angle") or ""),
+            "angle_stats": s.get("angle_stats") or {},
+        }
+        if s.get("angle_stats"):
+            prod["angle_stats"] = s["angle_stats"]
+        if row["best_angle"]:
+            prod["best_angle"] = row["best_angle"]
+        if prod.get("tier") == "free_sample":
+            row["reason"] = "🎁 สินค้ารีวิวฟรี (ข้อตกลงกับร้าน) — ไม่ตัดออกแม้ยอดยังไม่มา"
+            decisions["protected"].append(row)
+        elif matured >= min_posts and new_orders == 0:
+            row["reason"] = f"❌ บอทโพสต์คลิปใหม่แล้ว {posted} คลิป (เกิน {min_age} วันแล้ว {matured} คลิป) แต่คลิปใหม่ขายได้ 0 ชิ้น"
+            decisions["drop"].append(row)
+        elif new_orders > 0:
+            angle_txt = f" · มุมที่ขายออก: {row['best_angle']}" if row["best_angle"] else " · ยังแยกมุมไม่ได้ (คลิปเก่าไม่มีป้ายมุม)"
+            row["reason"] = f"✅ คลิปใหม่ขายออก {new_orders} ชิ้น (คอม ฿{row['new_comm']:,.0f}){angle_txt}"
+            decisions["scale"].append(row)
+        elif posted <= 2:
+            row["reason"] = f"⏳ เพิ่งโพสต์ {posted} คลิป — ยังเร็วเกินไปที่จะตัดสิน ปล่อยเทสต์ต่อ"
+            decisions["keep_testing"].append(row)
+        else:
+            row["reason"] = f"👀 โพสต์ {posted} คลิป (ครบ {min_age} วันแล้ว {matured} คลิป) ยังไม่มียอด — เฝ้าดูอีกสัปดาห์"
+            decisions["watching"].append(row)
+
+    # Replace future slots of dropped products with fresh, visual-proof-gated new stars
+    drop_with_future = [r for r in decisions["drop"] if r["future_slots"] > 0]
+    gate_notes: list[str] = []
+    replacements: list[dict[str, Any]] = []
+    if drop_with_future:
+        winners_like = [p for p in catalog if p.get("tier") in ("winner", "new_star") and p.get("review_status") != "dropped_weekly"]
+        prev_dropped = list(plan.get("dropped_products") or []) + [cat_by_sku[r["sku"]] for r in decisions["drop"]]
+        picked, backups = select_new_stars_from_pool(
+            winners_like,
+            prev_dropped,
+            desired_count=len(drop_with_future),
+            strategy=str(payload.get("new_star_strategy") or "balanced"),
+        )
+        plan_skus = set(cat_by_sku.keys())
+        picked = [p for p in picked if p.get("sku") not in plan_skus]
+        backups = [b for b in backups if b.get("sku") not in plan_skus]
+        picked, backups, gate_notes = gate_new_stars_by_visual_proof(picked, backups, len(drop_with_future), use_ai=use_ai, explicit_key=explicit_key)
+        replacements = picked
+
+    n_nums = [int(str(p.get("code"))[1:]) for p in catalog if str(p.get("code") or "").startswith("N") and str(p.get("code"))[1:].isdigit()]
+    next_n = (max(n_nums) if n_nums else 0) + 1
+    scale_sorted = sorted(
+        [cat_by_sku[r["sku"]] for r in decisions["scale"] if r["sku"] in cat_by_sku],
+        key=lambda p: -float((sales_by_sku.get(extract_clean_sku(p.get("sku")), {}) or {}).get("new_comm") or 0),
+    )
+    replaced_slots = 0
+    for i, r in enumerate(drop_with_future):
+        old_prod = cat_by_sku[r["sku"]]
+        if i < len(replacements):
+            target = dict(replacements[i])
+            target["code"] = f"N{next_n:02d}"
+            next_n += 1
+            target["tier"] = "new_star"
+            target["starred"] = True
+            target["reason"] = f"🔁 เสียบแทน {old_prod.get('code', '')} หลังรีวิวยอดขาย {review_date} · {target.get('reason') or ''}".strip(" ·")
+            catalog.append({
+                "code": target["code"],
+                "sku": extract_clean_sku(target.get("sku")),
+                "name": str(target.get("name") or ""),
+                "image": str(target.get("image") or ""),
+                "cat": str(target.get("cat") or ""),
+                "price": float(target.get("price") or 0),
+                "comm": float(target.get("comm") or 0),
+                "gmv": 0.0,
+                "orders": 0,
+                "v_rev": float(target.get("v_rev") or 0),
+                "growth": float(target.get("growth") or 0),
+                "tier": "new_star",
+                "starred": True,
+                "reason": target["reason"],
+                "link": target.get("link") or f"https://shop.tiktok.com/view/product/{extract_clean_sku(target.get('sku'))}?region=TH&locale=th-TH",
+                "safe_filename": build_safe_video_filename(target.get("sku", ""), str(target.get("name") or "")),
+                "marketing": target.get("marketing") or {},
+                "best_angle": "",
+                "angle_stats": {},
+            })
+            r["replaced_by"] = {"sku": extract_clean_sku(target.get("sku")), "code": target["code"], "name": str(target.get("name") or "")[:80], "fallback": False}
+        elif scale_sorted:
+            target = scale_sorted[i % len(scale_sorted)]
+            r["replaced_by"] = {"sku": extract_clean_sku(target.get("sku")), "code": target.get("code", ""), "name": str(target.get("name") or "")[:80], "fallback": True}
+        else:
+            r["replaced_by"] = None
+            continue
+        occ = 0
+        for d_i, sl in future_slots_by_sku.get(r["sku"], []):
+            role = sl.get("slot_role") or "ugc"
+            code = angle_sequence_code(target.get("marketing"), str(target.get("best_angle") or ""), occ)
+            occ += 1
+            used_today = {s2.get("style_num") for s2 in days[d_i].get("slots") or [] if s2 is not sl}
+            style = _pick_style_simple(role, preferred_styles_for(target, code, role), used_today)
+            _apply_product_to_slot(sl, target, code, style, reason=f"แทน {old_prod.get('code', '')} (รีวิว {review_date})")
+            replaced_slots += 1
+        old_prod["review_status"] = "dropped_weekly"
+        old_prod["reason"] = f"{r['reason']} (ตัดออกจากคิวหลัง {review_date})"
+        plan.setdefault("dropped_products", []).append({
+            "code": old_prod.get("code", ""),
+            "sku": r["sku"],
+            "name": old_prod.get("name", ""),
+            "tier": "dropped",
+            "reason": old_prod["reason"],
+        })
+
+    # Lock proven angles onto future slots of products that are selling
+    for r in decisions["drop"]:
+        if r["future_slots"] == 0 and r["sku"] in cat_by_sku:
+            cat_by_sku[r["sku"]]["review_status"] = "dropped_weekly"
+            r["replaced_by"] = None
+    relocked = 0
+    for r in decisions["scale"]:
+        best = r.get("best_angle") or ""
+        prod = cat_by_sku.get(r["sku"])
+        if not best or not prod:
+            continue
+        occ = 0
+        for d_i, sl in future_slots_by_sku.get(r["sku"], []):
+            if extract_clean_sku(sl.get("sku")) != r["sku"]:
+                continue
+            code = angle_sequence_code(prod.get("marketing"), best, occ)
+            occ += 1
+            if sl.get("angle_code") != code:
+                used_today = {s2.get("style_num") for s2 in days[d_i].get("slots") or [] if s2 is not sl}
+                _reangle_slot(sl, prod, code, used_today)
+                relocked += 1
+
+    # Older plans (made before angles existed): give every remaining future slot an angle
+    backfilled = 0
+    occ_by_sku: dict[str, int] = {}
+    for i in future_idx:
+        for sl in days[i].get("slots") or []:
+            sku = extract_clean_sku(sl.get("sku"))
+            if sl.get("angle_code") or not sku:
+                continue
+            prod = cat_by_sku.get(sku) or {"sku": sku, "name": sl.get("name", ""), "price": sl.get("price", 0), "cat": sl.get("cat", "")}
+            if not prod.get("marketing"):
+                build_product_angles([prod], use_ai=False)
+            occ = occ_by_sku.get(sku, 0)
+            occ_by_sku[sku] = occ + 1
+            code = angle_sequence_code(prod.get("marketing"), str(prod.get("best_angle") or ""), occ)
+            used_today = {s2.get("style_num") for s2 in days[i].get("slots") or [] if s2 is not sl}
+            _reangle_slot(sl, prod, code, used_today)
+            backfilled += 1
+
+    plan["catalog"] = catalog
+    plan = recompute_plan_counts(plan)
+    omni5_repaired = _repair_future_omni5(plan, review_date)
+    if omni5_repaired:
+        plan = recompute_plan_counts(plan)
+
+    report = {
+        "review_date": review_date,
+        "plan_window": f"{plan_start} → {plan.get('end_date', '')}",
+        "sales_window": f"{parsed.get('min_order_date', '')} → {parsed.get('max_order_date', '')}",
+        "rules": {"min_posts_to_drop": min_posts, "min_age_days": min_age},
+        "dropped": decisions["drop"],
+        "scale": decisions["scale"],
+        "keep_testing": decisions["keep_testing"],
+        "watching": decisions["watching"],
+        "protected": decisions["protected"],
+        "replaced_slots": replaced_slots,
+        "relocked_slots": relocked,
+        "backfilled_slots": backfilled,
+        "omni5_repaired": omni5_repaired,
+        "future_days": len(future_idx),
+        "marketing_notes": gate_notes,
+        "warnings": parsed.get("warnings", []),
+    }
+    reviews = list(plan.get("weekly_reviews") or [])
+    reviews.append({
+        "review_date": review_date,
+        "dropped": [r["code"] for r in decisions["drop"]],
+        "scale": [r["code"] for r in decisions["scale"]],
+        "replaced_slots": replaced_slots,
+        "relocked_slots": relocked,
+    })
+    plan["weekly_reviews"] = reviews[-10:]
+    plan["updated_at"] = dt.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    plan["ok"] = True
+    return {"ok": True, "plan": plan, "report": report}
 
 
 def export_plan_excel_bytes(plan: dict[str, Any]) -> bytes:
@@ -2476,6 +3503,10 @@ def export_plan_excel_bytes(plan: dict[str, Any]) -> bytes:
                 f"SKU: {sku}" if sku else "⚠️ ยังไม่มี SKU",
                 f"{sl.get('style_name', '')}",
             ]
+            if sl.get("angle_code"):
+                lines.append(f"🎯 {sl.get('angle_code')} {sl.get('angle_label', '')}")
+                if sl.get("angle_hook"):
+                    lines.append(f"ฮุค: {sl.get('angle_hook')}")
             if sl.get("slot_role") == "reply_fallback":
                 lines.append("💬 ตอบคอมเมนต์แทนได้")
             elif sl.get("urgent_badge"):
@@ -2491,7 +3522,7 @@ def export_plan_excel_bytes(plan: dict[str, Any]) -> bytes:
                 cell.fill = hardsell_fill
             else:
                 cell.fill = normal_fill
-        ws1.row_dimensions[r_i].height = 74
+        ws1.row_dimensions[r_i].height = 104
 
     ws1.column_dimensions["A"].width = 14
     ws1.column_dimensions["B"].width = 14
@@ -2500,7 +3531,7 @@ def export_plan_excel_bytes(plan: dict[str, Any]) -> bytes:
 
     # Sheet 2: Product Summary & 19-digit SKUs (stored explicitly as text strings)
     ws2 = wb.create_sheet("คลังสินค้า_SKU19หลัก")
-    headers2 = ["รหัส", "กลุ่ม", "SKU 19 หลัก", "ชื่อสินค้า", "คิวหลัก", "สำรอง OMNI5", "รวมทั้งเดือน", "ชื่อไฟล์อัปลง Drive (.mp4)", "ลิงก์สินค้า TikTok", "หมายเหตุ"]
+    headers2 = ["รหัส", "กลุ่ม", "SKU 19 หลัก", "ชื่อสินค้า", "คิวหลัก", "สำรอง OMNI5", "รวมทั้งเดือน", "ชื่อไฟล์อัปลง Drive (.mp4)", "ลิงก์สินค้า TikTok", "หมายเหตุ", "มุมที่ขายดี", "ภาพพิสูจน์ (1-5)", "ข้อกังวลหลักของลูกค้า"]
     ws2.append(headers2)
     for col_idx in range(1, len(headers2) + 1):
         cell = ws2.cell(row=1, column=col_idx)
@@ -2529,9 +3560,13 @@ def export_plan_excel_bytes(plan: dict[str, Any]) -> bytes:
         ws2.cell(row=row_cursor, column=8, value=build_safe_video_filename(sku_str, str(prod.get("name") or "")))
         ws2.cell(row=row_cursor, column=9, value=str(prod.get("link") or ""))
         ws2.cell(row=row_cursor, column=10, value=str(prod.get("reason") or ""))
+        mk = prod.get("marketing") or {}
+        ws2.cell(row=row_cursor, column=11, value=str(prod.get("best_angle") or "-"))
+        ws2.cell(row=row_cursor, column=12, value=int(mk.get("visual_proof_score") or 0) or "-")
+        ws2.cell(row=row_cursor, column=13, value=str(mk.get("core_objection") or ""))
         row_cursor += 1
 
-    widths2 = [8, 22, 22, 46, 10, 13, 13, 52, 42, 36]
+    widths2 = [8, 22, 22, 46, 10, 13, 13, 52, 42, 36, 12, 14, 40]
     for idx, w in enumerate(widths2, start=1):
         ws2.column_dimensions[get_column_letter(idx)].width = w
 
@@ -2706,6 +3741,19 @@ class PlannerHTTPHandler(http.server.BaseHTTPRequestHandler):
                 return
             if path == "/api/inject-free-sample":
                 self._send_json(inject_free_sample_into_plan(body))
+                return
+            if path == "/api/weekly-review":
+                self._send_json(weekly_review_plan(body))
+                return
+            if path == "/api/product-angles":
+                prods = [dict(p) for p in (body.get("products") or []) if isinstance(p, dict)]
+                build_product_angles(
+                    prods,
+                    use_ai=bool(body.get("use_ai") if body.get("use_ai") is not None else True),
+                    explicit_key=str(body.get("gemini_api_key") or ""),
+                    force=bool(body.get("force") or False),
+                )
+                self._send_json({"ok": True, "products": prods})
                 return
             if path == "/api/save-draft":
                 plan = recompute_plan_counts(body.get("plan") or body)
