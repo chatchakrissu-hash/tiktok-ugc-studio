@@ -1831,6 +1831,9 @@
       s = s.replace(/(\d{1,2})(\s*%\s*(?:off|ลด))/gi,
         (match, numStr, suffix) => `${floorTo5(numStr)}${suffix}`);
 
+      // 5. Retire repetitive cliché phrase so consecutive clips sound genuinely distinct
+      s = s.replace(/\.{0,3}\s*จะรอดหรือร่วง\s*(?:มาดู)?\s*[?!]*/g, ' ของจริงตรงปกแค่ไหนดู!');
+
       return s.replace(/[ \t]{2,}/g, ' ').trim();
     }
 
@@ -2123,14 +2126,49 @@
       'มุมที่ 10 (Close-Up Micro-Story Hook): เปิดด้วยภาพระยะใกล้ที่ชวนสงสัยว่ากำลังทำอะไรกับสินค้า แล้วถอยกล้องเฉลยการใช้งานจริงที่น่าทึ่ง'
     ];
     let lastScenarioIdx = -1;
+    let lastHookArchetypeIdx = -1;
+
+    function pickRotatingIndex(storageKey, length, memFallbackIdx, setMemIdx) {
+      let prev = memFallbackIdx;
+      try {
+        const stored = parseInt(localStorage.getItem(storageKey) || '-1', 10);
+        if (!Number.isNaN(stored) && stored >= 0 && stored < length) {
+          prev = stored;
+        }
+      } catch (_) {}
+      const idx = prev >= 0 ? (prev + 1) % length : Math.floor(Math.random() * length);
+      setMemIdx(idx);
+      try {
+        localStorage.setItem(storageKey, String(idx));
+      } catch (_) {}
+      return idx;
+    }
 
     function pickRandomScenarioSeed() {
-      let idx = Math.floor(Math.random() * CREATIVE_VARIATION_ANGLES.length);
-      if (idx === lastScenarioIdx) {
-        idx = (idx + 1) % CREATIVE_VARIATION_ANGLES.length;
-      }
-      lastScenarioIdx = idx;
+      const idx = pickRotatingIndex('ugc_scenario_rot_idx', CREATIVE_VARIATION_ANGLES.length, lastScenarioIdx, (v) => { lastScenarioIdx = v; });
       return CREATIVE_VARIATION_ANGLES[idx];
+    }
+
+    const HOOK_OPENING_ARCHETYPES = [
+      '1. ช็อตลงมือทำสดคาตา (Instant Live Action): เปิดด้วยการกระทำจริงตรงหน้าตั้งแต่วินาทีที่ 0 (เช่น เทน้ำสาด, กดลงสุดมือ, ก้าวเหยียบ, สะบัดกางออก) พูดสิ่งที่กำลังทำสดๆ ไม่ต้องเกริ่น',
+      '2. ซูมเช็กเนื้อวัสดุระยะประชิด (Macro Material Proof): เปิดด้วยการซูมจับเนื้อผ้า/ความหนา/ตะเข็บ/ฐานกันลื่น ให้เห็นคุณภาพจริงด้วยตา',
+      '3. เทียบก่อนใช้กับหลังวางทันที (Instant Contrast Rescue): เปิดด้วยสภาพปัญหาจริงในบ้าน 1 จังหวะสั้นๆ แล้ววางสินค้าจบปัญหาให้เห็นความต่างคาตา',
+      '4. ชี้เป้าความคุ้มเทียบเพดานงบ (Value & Bundle Shock): เปิดด้วยขนาดจริงหรือจำนวนชิ้นที่ได้ในเซ็ตเทียบกับเพดานราคาปลอดภัยแบบกระชับสะดุดหู',
+      '5. แกะเช็กของจริงตรงปกไหม (Unbox & Spec Check): เปิดด้วยจังหวะหยิบของจริงมาเทียบขนาด/ความหนา/ฟังก์ชัน ตอบจุดที่คนซื้อกลัวไม่ตรงปก',
+      '6. สถานการณ์จริงในบ้านรับจบ (Real-Life Incident Proof): เปิดด้วยเหตุการณ์จริงในชีวิตประจำวัน (น้ำกระเด็น, พื้นลื่น, ฟูกแข็ง, ของรก) ที่ตัวนี้รับมือได้ทันที',
+      '7. จับจุดเด่นลับที่คนไม่รู้ (Hidden Detail Spotlight): เปิดด้วยการพลิกโชว์ดีเทลสำคัญที่ทำให้ตัวนี้ต่างจากของทั่วไปในตลาด',
+      '8. บุกคลัง/หน้างานปล่อยโปรคุ้ม (Live Stock & Deal Drop): เปิดด้วยจังหวะคึกคักหยิบของจากกองสต็อก/หน้างาน ย้ำความคุ้มแบบพ่อค้าแม่ค้าตัวจริง (ถ้าเป็นแนว 1–12 ให้ปรับเป็นจังหวะหยิบเซ็ตสุดคุ้มในบ้านแบบเป็นกันเอง)'
+    ];
+
+    function pickNextHookArchetype(styleText = '') {
+      const isHardsell = /(?:^|\b)(?:13\.|14\.|15\.|16\.|โกดัง|โรงงาน|ตลาด|ค้าส่ง|พนักงาน|แพ็ก|warehouse|market|mall|showroom|packing|hard-sell)/i.test(String(styleText || ''));
+      if (isHardsell && Math.random() < 0.35) {
+        lastHookArchetypeIdx = 7;
+        try { localStorage.setItem('ugc_hook_rot_idx', '7'); } catch (_) {}
+        return HOOK_OPENING_ARCHETYPES[7];
+      }
+      const idx = pickRotatingIndex('ugc_hook_rot_idx', HOOK_OPENING_ARCHETYPES.length, lastHookArchetypeIdx, (v) => { lastHookArchetypeIdx = v; });
+      return HOOK_OPENING_ARCHETYPES[idx];
     }
 
     // 3. Core Skill System Prompt (/video-studio: video-shotcraft + DirectorSKILL + earshot + /socialmedia + Anti-Ban 2026)
@@ -2143,10 +2181,14 @@
 ============================================================
 - เขียนในฐานะ "คนใช้จริง / เจ้าของโกดัง / พนักงานหน้าร้าน / ครีเอเตอร์คนไทยที่หยิบของจริงมาใช้หน้ากล้อง" อ่านออกเสียงแล้วลื่นไหล มีอินเนอร์ มีอารมณ์ร่วมสูง ไม่ใช่โฆษณาอ่านสคริปต์
 - **ห้ามเปิดคลิปด้วยประโยคน่าเบื่อที่คนปัดหนีทันที** เช่น ห้ามขึ้นต้นว่า: "เบื่อไหม...", "ใครเคย...", "ใครมีปัญหา...", "สวัสดีค่ะ/ครับทุกคน", "วันนี้จะมารีวิว...", "จากหน้าร้านระบุว่า", "จากภาพเห็นว่า", "เท่าที่เห็นในภาพ", "ราคาตอนที่แคป", "ข้อมูลที่ร้านแจ้ง", "ตอบโจทย์การใช้งาน", "เพิ่มความสะดวกสบาย", "เหมาะสำหรับผู้ที่", "วันนี้มีสินค้ามาแนะนำ", "ใครกำลังมองหา"
-- **บังคับเปิดใน 1.5 วินาทีแรก (5–8 คำแรก) ด้วย 1 ใน 3 สูตร Hook ไวรัลที่พิสูจน์แล้วว่าปังจริง:**
-  1) **ท้าพิสูจน์ "จะรอดหรือร่วง!" + เพดานราคาคุ้มช็อก:** เปิดด้วยคำท้า+ความอยากรู้+ความคุ้ม เช่น "งบไม่ถึงร้อยได้พรมคู่สองผืน...จะรอดหรือร่วง มาดู!", "สองร้อยมีทอนได้ไซส์ยักษ์...ของจริงจะจกตาไหม?!"
-  2) **บุกโกดัง/ตัดสต็อก/เทียบราคาคาตา:** เปิดด้วยจังหวะเร่งด่วนหน้าคลัง เช่น "บุกคลังมาปล่อยเอง! ยกเซ็ตขนาดนี้แบงก์ร้อยมีทอน!", "สต็อกแน่นล้นโกดัง รอบนี้ตัดราคาให้แบบจุกๆ!"
-  3) **โชว์ช็อตปะทะของจริง/ตอบคอมเมนต์ทันทีตั้งแต่วินาทีที่ 0:** เปิดด้วยผลลัพธ์คาตา เช่น "เทน้ำใส่ให้ดูสดๆ เลย! ซับไวหนึบพื้นแค่ไหนดู!", "ของจริงมาแล้ว! ไหนดูซิจะหนาฟูอย่างที่ลือไหม!"
+- **บังคับเปิดใน 1.5 วินาทีแรก (5–8 คำแรก) ด้วยโครงสร้าง Hook ไวรัลที่หลากหลายตามบริบทสินค้า (6 ตระกูลหลัก):**
+  1) **Action Strike (เปิดด้วยการลงมือทำสด):** สาดน้ำ กดทับ สะบัด ดึง หรือใช้งานตรงหน้าทันทีพร้อมพากย์สิ่งที่เห็นคาตา
+  2) **Tactile / Macro Proof (ซูมเช็กเนื้อวัสดุและงานจริง):** จี้ใกล้ให้เห็นความหนา เนื้อผ้า ตะเข็บ หรือจุดยึดเกาะตั้งแต่วินาทีที่ 0
+  3) **Value / Bundle Shock (เปิดด้วยขนาดจริง/จำนวนชิ้นเทียบงบเซฟ):** ชูความคุ้มค่าหรือปริมาณที่ได้เต็มมือเทียบเพดานราคาปลอดภัย
+  4) **Warehouse / Stock Drop (บุกคลัง/หน้างานปล่อยโปร):** จังหวะเร่งด่วนหน้ากองสต็อก ตัดราคาหน้าคลังแบบไลฟ์สด
+  5) **Real-Life Rescue (สถานการณ์จริงในบ้านรับจบ):** เปิดด้วยปัญหาที่เพิ่งเกิดขึ้นต่อหน้าแล้ววางสินค้าจบปัญหาทันที
+  6) **Spec & Doubt Buster (แกะเช็กของจริงตอบจุดคนกลัวไม่ตรงปก):** เทียบขนาดหรือฟังก์ชันจริงให้เห็นกันจะๆ เพื่อลบข้อกังวลหลักของคนซื้อ
+- **ห้ามใช้วลีซ้ำซากจำเจอย่าง "จะรอดหรือร่วง" หรือแพตเทิร์นคำพูดเดิมซ้ำๆ เด็ดขาด!** ต้องยึดตาม "สูตรโครงสร้างประโยคเปิดประจำรอบ (Hook Archetype)" ที่ส่งให้ในคำสั่งรอบนั้น และผูกกับจุดเด่นเฉพาะตัวของสินค้าชิ้นนั้นเสมอ
 - **กฎเหล็กอินเนอร์เสียงพูด (Vocal Inner & Emotion Engine — ห้ามเสียงเรียบเหมือนหุ่นยนต์/TTS):**
   ในบทพูดและการกำกับเสียงพูดภาษาอังกฤษ (Audio Block) ห้ามใช้คำสั่งเสียงเรียบๆ แบบ "speaking warmly" หรือ "calm narrator" เด็ดขาด! ต้องใส่อินเนอร์เสียงให้ตรงกับแนวคลิป:
   * ถ้าเป็นแนวที่ 13–16 (โกดัง/ตลาด/ห้าง/แพ็กของ): น้ำเสียงเร่งจังหวะ ตื่นเต้น กระตือรือร้น มีเน้นเสียงสูงต่ำจริงจังแบบพ่อค้าแม่ค้าไลฟ์สดปล่อยโปร (High-energy live-seller urgency & deal excitement)
@@ -2360,8 +2402,12 @@
           : `แนวความต้องการ: ${selectedChipStyle}`);
 
       const randomAngle = pickRandomScenarioSeed();
+      const hookArchetype = pickNextHookArchetype(`${customStyle} ${selectedChipStyle}`);
+      const safePlanHookHint = activePlanAngle
+        ? String(activePlanAngle.hook || '').replace(/\.{0,3}\s*จะรอดหรือร่วง\s*(?:มาดู)?\s*[?!]*/g, ' พิสูจน์ให้ดูสดๆ!')
+        : '';
       const planAngleInstruction = activePlanAngle
-        ? `\n🎯 มุมลูกค้าที่ตารางรายเดือนกำหนดไว้ (ต้องยึดมุมนี้เป็นหลักทั้งบทพูด ฮุค ช็อตเปิด และ Video Prompt — ห้ามเปลี่ยนไปมุมอื่น): ${activePlanAngle.code} ${activePlanAngle.label} | ลูกค้า: ${activePlanAngle.persona} | พฤติกรรมการซื้อ: ${activePlanAngle.behavior} | สิ่งที่ลูกค้ากลัวและต้องพิสูจน์ให้เห็นในคลิป: ${activePlanAngle.objection} | ช็อตเปิด 2 วินาทีแรก: ${activePlanAngle.visual} | ฮุคตั้งต้น (ปรับคำให้ลื่นได้แต่คงความหมาย): "${activePlanAngle.hook}"`
+        ? `\n🎯 มุมลูกค้าที่ตารางรายเดือนกำหนดไว้ (ต้องยึดมุมนี้เป็นหลักทั้งบทพูด ฮุค ช็อตเปิด และ Video Prompt — ห้ามเปลี่ยนไปมุมอื่น): ${activePlanAngle.code} ${activePlanAngle.label} | ลูกค้า: ${activePlanAngle.persona} | พฤติกรรมการซื้อ: ${activePlanAngle.behavior} | สิ่งที่ลูกค้ากลัวและต้องพิสูจน์ให้เห็นในคลิป: ${activePlanAngle.objection} | ช็อตเปิด 2 วินาทีแรก: ${activePlanAngle.visual} | แนวทางประโยคเปิด (ห้ามก๊อปคำซ้ำตรงตัว และห้ามใช้คำว่า "จะรอดหรือร่วง" ให้แต่งประโยคเปิดใหม่ให้สดเข้ากับสูตรฮุคประจำรอบ): "${safePlanHookHint}"`
         : '';
 
       let livelyInstruction = '';
@@ -2386,7 +2432,7 @@
       });
 
       userPromptParts.push({
-        text: `กรุณาวิเคราะห์ข้อมูลจากภาพสินค้าที่แนบมานี้ ${infoText ? `(ข้อมูลเพิ่มเติมจากผู้ใช้: ${infoText})` : ''}\n${styleInstruction}\n${livelyInstruction}${planAngleInstruction}\nจำกฎเหล็ก:\n0) ต้องถอดข้อความชื่อสินค้าทั้งหมดที่ปรากฏในรูปภาพแบบคำต่อคำครบทุกตัวอักษรใส่ใน exact_product_name_from_image (ส่วนในบทพูด ปก แคปชั่น ตะกร้า ห้ามมีคำว่า ปวดหลัง/แก้ปวดหลัง/ไม่ปวดหลัง/ภูมิแพ้/ฆ่าเชื้อ/99.9%/100% เด็ดขาด)\n1) ห้ามเปิดบทพูดด้วยคำว่า "เบื่อไหม...", "ใครเคย...", "ทุกคน วันนี้..." ให้เปิดใน 1.5 วิแรกด้วยสูตรท้าพิสูจน์ "จะรอดหรือร่วง!" / บุกโกดังปล่อยโปร / โชว์ช็อตปะทะจริงทันที และต้องใส่อินเนอร์เสียงพูดภาษาอังกฤษแบบเร้าใจมีชีวิตชีวาใน Video Prompt (ห้ามใช้คำว่า speaking warmly)\n2) คุม Lip-Sync vs Hands-Only: ถ้าเห็นหน้าคนต้องระบุให้ปากขยับพูดภาษาไทยเป๊ะตามบท (accurate Thai lip-sync, never silent smiling face); ถ้าใช้เสียงบรรยายนอกจอให้ถ่ายเฉพาะมือกับสินค้า (hands-only below-chin framing)\n3) ห้ามพูดคำว่า "ราคาหลักสิบ" ให้ปัดเป็นเพดานราคาปลอดภัย (เช่น 79 บาท -> "งบไม่ถึงร้อย / แบงก์ร้อยมีทอน", 2XX บาท -> "สามร้อยมีทอน") และถ้าพูด % ส่วนลด ต้องปัดลงให้ต่ำกว่าในภาพและลงท้ายด้วย 0 หรือ 5 เท่านั้น (เช่น 78% -> 75%)\n4) ห้ามมีข้อความขึ้นในคลิปและใน Storyboard และต้องใส่ "no background music" ใน Negatives ของ Gemini Omni Video Prompt (ฟิลด์ kling_master_prompt) พร้อมใส่บล็อก [Living Background & Natural Life Detail] และห้ามใช้ไวยากรณ์ Kling อย่าง <<<image_1>>> หรือ ++\n5) ชุดแฮชแท็กต้องมี 5 แบบ แบบละ 5 แฮชแท็กเป๊ะๆ`
+        text: `กรุณาวิเคราะห์ข้อมูลจากภาพสินค้าที่แนบมานี้ ${infoText ? `(ข้อมูลเพิ่มเติมจากผู้ใช้: ${infoText})` : ''}\n${styleInstruction}\n${livelyInstruction}${planAngleInstruction}\nจำกฎเหล็ก:\n0) ต้องถอดข้อความชื่อสินค้าทั้งหมดที่ปรากฏในรูปภาพแบบคำต่อคำครบทุกตัวอักษรใส่ใน exact_product_name_from_image (ส่วนในบทพูด ปก แคปชั่น ตะกร้า ห้ามมีคำว่า ปวดหลัง/แก้ปวดหลัง/ไม่ปวดหลัง/ภูมิแพ้/ฆ่าเชื้อ/99.9%/100% เด็ดขาด)\n1) ห้ามเปิดบทพูดด้วยคำว่า "เบื่อไหม...", "ใครเคย...", "ทุกคน วันนี้..." และห้ามพูดคำว่า "จะรอดหรือร่วง" เด็ดขาด! รอบนี้ต้องเปิดใน 1.5 วิแรกตามสูตรฮุคประจำรอบคือ -> ${hookArchetype} <- และต้องใส่อินเนอร์เสียงพูดภาษาอังกฤษแบบเร้าใจมีชีวิตชีวาใน Video Prompt (ห้ามใช้คำว่า speaking warmly)\n2) คุม Lip-Sync vs Hands-Only: ถ้าเห็นหน้าคนต้องระบุให้ปากขยับพูดภาษาไทยเป๊ะตามบท (accurate Thai lip-sync, never silent smiling face); ถ้าใช้เสียงบรรยายนอกจอให้ถ่ายเฉพาะมือกับสินค้า (hands-only below-chin framing)\n3) ห้ามพูดคำว่า "ราคาหลักสิบ" ให้ปัดเป็นเพดานราคาปลอดภัย (เช่น 79 บาท -> "งบไม่ถึงร้อย / แบงก์ร้อยมีทอน", 2XX บาท -> "สามร้อยมีทอน") และถ้าพูด % ส่วนลด ต้องปัดลงให้ต่ำกว่าในภาพและลงท้ายด้วย 0 หรือ 5 เท่านั้น (เช่น 78% -> 75%)\n4) ห้ามมีข้อความขึ้นในคลิปและใน Storyboard และต้องใส่ "no background music" ใน Negatives ของ Gemini Omni Video Prompt (ฟิลด์ kling_master_prompt) พร้อมใส่บล็อก [Living Background & Natural Life Detail] และห้ามใช้ไวยากรณ์ Kling อย่าง <<<image_1>>> หรือ ++\n5) ชุดแฮชแท็กต้องมี 5 แบบ แบบละ 5 แฮชแท็กเป๊ะๆ`
       });
 
       const modelsToTry = getModelQueue();
@@ -2498,11 +2544,12 @@
       if (/3\.|4\.|7\.|10\.|Hands-Only|POV|Macro|Hidden Feature|Aesthetic/i.test(s)) {
         return 'Crisp, upbeat, close-mic Thai creator voiceover with lively pacing, curious hook energy, and tactile enthusiasm (no background music, clean voice + real foley only)';
       }
-      return 'Expressive, curious, high-conviction Thai creator voice opening with a playful "will it pass or fail?" challenge hook, lively pitch inflection, and genuine impressed "wow!" energy on the reveal (NEVER flat or monotone)';
+      return 'Expressive, curious, high-conviction Thai creator voice opening with an immediate scroll-stopping hook, lively pitch inflection, and genuine impressed "wow!" energy on the reveal (NEVER flat or monotone)';
     }
 
     function ensureVoiceAndNoTextInKlingPrompt(klingPrompt, cleanScript, styleText = '') {
-      let kp = String(klingPrompt || '').trim();
+      let kp = String(klingPrompt || '').trim()
+        .replace(/\.{0,3}\s*จะรอดหรือร่วง\s*(?:มาดู)?\s*[?!]*/g, ' ของจริงตรงปกแค่ไหนดู!');
       const voiceDirection = buildVoiceActingDirection(styleText);
       const isHandsOnlyPov = /(?:^|\b)(?:3\.|4\.|Hands-Only|POV Experience)\b/i.test(String(styleText || ''))
         || /hands-only|hands only|below-chin|no face visible/i.test(kp);
@@ -2855,7 +2902,7 @@
           { "label": "ราคาในภาพ ➡️ คำพูดราคาแบบเซฟ", "value": "ในภาพ 79 บาท (ลด 78%) ➡️ เซฟเป็น 'งบไม่ถึงร้อย / แบงก์ร้อยมีทอน' และ 'ลดหนัก 75%' (ห้ามพูดคำว่าหลักสิบ)" },
           { "label": "แนวคลิปที่ใช้ (จาก 12 แนว)", "value": "แนวที่ 1: Real-Use Demo (ใช้งานจริงให้เห็นผลชัด)" }
         ],
-        "voiceover_10s": "งบไม่ถึงร้อยได้พรมครัวหมากรุกยกเซ็ตสองผืน...จะรอดหรือร่วง มาดู! ได้ทั้งผืนยาวผืนสั้น ซับน้ำไว ฐานหนึบขนาดแมววิ่งเล่นยังไม่ขยับ ตอนนี้ลดหนัก 75% แบงก์ร้อยมีทอน กดตะกร้าเหลืองซ้ายล่างได้เลย!",
+        "voiceover_10s": "งบไม่ถึงร้อยได้พรมครัวหมากรุกยกเซ็ตสองผืน เทน้ำสาดให้ดูสดๆ ซับไวแค่ไหนมาดู! ได้ทั้งผืนยาวผืนสั้น ฐานหนึบขนาดแมววิ่งเล่นยังไม่ขยับ ตอนนี้ลดหนัก 75% แบงก์ร้อยมีทอน กดตะกร้าเหลืองซ้ายล่างได้เลย!",
         "storyboard": [
           { "time": "0–2 วินาที (Hook / Visual Strike)", "camera_lens": "MS · 35mm · High +20° · Slow Push-in", "lighting": "Shallow Raking Side Light ส่องเฉียงเน้นตารางหมากรุก", "visual": "Start: พื้นกระเบื้องหน้าซิงก์ ➡️ Action: เท้าเปล่าก้าวเหยียบลงบนพรมลายหมากรุกผืนยาว พร้อมลูกบอลเล็กกลิ้งผ่านและน้องแมวเดินผ่านขอบพรมอย่างเป็นธรรมชาติ ➡️ End State: พรมยึดเกาะพื้นแน่นไม่ขยับ Hold 0.5s" },
           { "time": "2–4 วินาที (Scale & Setup Proof)", "camera_lens": "WS · 35mm · Low Angle · Lateral Tracking Glide", "lighting": "Natural Window Daylight + Soft Warm Fill", "visual": "Start: มุมเคาน์เตอร์ครัว ➡️ Action: กล้องแพนตามแนวยาวโชว์พรมทั้ง 2 ชิ้น (ผืนยาว 120×40 + ผืนสั้น 60×40 ซม.) โดยมีน้องแมวนั่งมองอยู่ด้านข้างแบบละลายฉากหลัง ➡️ End State: เห็นพรมสองผืนวางเข้าชุดกัน" },
@@ -2863,7 +2910,7 @@
           { "time": "6–8 วินาที (Grip & Backing Test)", "camera_lens": "CU · 50mm · Low 25cm off floor · Locked Camera", "lighting": "Controlled Key + Floor Bounce", "visual": "Start: มือจับมุมพรม ➡️ Action: เปิดมุมพรมด้านหลังขึ้นโชว์ปุ่มยางกันลื่นแล้ววางทาบลงพื้น ➡️ End State: มือดันทดสอบความหนึบ พรมนิ่งสนิท" },
           { "time": "8–10 วินาที (Hero Packshot Hold)", "camera_lens": "WS · 35mm · Eye-level +15° · Gentle Pull-back", "lighting": "Balanced Commercial Daylight", "visual": "Start: มุมกลางครัว ➡️ Action: กล้องถอยออกช้าๆ เห็นห้องครัวมินิมอลอบอุ่นมีชีวิตชีวา ➡️ End State: พรมทั้ง 2 ผืนวางเด่นชัด Hold 0.5s" }
         ],
-        "kling_master_prompt": "[Format]: Photorealistic vertical 9:16 TikTok product video, 10 seconds. Single continuous shot, no scene cuts.\n\n[Product Lock]: The product in the attached photo: black and white checkerboard kitchen mat 2-piece set, consisting of one long rectangular runner mat (120x40 cm, 3:1 proportion) and one matching shorter rectangular mat (60x40 cm, 3:2 proportion), crisp woven polyester fabric texture with sharp black-and-white checker grid.\n\n[Blocking: Start -> Action -> End State & Framing]: Below-chin / hands-and-feet-only framing (no silent face on screen): starts with the two mats laid neatly in front of the kitchen counter and sink -> bare feet step onto the long runner mat while a single adult hand presses the woven surface and lifts one corner slightly to prove non-slip grip -> ends in a stable 0.5s hold with both mats flat and unwarped on the floor.\n\n[Living Background & Natural Life Detail]: A cute ginger house cat playfully trots past the edge of the kitchen mat chasing a small rolling toy ball in the background, naturally proving that the non-slip mat stays completely flat and anchored on the tile floor without sliding, while keeping the full checkerboard pattern clearly visible.\n\n[Scene & Material Lighting (DirectorSKILL)]: Clean minimalist home kitchen, warm oak cabinets, bright white floor tiles; Shallow Raking Side Light from a camera-left window casting subtle micro-shadows across the woven polyester fibers so texture reads clearly without glare.\n\n[Spatial & Aspect]: Vertical 9:16 composition, safe margins top 12% and bottom 20% clear; foreground shows tactile mat surface, midground shows the 2-piece set alignment.\n\n[Camera & Lens (video-shotcraft)]: 35mm spherical lens, one smooth high-angle push-in transitioning into a stable hold, zero handheld shake, focus plane locked on the front checkerboard weave.\n\n[Audio & Real-Sound Foley (earshot)]: Soft tactile fabric brush foley, subtle rolling ball and firm rubber-grip floor contact sound (no background music, no game-like synth SFX) + Expressive, curious, high-conviction Thai female creator voiceover opening with a playful challenge hook and excited reveal energy (10s): \"งบไม่ถึงร้อยได้พรมครัวหมากรุกยกเซ็ตสองผืน...จะรอดหรือร่วง มาดู! ได้ทั้งผืนยาวผืนสั้น ซับน้ำไว ฐานหนึบขนาดแมววิ่งเล่นยังไม่ขยับ ตอนนี้ลดหนัก 75% แบงก์ร้อยมีทอน กดตะกร้าเหลืองซ้ายล่างได้เลย!\"\n\n[Instance-Level Negatives (DirectorSKILL)]: No text, no on-screen text, no captions, no subtitles, no Thai characters on screen, no logos, no watermarks, no background music, no lighting rig reflected, no distorted checkerboard lines, no warped grid pattern, no deformed hands, no extra fingers, no duplicate extra mats.",
+        "kling_master_prompt": "[Format]: Photorealistic vertical 9:16 TikTok product video, 10 seconds. Single continuous shot, no scene cuts.\n\n[Product Lock]: The product in the attached photo: black and white checkerboard kitchen mat 2-piece set, consisting of one long rectangular runner mat (120x40 cm, 3:1 proportion) and one matching shorter rectangular mat (60x40 cm, 3:2 proportion), crisp woven polyester fabric texture with sharp black-and-white checker grid.\n\n[Blocking: Start -> Action -> End State & Framing]: Below-chin / hands-and-feet-only framing (no silent face on screen): starts with the two mats laid neatly in front of the kitchen counter and sink -> bare feet step onto the long runner mat while a single adult hand presses the woven surface and lifts one corner slightly to prove non-slip grip -> ends in a stable 0.5s hold with both mats flat and unwarped on the floor.\n\n[Living Background & Natural Life Detail]: A cute ginger house cat playfully trots past the edge of the kitchen mat chasing a small rolling toy ball in the background, naturally proving that the non-slip mat stays completely flat and anchored on the tile floor without sliding, while keeping the full checkerboard pattern clearly visible.\n\n[Scene & Material Lighting (DirectorSKILL)]: Clean minimalist home kitchen, warm oak cabinets, bright white floor tiles; Shallow Raking Side Light from a camera-left window casting subtle micro-shadows across the woven polyester fibers so texture reads clearly without glare.\n\n[Spatial & Aspect]: Vertical 9:16 composition, safe margins top 12% and bottom 20% clear; foreground shows tactile mat surface, midground shows the 2-piece set alignment.\n\n[Camera & Lens (video-shotcraft)]: 35mm spherical lens, one smooth high-angle push-in transitioning into a stable hold, zero handheld shake, focus plane locked on the front checkerboard weave.\n\n[Audio & Real-Sound Foley (earshot)]: Soft tactile fabric brush foley, subtle rolling ball and firm rubber-grip floor contact sound (no background music, no game-like synth SFX) + Expressive, curious, high-conviction Thai female creator voiceover opening with a playful challenge hook and excited reveal energy (10s): \"งบไม่ถึงร้อยได้พรมครัวหมากรุกยกเซ็ตสองผืน เทน้ำสาดให้ดูสดๆ ซับไวแค่ไหนมาดู! ได้ทั้งผืนยาวผืนสั้น ฐานหนึบขนาดแมววิ่งเล่นยังไม่ขยับ ตอนนี้ลดหนัก 75% แบงก์ร้อยมีทอน กดตะกร้าเหลืองซ้ายล่างได้เลย!\"\n\n[Instance-Level Negatives (DirectorSKILL)]: No text, no on-screen text, no captions, no subtitles, no Thai characters on screen, no logos, no watermarks, no background music, no lighting rig reflected, no distorted checkerboard lines, no warped grid pattern, no deformed hands, no extra fingers, no duplicate extra mats.",
         "keyframe_image_prompt": "Photorealistic vertical 9:16 start-frame photo for a TikTok product video. Use the attached product photo(s) as the exact product reference: a black-and-white checkerboard kitchen mat set, one long runner (120x40 cm, 3:1 proportion) and one short mat (60x40 cm, 3:2 proportion), identical checker size, colors and borderless edges. Scene: clean minimalist home kitchen, warm oak cabinets, white floor tiles; the long runner lies flat in front of the sink, the short mat in front of the counter. Moment: a bare adult foot is about to step onto the long runner, captured just before contact. Camera: MS, 35mm lens, high angle +20 degrees, product in sharp focus. Lighting: shallow raking side daylight from a camera-left window, subtle micro-shadows revealing the woven polyester texture, no glare. Composition: keep the top 12% and bottom 20% free of key elements. Negatives: no text, no captions, no logos, no watermarks, no extra mats, no warped checker grid, natural feet and hands.",
         "end_frame_image_prompt": "Photorealistic vertical 9:16 end-frame photo, the final held moment of the same video. Same minimalist kitchen with warm oak cabinets and white floor tiles, same camera-left window daylight, and the exact same black-and-white checkerboard mat set as the start frame. Moment: wide eye-level hero shot, the long runner perfectly flat in front of the sink and the short mat in front of the counter, both centered and fully visible, the kitchen calm and tidy. Camera: WS, 35mm lens, eye level +15 degrees, locked. Composition: keep the top 12% and bottom 20% free of key elements. Negatives: no text, no captions, no logos, no watermarks, no extra mats, no warped checker grid.",
         "storyboard_grid_prompt": "Single storyboard sheet with 5 photorealistic panels: top row 3 panels, bottom row 2 panels, each panel vertical 9:16, separated by thin white gutters. Use the attached product photo(s) as the exact product reference: black-and-white checkerboard kitchen mat set (120x40 cm runner + 60x40 cm mat). Same minimalist oak-and-white-tile kitchen and the same camera-left window daylight in every panel.\nPanel 1: high-angle medium shot, a bare foot stepping firmly onto the long runner in front of the sink, the mat staying flat.\nPanel 2: low-angle wide shot along the counter showing both mats laid out together as a matching set.\nPanel 3: extreme macro, an adult hand pressing the woven polyester checker surface, hard raking side light revealing fibers.\nPanel 4: close-up near the floor, a hand lifting one corner to reveal the non-slip rubber dots on the back.\nPanel 5: wide eye-level hero shot of the clean kitchen with both mats perfectly flat and centered.\nNo text, no numbers, no captions, no logos, no watermarks anywhere in the image.",

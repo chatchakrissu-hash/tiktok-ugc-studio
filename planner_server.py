@@ -1637,15 +1637,16 @@ _FORBIDDEN_CLAIM_REPLACEMENTS: list[tuple[str, str]] = [
     ("Lazada", "TikTok Shop"),
 ]
 _THAI_HUNDREDS = {1: "ร้อย", 2: "สองร้อย", 3: "สามร้อย", 4: "สี่ร้อย", 5: "ห้าร้อย", 6: "หกร้อย", 7: "เจ็ดร้อย", 8: "แปดร้อย", 9: "เก้าร้อย", 10: "พัน"}
-# Dead openers that made recent clips flop (vague questions instead of a visual/price/challenge statement)
-_WEAK_HOOK_RE = re.compile(r"^\s*(?:เบื่อไหม|ใครเคย|ใครที่|บ้านไหน|สวัสดี|วันนี้มารีวิว|วันนี้จะมารีวิว|อยากให้|หา.{0,30}อยู่)|ใช่ไหม\s*[?!]*\s*$")
+# Dead openers or overused clichés that made recent clips sound repetitive
+_WEAK_HOOK_RE = re.compile(r"^\s*(?:เบื่อไหม|ใครเคย|ใครที่|บ้านไหน|สวัสดี|วันนี้มารีวิว|วันนี้จะมารีวิว|อยากให้|หา.{0,30}อยู่)|ใช่ไหม\s*[?!]*\s*$|จะรอดหรือร่วง")
 
 
 def sanitize_marketing_text(text: Any, limit: int = 220) -> str:
-    """Strip TikTok Shop TH forbidden claims (medical/pain/germ/100%) and competitor apps from AI marketing copy."""
+    """Strip TikTok Shop TH forbidden claims (medical/pain/germ/100%), cliché phrases, and competitor apps from AI marketing copy."""
     s = normalize_thai_text(str(text or ""))
     for bad, good in _FORBIDDEN_CLAIM_REPLACEMENTS:
         s = s.replace(bad, good)
+    s = re.sub(r"\.{0,3}\s*จะรอดหรือร่วง\s*(?:มาดู)?\s*[?!]*", " พิสูจน์ของจริงสดๆ!", s)
     s = re.sub(r"(?:ราคาแค่|ราคา|แค่|งบ)?หลักสิบ(?:บาท)?", "งบไม่ถึงร้อย", s)
     s = re.sub(r"99\.9\s*%|100\s*%", "", s)
     s = re.sub(r"\s+", " ", s).strip()
@@ -1715,6 +1716,27 @@ def heuristic_product_angles(prod: dict[str, Any]) -> dict[str, Any]:
     """Deterministic fallback angles (used when AI is off/unavailable). Never gates a product (score 3)."""
     short = short_product_label(prod.get("name"))
     cushion = price_cushion_phrase(prod.get("price"))
+    seed = sum(ord(ch) for ch in (str(prod.get("sku") or "") + short))
+    a1_hooks = [
+        f"พิสูจน์{short}ของจริงคาตา! {cushion}ตรงปกแค่ไหนดู!",
+        f"แกะเช็กเนื้อจริง! {short} {cushion} งานจริงเป็นยังไงมาดู!",
+        f"เทสต์{short}ให้ดูสดๆ ไม่ตัดต่อ! {cushion}คุ้มจริงไหมดูเอง!",
+        f"ซูมดูความหนา{short}ชัดๆ! {cushion}ได้งานระดับนี้เลย!",
+        f"ลองกดลองดึง{short}หน้ากล้องสดๆ! {cushion}เอาอยู่ไหมดู!",
+        f"ของจริงมาแล้ว! เช็กสเปก{short} {cushion} ให้เห็นกันจะๆ!",
+    ]
+    a2_hooks = [
+        f"บุกคลังตัดสต็อก! {short} {cushion}",
+        f"ยกเซ็ตหน้าคลัง! {short} {cushion} คุ้มกว่าที่คิด",
+        f"รอบนี้ปล่อยราคาโรงงาน! {short} {cushion} ดูขนาดจริง!",
+        f"งบเท่านี้ได้ครบขนาดนี้เลย! {short} {cushion} เช็กในตะกร้า!",
+    ]
+    a3_hooks = [
+        f"ปัญหาเดิมทุกวันจบได้ด้วย{short} ดูนี่!",
+        f"เปลี่ยนมุมบ้านให้จบในชิ้นเดียว! ลองวาง{short}ให้ดูสดๆ!",
+        f"ของใช้ติดบ้านที่หยิบใช้ทุกวัน! ดูจังหวะใช้งาน{short}จริง!",
+        f"เทียบบ้านก่อนใช้กับหลังวาง{short} ความต่างเห็นชัดทันที!",
+    ]
     angles = [
         {
             "code": "A1",
@@ -1722,9 +1744,9 @@ def heuristic_product_angles(prod: dict[str, Any]) -> dict[str, Any]:
             "persona": "คนที่เคยโดนของไม่ตรงปก ต้องเห็นการทดสอบจริงก่อนถึงจะยอมกดตะกร้า",
             "buying_behavior": "ปัดทิ้งทันทีถ้าเปิดมาด้วยคำชม เชื่อภาพทดสอบหนักๆ คาตามากกว่าคำพูด และชอบอ่านคอมเมนต์ก่อนซื้อ",
             "objection": f"กลัวว่า{short}ของจริงจะไม่ตรงปก คุณภาพไม่ถึง",
-            "hook_th": f"{cushion}ได้{short}...จะรอดหรือร่วง มาดู!",
+            "hook_th": a1_hooks[seed % len(a1_hooks)],
             "visual_proof": "เปิดเฟรมแรกด้วยการทดสอบที่หนักที่สุดของสินค้า (เท/กด/ดึง/ใช้งานจริง) ให้เห็นผลภายใน 2 วินาที",
-            "trigger_words": ["รอดไหม", "ของจริง", "ไม่จกตา"],
+            "trigger_words": ["พิสูจน์สด", "ของจริง", "ตรงปก"],
             "style_nums": [3, 9, 1],
             "hardsell_style": 16,
         },
@@ -1734,7 +1756,7 @@ def heuristic_product_angles(prod: dict[str, Any]) -> dict[str, Any]:
             "persona": "คนชอบของคุ้ม ไม่ได้ตั้งใจหาซื้อแต่แพ้ความคุ้มค่าและภาพสต็อกแน่นๆ",
             "buying_behavior": "ตัดสินใจเร็วเมื่อเห็นจำนวนชิ้นหรือความคุ้มชัดๆ แพ้คำว่าตัดสต็อก ราคาโรงงาน และกดตะกร้าทันทีถ้ารู้สึกคุ้ม",
             "objection": "กลัวซื้อแพงกว่าที่อื่น หรือได้ของน้อยกว่าที่คิด",
-            "hook_th": f"บุกคลังตัดสต็อก! {short} {cushion}",
+            "hook_th": a2_hooks[seed % len(a2_hooks)],
             "visual_proof": "โชว์ปริมาณหรือจำนวนชิ้นจริงเต็มเฟรม เทียบขนาดกับมือหรือของรอบตัว ให้เห็นความคุ้มทันที",
             "trigger_words": ["ตัดสต็อก", "ราคาโรงงาน", "คุ้ม"],
             "style_nums": [5, 11, 8],
@@ -1746,7 +1768,7 @@ def heuristic_product_angles(prod: dict[str, Any]) -> dict[str, Any]:
             "persona": "คนที่รำคาญปัญหาเดิมในชีวิตประจำวัน อยากได้ตัวช่วยที่จบปัญหาได้จริงในบ้านตัวเอง",
             "buying_behavior": "หยุดดูเมื่อเห็นปัญหาที่ตัวเองเจออยู่ทุกวัน เชื่อคนใช้จริงในบ้านจริง และซื้อเมื่อเห็นก่อน-หลังชัดเจน",
             "objection": "ไม่แน่ใจว่าจะช่วยแก้ปัญหาในบ้านตัวเองได้จริง หรือใช้ยุ่งยาก",
-            "hook_th": f"ปัญหาเดิมทุกวันจบได้ด้วย{short} ดูนี่!",
+            "hook_th": a3_hooks[seed % len(a3_hooks)],
             "visual_proof": "เปิดด้วยภาพปัญหาจริงในบ้าน แล้วตัดเห็นผลหลังใช้สินค้าภายในไม่กี่วินาที",
             "trigger_words": ["จบปัญหา", "ใช้ง่าย", "ในบ้าน"],
             "style_nums": [2, 1, 6],
@@ -1796,8 +1818,9 @@ def _validate_angle_entry(raw: Any, prod: dict[str, Any]) -> dict[str, Any] | No
         if hs not in HARDSELL_STYLE_NUMS:
             hs = fb["hardsell_style"]
         triggers = [sanitize_marketing_text(t, 28) for t in (a.get("trigger_words") or []) if str(t).strip()][:4]
-        hook = sanitize_marketing_text(a.get("hook_th") or "", 140)
-        if not hook or _WEAK_HOOK_RE.search(hook):
+        raw_hook_text = normalize_thai_text(str(a.get("hook_th") or ""))
+        hook = sanitize_marketing_text(raw_hook_text, 140)
+        if not hook or _WEAK_HOOK_RE.search(raw_hook_text) or _WEAK_HOOK_RE.search(hook):
             hook = fb["hook_th"]
         out_angles.append({
             "code": code,
@@ -1845,9 +1868,10 @@ def _build_angle_prompt(compact_products: list[dict[str, Any]]) -> str:
         "ให้ใช้เพดานราคา (งบไม่ถึงร้อย / สองร้อยมีทอน / สามร้อยมีทอน), ห้ามพูดถึงแอปอื่น\n"
         "กฎฮุค (สำคัญมาก): hook_th ต้องเป็นประโยคบอกเล่า/ท้าทาย/ช็อตราคาที่เห็นภาพทันที ห้ามเป็นคำถามลอยๆ ลงท้าย 'ใช่ไหม' "
         "และห้ามขึ้นต้นด้วย 'บ้านไหน...', 'ใครที่...', 'หา...อยู่', 'อยากให้...' "
-        "A1 ต้องเป็นมุม 'ท้าพิสูจน์ของจริง จะรอดหรือร่วง' เสมอ (สูตรที่ช่องนี้เคยทำได้ 500K วิว) "
-        "ตัวอย่างฮุคที่ขายได้จริงในช่องนี้: 'งบไม่ถึงร้อยได้ 2 ผืน...จะรอดหรือร่วง มาดู!', 'บุกคลังตัดสต็อก! ยกเซ็ตนี้แบงก์ร้อยมีทอน', "
-        "'เทน้ำใส่ให้ดูสดๆ ซับไวแค่ไหนดูเอง!', 'กดลงไปสุดมือ...ดูมันเด้งกลับ!'\n"
+        "A1 ต้องเป็นมุม 'พิสูจน์ของจริงด้วยตาตั้งแต่วินาทีแรก (Visual Stress-Test / เช็กงานจริงตรงปก)' เสมอ "
+        "แต่ห้ามใช้วลีซ้ำซากอย่าง 'จะรอดหรือร่วง' เด็ดขาด! ให้คิด hook_th แยกตามวิธีทดสอบจริงของสินค้าแต่ละชิ้นให้ไม่ซ้ำแพตเทิร์นกัน "
+        "ตัวอย่างฮุคที่หลากหลายและขายได้จริง: 'เทน้ำสาดให้ดูสดๆ ซับไวแค่ไหนดูเอง!', 'บุกคลังตัดสต็อก! ยกเซ็ตนี้แบงก์ร้อยมีทอน', "
+        "'กดลงไปสุดมือ...ดูความเด้งคืนตัวชัดๆ!', 'แกะเทียบขนาดจริงคาตา สองร้อยมีทอนได้ไซส์นี้เลย!'\n"
         "ตอบเป็น JSON เท่านั้น: {\"products\":[{\"key\":\"...\",\"visual_proof_score\":4,\"visual_proof_note\":\"...\","
         "\"core_objection\":\"...\",\"angles\":[{...A1...},{...A2...},{...A3...}]}]}\n"
         f"สินค้า ({len(compact_products)} รายการ): {json.dumps(compact_products, ensure_ascii=False)}"
